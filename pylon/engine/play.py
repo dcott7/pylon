@@ -2,7 +2,7 @@ from enum import auto, Enum
 import logging
 from typing import List
 
-from .athlete import Athlete, AthletePositionEnum
+from ..entities.athlete import Athlete, AthletePositionEnum
 from .event import Event
 from .situation import Situation
 

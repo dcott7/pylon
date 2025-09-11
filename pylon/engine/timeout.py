@@ -1,7 +1,7 @@
 import logging
 from typing import Dict
 
-from .team import Team
+from ..entities.team import Team
 
 
 logger = logging.getLogger(__name__)
