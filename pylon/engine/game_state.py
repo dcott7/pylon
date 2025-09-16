@@ -3,7 +3,7 @@ import logging
 
 from .clock import GameClock
 from .score import ScoreboardManager
-from ..entities.team import Team
+from ..model.game.team import Team
 from .timeout import TimeoutManager
 
 

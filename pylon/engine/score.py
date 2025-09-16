@@ -1,7 +1,7 @@
 import logging
 from typing import Dict
 
-from ..entities.team import Team
+from ..model.game.team import Team
 
 
 logger = logging.getLogger(__name__)

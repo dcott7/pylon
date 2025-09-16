@@ -2,7 +2,7 @@ from enum import auto, Enum
 import logging
 from typing import List
 
-from ..entities.athlete import Athlete
+from ..model.game.athlete import Athlete
 
 
 logger = logging.getLogger(__name__)

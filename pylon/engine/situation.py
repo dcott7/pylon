@@ -1,7 +1,7 @@
 import logging
 
 from .score import ScoreboardManager
-from ..entities.team import Team
+from ..model.game.team import Team
 from .clock import GameClock
 
 

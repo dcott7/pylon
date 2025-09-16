@@ -7,7 +7,7 @@ import joblib
 import pandas as pd
 
 from pylon.engine.plugins.base import GamePluginModel
-from pylon.engine.play import PlayType
+from pylon.model.game.play import PlayType
 
 class PlayTypeModel(GamePluginModel):
     @abstractmethod

@@ -2,8 +2,8 @@ import csv
 from typing import Dict, List
 from pathlib import Path
 
-from pylon.entities.team import Team
-from pylon.entities.athlete import Athlete, AthletePositionEnum
+from pylon.model.game.team import Team
+from pylon.model.game.athlete import Athlete, AthletePositionEnum
 
 
 TEAM_FILE = Path("./data/teams.csv")

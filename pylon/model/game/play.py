@@ -2,9 +2,9 @@ from enum import auto, Enum
 import logging
 from typing import List
 
-from ..entities.athlete import Athlete, AthletePositionEnum
-from .event import Event
-from .situation import Situation
+from .team import Athlete, AthletePositionEnum
+from ...engine.event import Event
+from ...engine.situation import Situation
 
 
 logger = logging.getLogger(__name__)

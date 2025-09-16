@@ -1,9 +1,8 @@
 from enum import auto, Enum
 import logging
 from typing import Dict, List, Optional
-import uuid
 
-from .athlete import Athlete, AthletePositionEnum
+from .team import Athlete, AthletePositionEnum
 
 
 logger = logging.getLogger(__name__)
