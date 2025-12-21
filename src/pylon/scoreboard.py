@@ -1,0 +1,87 @@
+import logging
+from typing import Dict, Optional
+
+from .entities.team import Team
+
+
+logger = logging.getLogger(__name__)
+
+
+class Scoreboard:
+    """
+    Tracks the score of a football game.
+
+    This is a passive, SimPy-friendly state container. It does not
+    manage time; scores are updated by external play/outcome events.
+
+    Attributes:
+        _scores (Dict[str, int]): Mapping from team UID to current score.
+    """
+
+    def __init__(self, home_team: Team, away_team: Team) -> None:
+        self._home_team = home_team
+        self._away_team = away_team
+        self._scores: Dict[str, int] = {home_team.uid: 0, away_team.uid: 0}
+
+    def _validate_team(self, team: Team) -> None:
+        if team.uid not in self._scores:
+            raise ValueError(f"Team {team.name} is not part of this game")
+
+    def add_points(
+        self, team: Team, points: int, description: str = ""
+    ) -> None:
+        """Add points to a team's score, optionally with a description for logging."""
+        self._validate_team(team)
+        old_score = self._scores[team.uid]
+        self._scores[team.uid] += points
+        if description:
+            logger.info(
+                f"{team.name} {description}: {old_score} -> {self._scores[team.uid]}"
+            )
+        else:
+            logger.info(
+                f"{team.name} score updated: {old_score} -> {self._scores[team.uid]}"
+            )
+
+    # Convenience scoring methods
+    def touchdown(self, team: Team) -> None:
+        self.add_points(team, 6, "touchdown")
+
+    def field_goal(self, team: Team) -> None:
+        self.add_points(team, 3, "field goal")
+
+    def extra_point(self, team: Team) -> None:
+        self.add_points(team, 1, "extra point")
+
+    def two_point_conversion(self, team: Team) -> None:
+        self.add_points(team, 2, "two-point conversion")
+
+    def safety(self, team: Team) -> None:
+        self.add_points(team, 2, "safety")
+
+    # Query methods
+    def current_score(self, team: Team) -> int:
+        self._validate_team(team)
+        return self._scores[team.uid]
+
+    def score(self) -> Dict[str, int]:
+        """Return a snapshot of current scores."""
+        return self._scores.copy()
+
+    def is_tied(self) -> bool:
+        scores = list(self._scores.values())
+        return scores[0] == scores[1]
+
+    def leader(self) -> Optional[Team]:
+        """Return the leading team, or None if tied."""
+        home_score, away_score = list(self._scores.values())
+        if home_score == away_score:
+            return None
+
+        return self._home_team if home_score > away_score else self._away_team
+
+    def reset(self) -> None:
+        """Reset both teams' scores to zero."""
+        for team in self._scores:
+            self._scores[team] = 0
+        logger.info("Scoreboard reset to 0–0")
