@@ -32,6 +32,21 @@ class GameClock:
     def time_remaining(self) -> int:
         return max(self.total_game_sec - int(self.env.now), 0)
 
+    def is_expired(self) -> bool:
+        return self.time_remaining <= 0
+
+    def project(self, seconds_elapsed: int) -> tuple[int, int]:
+        """
+        Return (quarter, time_remaining) after advancing the clock
+        by the given number of seconds, without mutating state.
+        """
+        projected_now = int(self.env.now) + seconds_elapsed
+
+        quarter = int(projected_now // (self.min_per_qtr * 60)) + 1
+        time_remaining = max(self.total_game_sec - projected_now, 0)
+
+        return quarter, time_remaining
+
     def __int__(self) -> int:
         """Convert the simpy.Environment.now to an integer number of seconds.
 

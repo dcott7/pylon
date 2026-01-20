@@ -14,6 +14,10 @@ class InvalidModelReturnType(Exception):
     pass
 
 
+class ModelExecutionError(Exception):
+    pass
+
+
 class TypedModel(ABC, Generic[C, R]):
     """Base class for models with typed context and return value.
 
@@ -52,3 +56,23 @@ class TypedModel(ABC, Generic[C, R]):
 
     @abstractmethod
     def execute(self, context: C) -> R: ...
+
+
+class IntegerModel(TypedModel[C, int]):
+    def __init__(self, name: Optional[str] = None) -> None:
+        super().__init__(name=name, return_type=int)
+
+
+class FloatModel(TypedModel[C, float]):
+    def __init__(self, name: Optional[str] = None) -> None:
+        super().__init__(name=name, return_type=float)
+
+
+class BooleanModel(TypedModel[C, bool]):
+    def __init__(self, name: Optional[str] = None) -> None:
+        super().__init__(name=name, return_type=bool)
+
+
+class StringModel(TypedModel[C, str]):
+    def __init__(self, name: Optional[str] = None) -> None:
+        super().__init__(name=name, return_type=str)

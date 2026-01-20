@@ -14,7 +14,7 @@ class RNG:
     def __init__(self, seed: Optional[int] = None) -> None:
         if seed is None:
             seed = int(time.time_ns() & 0xFFFFFFFF)
-            logger.info(f"RNG initialized with generated seed={seed}")
+            logger.debug(f"RNG initialized with generated seed={seed}")
 
         self._seed = seed
         self._rng = random.Random(seed)

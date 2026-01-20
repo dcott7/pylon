@@ -1,53 +1,50 @@
 import logging
 from typing import Dict
 
-from .entities.team import Team
+from ..domain.team import Team
 
 
 logger = logging.getLogger(__name__)
 
 
 class TimeoutManager:
-    MAX_TIMEOUTS = 3  # TODO: Make this configurable per league rules
-
-    def __init__(self, home_team: Team, away_team: Team) -> None:
+    def __init__(self, home_team: Team, away_team: Team, max_timeouts: int) -> None:
+        self._max_timeouts = max_timeouts
         self.timeouts: Dict[str, int] = {
-            home_team.uid: self.MAX_TIMEOUTS,
-            away_team.uid: self.MAX_TIMEOUTS,
+            home_team.uid: self._max_timeouts,
+            away_team.uid: self._max_timeouts,
         }
         logger.debug(
             f"Initialized TimeoutManager with teams {home_team} vs {away_team}, "
-            f"{self.MAX_TIMEOUTS} each"
+            f"{self._max_timeouts} each"
         )
+
+    @property
+    def max_timeouts(self) -> int:
+        return self._max_timeouts
 
     def use_timeout(self, team: Team) -> None:
         """Consume a timeout for a team if available."""
         if self.timeouts[team.uid] > 0:
             self.timeouts[team.uid] -= 1
-            logger.info(
-                f"{team} used a timeout. Remaining: {self.timeouts[team.uid]}"
-            )
+            logger.info(f"{team} used a timeout. Remaining: {self.timeouts[team.uid]}")
         else:
-            logger.warning(
-                f"{team} attempted to use a timeout but has none left"
-            )
+            logger.warning(f"{team} attempted to use a timeout but has none left")
 
     def add_timeout(self, team: Team) -> None:
-        """Add back a timeout (cannot exceed MAX_TIMEOUTS)."""
-        if self.timeouts[team.uid] < self.MAX_TIMEOUTS:
+        """Add back a timeout (cannot exceed _max_timeouts)."""
+        if self.timeouts[team.uid] < self._max_timeouts:
             self.timeouts[team.uid] += 1
-            logger.info(
-                f"{team} gained a timeout. Now has {self.timeouts[team.uid]}"
-            )
+            logger.info(f"{team} gained a timeout. Now has {self.timeouts[team.uid]}")
         else:
             logger.debug(
-                f"{team} already has the maximum ({self.MAX_TIMEOUTS}) timeouts"
+                f"{team} already has the maximum ({self._max_timeouts}) timeouts"
             )
 
     def reset_timeouts(self) -> None:
         """Reset all teams to the maximum allowed timeouts."""
         for team in self.timeouts:
-            self.timeouts[team] = self.MAX_TIMEOUTS
+            self.timeouts[team] = self._max_timeouts
         logger.info("Timeouts reset for all teams")
 
     def num_timeouts(self, team: Team) -> int:
@@ -69,9 +66,7 @@ class TimeoutManager:
         return snapshot
 
     def __str__(self) -> str:
-        return " | ".join(
-            f"{team}: {count}" for team, count in self.timeouts.items()
-        )
+        return " | ".join(f"{team}: {count}" for team, count in self.timeouts.items())
 
     def __repr__(self) -> str:
         return f"TimeoutManager({self.timeouts})"

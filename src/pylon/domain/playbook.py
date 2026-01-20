@@ -3,16 +3,27 @@ import logging
 from typing import Dict, List, Optional, Set
 import uuid
 
-from .athlete import AthletePositionEnum
+from .athlete import AthletePositionEnum, POSITION_TREE
 
 
 logger = logging.getLogger(__name__)
 
 
+class FormationInitializationError(Exception):
+    """Raised when there is an error initializing a Formation."""
+
+    pass
+
+
+class PlayCallInitializationError(Exception):
+    """Raised when there is an error initializing a PlayCall."""
+
+    pass
+
+
 class PlaySideEnum(Enum):
     OFFENSE = auto()
     DEFENSE = auto()
-    SPECIAL = auto()
 
 
 class PlayTypeEnum(Enum):
@@ -28,8 +39,17 @@ class PlayTypeEnum(Enum):
     KICKOFF = auto()
     EXTRA_POINT = auto()
     TWO_POINT_CONVERSION = auto()
-    # Defense
+    # Defense # TODO: Implement defensive play types
     DEFENSIVE_PLAY = auto()
+
+    def is_kick(self) -> bool:
+        return self in {
+            PlayTypeEnum.PUNT,
+            PlayTypeEnum.FIELD_GOAL,
+            PlayTypeEnum.KICKOFF,
+            PlayTypeEnum.EXTRA_POINT,
+            PlayTypeEnum.TWO_POINT_CONVERSION,
+        }
 
 
 class Formation:
@@ -59,6 +79,7 @@ class Formation:
         self._subformations = subformations or set()
         if self.parent and self not in self.parent.subformations:
             self.parent.subformations.add(self)
+        self._validate()
 
     @property
     def uid(self) -> str:
@@ -90,9 +111,7 @@ class Formation:
 
     def add_tag(self, tag: str) -> None:
         if tag in self._tags:
-            logger.debug(
-                f"Tag '{tag}' already present in formation {self.name}"
-            )
+            logger.debug(f"Tag '{tag}' already present in formation {self.name}")
             return
         self._tags.append(tag)
         logger.debug(f"Added tag '{tag}' to formation {self.name}")
@@ -112,6 +131,15 @@ class Formation:
                 return True
             current = current.parent
         return False
+
+    def _validate(self) -> None:
+        total_slots = sum(self.position_counts.values())
+        # If there is a parent formation, this formation must define exactly 11 slots
+        # Parent formations are allowed to have fewer than 11 slots (they can function as abstract formations)
+        if self.parent is not None and total_slots != 11:
+            msg = f"Formation '{self.name}' has a parent and defines {total_slots} slots (must be 11)"
+            logger.error(msg)
+            raise FormationInitializationError(msg)
 
     def __str__(self) -> str:
         return f"Formation(uid={self.uid}, name={self.name}, positions={len(self.position_counts)})"
@@ -143,7 +171,9 @@ class PersonnelPackage:
         return self._uid
 
     def __str__(self) -> str:
-        return f"PersonnelPackage(uid={self.uid}, name={self.name}, counts={self.counts})"
+        return (
+            f"PersonnelPackage(uid={self.uid}, name={self.name}, counts={self.counts})"
+        )
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -161,7 +191,7 @@ class PlayCall:
         formation: Formation,
         personnel_package: PersonnelPackage,
         side: PlaySideEnum,
-        description: Optional[str],
+        description: Optional[str] = None,
         tags: Optional[List[str]] = None,
         uid: Optional[str] = None,
     ) -> None:
@@ -173,6 +203,7 @@ class PlayCall:
         self.side = side
         self.description = description
         self._tags = tags if tags else []
+        self._validate()
 
     @property
     def uid(self) -> str:
@@ -185,6 +216,33 @@ class PlayCall:
     def add_tag(self, tag: str) -> None:
         if tag not in self._tags:
             self._tags.append(tag)
+
+    def _validate(self) -> None:
+        if self.formation.parent is None:
+            msg = (
+                f"PlayCall '{self.name}' must use a subformation "
+                f"(formation '{self.formation.name}' has no parent)"
+            )
+            logger.error(msg)
+            raise PlayCallInitializationError(msg)
+
+        # Select the correct subtree based on play side
+        if self.side == PlaySideEnum.OFFENSE:
+            valid_tree = POSITION_TREE.children[AthletePositionEnum.OFFENSE]
+            side_label = "offensive"
+        else:
+            valid_tree = POSITION_TREE.children[AthletePositionEnum.DEFENSE]
+            side_label = "defensive"
+
+        # Validate each position in the formation
+        for position in self.formation.positions():
+            if not valid_tree.contains(position):
+                msg = (
+                    f"PlayCall '{self.name}' is {side_label} but formation "
+                    f"'{self.formation.name}' includes invalid position '{position.name}'"
+                )
+                logger.error(msg)
+                raise PlayCallInitializationError(msg)
 
     def __str__(self) -> str:
         return f"PlayCall(uid={self.uid}, name={self.name}, type={self.play_type.name})"

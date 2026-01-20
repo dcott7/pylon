@@ -1,0 +1,5922 @@
+[
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "bunch-x-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn X Whip", 
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Dive", 
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Deep X Over", 
+                "type": "PASS"
+            },
+            {
+                "name": "PA Boot Cheat Slide Levels", 
+                "type": "PASS"
+            },
+            {
+                "name": "Cheat HB Slash", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Cheat Wheel Post", 
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet Wk", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep", 
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Sweep Wk", 
+                "type": "RUN"
+            },
+            {
+                "name": "HB Dive", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Cross", 
+                "type": "PASS"
+            },
+            {
+                "name": "Crack Toss", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot", 
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Wk", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Corner Post", 
+                "type": "PASS"
+            },
+            {
+                "name": "PA Boot Slide", 
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slash", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Out", 
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing", 
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Counter", 
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals", 
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone Wk", 
+                "type": "RUN"
+            },
+            {
+                "name": "PA Post Curl Shot", 
+                "type": "PASS"
+            },
+            {
+                "name": "Fk Flat Trail", 
+                "type": "PASS"
+            },
+            {
+                "name": "Flat Y Leak", 
+                "type": "PASS"
+            },
+            {
+                "name": "Flat Y Seam", 
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "deuce-close",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Split Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Corner Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Slide Y Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Chr Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "TE Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Wham",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "tight-y-off",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "Drive Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Sweep",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "u-off",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn HB Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Deep Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "Quick Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Flood",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-close",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Out N Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Zone Alert",
+                "type": "RPO"
+            },
+            {
+                "name": "Mtn PA Z Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Dbl Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Y-Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA TE Flood",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-slot",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA TE Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "Dragon Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "26 Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Y Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Y Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Power O",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter U",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-tight-nasty",
+		"required_pos": {"RB": 1, "TE": 3},
+		"plays": [
+            {
+                "name": "Mtn PA Y-Copo",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Smash",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Boot Lt",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig Y-Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA U-Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Str",
+                "type": "RUN"
+            },
+            {
+                "name": "Stick Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "i-form",
+        "subformation": "close",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Flow",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Read",
+                "type": "PASS"
+            },
+            {
+                "name": "95 Mike",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Cross Go",
+                "type": "PASS"
+            },
+            {
+                "name": "Stutter Go'S",
+                "type": "PASS"
+            },
+            {
+                "name": "Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Spider Mesh",
+                "type": "PASS"
+            },
+            {
+                "name": "Dbl Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Iso",
+                "type": "RUN"
+            },
+            {
+                "name": "PA TE Leak",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "i-form",
+        "subformation": "wing",
+		"required_pos": {"RB": 2, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA U Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Power",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Flow",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "Stretch Alert Lookie",
+                "type": "RUN"
+            },
+            {
+                "name": "X Slant",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Lead",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "i-form",
+        "subformation": "y-off-close",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "Sft Mtn PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft PA WR Options",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Counter Solid",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Counter",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Iso",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Pylon Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Deep Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Read",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "Double Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Wk",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "strong",
+        "subformation": "wing",
+		"required_pos": {"RB": 2, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Mtn Power",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "Fb Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Wk",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "strong",
+        "subformation": "y-off-close",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Sft Mtn PA Y-Fork",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft PA Double Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Counter Solid",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Counter",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Blast",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Blunt Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "TE Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Split Lead",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "bunch-spread-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Snag Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Hitch",
+                "type": "PASS"
+            },
+            {
+                "name": "Seam Divide",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Speed Dig Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Swirl Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Swirl In",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock HB Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Drive Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Corner Divide",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Slot Out",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "bunch-x-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Return Trail Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn China Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Smash Sluggo",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Speed Dig Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Mesh HB Sneak",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Shovel",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Middle",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Flat Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Spot Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Stick Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Choice Shallow Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Zone Alert",
+                "type": "RPO"
+            },
+            {
+                "name": "Double Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "Smash Return",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "Drive Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig Return",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "bunch-y-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Dagger Slt",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Drive Zig",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Inside Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Dbl Post Reverse Dragon",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Crossers Y-Whip",
+                "type": "PASS"
+            },
+            {
+                "name": "Branch Return",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Out",
+                "type": "RPO"
+            },
+            {
+                "name": "Speed Dig Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "Dagger",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Choice Shallow Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Curls Y Swirl",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power",
+                "type": "RUN"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Switch Mills",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Pull Shallow",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Swirl Hook N Go",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "deuce-close",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Return H-Trail",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return HB Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn Return Y-Shake",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn WR Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Over",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Bench Dig Curl",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Peek Stick",
+                "type": "RPO"
+            },
+            {
+                "name": "PA Deep Curls",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "doubles-flex-y-off-close",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Dagger Yin",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Dig Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Angle Y Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Switch Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Pass Fk Zone",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Zone Fk Jet",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Snag",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Escape",
+                "type": "PASS"
+            },
+            {
+                "name": "Redzone Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Zone Peek Glance",
+                "type": "RPO"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Y Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Flood H Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Y-Sail",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "empty-base-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Jailbreak Slot Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock WR Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Trail Shake",
+                "type": "PASS"
+            },
+            {
+                "name": "Choice Stick Nod",
+                "type": "PASS"
+            },
+            {
+                "name": "Hoss Y Juke",
+                "type": "PASS"
+            },
+            {
+                "name": "Levels Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Redzone Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Middle Hi Lo",
+                "type": "PASS"
+            },
+            {
+                "name": "QB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "WR Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "flex-y-off-close",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Hitch HB Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read Out",
+                "type": "RPO"
+            },
+            {
+                "name": "TE Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Levels Mills",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Post Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "Escape",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "Curl Ohio",
+                "type": "PASS"
+            },
+            {
+                "name": "Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Circle",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "split-close",
+		"required_pos": {"RB": 2, "TE": 0},
+		"plays": [
+            {
+                "name": "Mtn HB Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fb Cross Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y-Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fb Cross Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y-Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Double Swirl",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Pivot Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig HB Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Dbl Ins",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh",
+                "type": "PASS"
+            },
+            {
+                "name": "Fb Inside",
+                "type": "RUN"
+            },
+            {
+                "name": "WR Corner",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "split-twins-stack",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "Smash Y Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Slot Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Power 0",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "spread-dbl-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Dbl Dig Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fk Swing Mid Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Dbl Slants Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fades H-Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Flood H-Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Curls H-Sluggo",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Flanker Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Quick Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Shallow Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Z Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Mid Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Comebacks",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Sweep",
+                "type": "RUN"
+            },
+            {
+                "name": "Corner Strike",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "tight-base-flex",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn H-Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fk H-Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn H Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Dragon Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Quick Base",
+                "type": "RUN"
+            },
+            {
+                "name": "F Choice Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Off Tackle",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "tight-slot-flip",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Z Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Smash Slot Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Read",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Sweep",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Draw",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "tight-y-off",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Y-Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slash Wheel Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn Spot Y Quick",
+                "type": "PASS"
+            },
+            {
+                "name": "Redzone Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Go Slot Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "0 1 Trap",
+                "type": "RUN"
+            },
+            {
+                "name": "Flood Drive",
+                "type": "PASS"
+            },
+            {
+                "name": "Fake Jet HB Seam",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            },
+            {
+                "name": "Jet Touch Pass",
+                "type": "PASS"
+            },
+            {
+                "name": "TE Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Peek Slant",
+                "type": "RPO"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "trey-y-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Empty Vertical",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Empty Slot Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Empty Flood Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Post Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Crossers",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock H Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Dagger",
+                "type": "PASS"
+            },
+            {
+                "name": "Levels Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Screen",
+                "type": "RPO"
+            },
+            {
+                "name": "SE Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "trips-x-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Drag Sluggo",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Fades",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Stick Nod",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Spot Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Stick Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Hi Lo Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Cross-Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot Fade H Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Off Tackle",
+                "type": "RUN"
+            },
+            {
+                "name": "WR Smash",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Unders",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Short Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Fork Zig",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals X Shallow",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Mid Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "Hi Lo Dig",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "u-off-stack",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn PA Y-Leak",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Punch",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Crossers",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn PA Switch Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn Double Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Slot Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Hitch N Go",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Y-Choice Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Alert Out",
+                "type": "RPO"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "y-off-trio-close",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Boomerang PA X Over",
+                "type": "PASS"
+            },
+            {
+                "name": "Boomerang RPO Alert Swing",
+                "type": "RPO"
+            },
+            {
+                "name": "Boomerang Mesh Z Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Mtn Flood H-Trail",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Mtn Mesh Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Mtn Salem",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Mesh Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Cross Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Pin Pull Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Toss Lead Swing Crosser",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Power Shallow Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "Smash Return",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "0 1 Trap",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "offense",
+        "formation": "goal-line",
+        "subformation": "normal",
+		"required_pos": {"RB": 2, "TE": 3},
+		"plays": [
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "QB Sneak",
+                "type": "RUN"
+            },
+            {
+                "name": "Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Power O",
+                "type": "PASS"
+            },
+            {
+                "name": "Fb Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Split O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power G",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Sting",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Waggle",
+                "type": "PASS"
+            },
+            {
+                "name": "Strong Toss",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "bunch-x-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn PA Deep X Over",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn X Whip",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Sweep Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Out Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Counter HB Leak",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "deuce-close",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Mtn Spider Y Leak",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "Bench",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Post Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Split Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Misdirection",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "0 1 Trap",
+                "type": "RUN"
+            },
+            {
+                "name": "Jet Sweep",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "tight-y-off-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Sweep",
+                "type": "RUN"
+            },
+            {
+                "name": "Stick Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Out",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "Shallow Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "Under Z Curl",
+                "type": "PASS"
+            },
+            {
+                "name": "0 1 Trap",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "u-off-trips",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Power",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Zone Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Dagger U Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Misdirection",
+                "type": "RUN"
+            },
+            {
+                "name": "Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slam",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Str",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-close",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Mtn Out N Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Zone Alert",
+                "type": "RPO"
+            },
+            {
+                "name": "Mtn PA Z Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Dbl Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "PA TE Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Y-Drag Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Toss",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-pair-heavy",
+		"required_pos": {"RB": 1, "TE": 3},
+		"plays": [
+            {
+                "name": "Mtn Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Plunge",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Deep Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Mesh Drive",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA X Zig Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Stretch Alert Lookie",
+                "type": "RPO"
+            },
+            {
+                "name": "26 Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "Y Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Ctr Shot",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "singleback",
+        "subformation": "wing-tight-left",
+		"required_pos": {"RB": 1, "TE": 3},
+		"plays": [
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Wide Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "26 Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "i-form",
+        "subformation": "wing",
+		"required_pos": {"RB": 2, "TE": 2},
+		"plays": [
+            {
+                "name": "HB Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Power O",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Power G",
+                "type": "RUN"
+            },
+            {
+                "name": "Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Burst Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "Fb Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "Post Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "Fb Fake HB Toss",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "i-form",
+        "subformation": "y-off-close",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "Sft Mtn PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft PA Double Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn PA Counter",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Counter Solid",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Iso",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Pylon Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "PA X Deep Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Deep Read",
+                "type": "PASS"
+            },
+            {
+                "name": "Dbl Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Stretch",
+                "type": "RUN"
+            },
+            {
+                "name": "Double Dig",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "weak",
+        "subformation": "close",
+		"required_pos": {"RB": 2, "TE": 1},
+		"plays": [
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "94 Will",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Lt",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Fb Power",
+                "type": "RUN"
+            },
+            {
+                "name": "Mesh",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Post Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Zone Wk",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Boot Slide",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "bunch-spread",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Curl Flat Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Snag Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Hitch",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y-Shake",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Slot Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Levels Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Pull Shallow",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Post",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig Return",
+                "type": "PASS"
+            },
+            {
+                "name": "Drive Y Corner",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "bunch-x-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Clear HB Seam",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Corner Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y Corner Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn HB Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn Spot HB Under",
+                "type": "PASS"
+            },
+            {
+                "name": "Spacing Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Base",
+                "type": "RUN"
+            },
+            {
+                "name": "Corner Out Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Smash Return",
+                "type": "PASS"
+            },
+            {
+                "name": "Drive Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "Mesh HB Sneak",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Flat Goalline",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Mesh Goalline",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Spot Goalline",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return Mesh Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return Spot X-Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Return Trail Corner",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "double-stack",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Stack Out",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read Fl Screen",
+                "type": "RPO"
+            },
+            {
+                "name": "Fake Screen Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "Smash",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Screen",
+                "type": "RPO"
+            },
+            {
+                "name": "Curl Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Trap",
+                "type": "RPO"
+            },
+            {
+                "name": "HB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "doubles-hb-wk",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Boomerang Slot Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Boomerang 0 1 Trap",
+                "type": "RUN"
+            },
+            {
+                "name": "Boomerang Y Delay",
+                "type": "PASS"
+            },
+            {
+                "name": "Shake HB Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read Bubble",
+                "type": "RPO"
+            },
+            {
+                "name": "X Dagger",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Peek Slant",
+                "type": "RPO"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Seams",
+                "type": "PASS"
+            },
+            {
+                "name": "Sail Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Salem Y Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Base",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jailbreak Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Double Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Curl Combo",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "empty-base-trio",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Stick Nod",
+                "type": "PASS"
+            },
+            {
+                "name": "QB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "Shock Slot Option",
+                "type": "PASS"
+            },
+            {
+                "name": "X Mid Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Drive Switch Seams",
+                "type": "PASS"
+            },
+            {
+                "name": "Salem Smash",
+                "type": "PASS"
+            },
+            {
+                "name": "Curl Combo",
+                "type": "PASS"
+            },
+            {
+                "name": "Drag Slot Fade",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals H Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "Deep Attack",
+                "type": "PASS"
+            },
+            {
+                "name": "Divide Double In",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot Fade Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Hoss Juke",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot Shake",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "empty-chips-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Slot Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Post Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Out X Dig",
+                "type": "PASS"
+            },
+            {
+                "name": "Dagger",
+                "type": "PASS"
+            },
+            {
+                "name": "Deep Post Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Double 7 Stop",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "empty-chips-quads",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Cheat Fk Screen Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Cheat Jailbreak WR Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Cheat Texas X Sluggo",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "TE Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Dagger",
+                "type": "PASS"
+            },
+            {
+                "name": "Crossers",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Post Corner Up",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "normal-y-off-close",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Cheat Flat X Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Cheat Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Cheat Slash Wheel In",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Snag",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Peek Spot",
+                "type": "RPO"
+            },
+            {
+                "name": "Double Slant",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Out",
+                "type": "RPO"
+            },
+            {
+                "name": "Wheel Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Zone Peek",
+                "type": "RPO"
+            },
+            {
+                "name": "Y-Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Escape",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Redzone Scissors",
+                "type": "PASS"
+            },
+            {
+                "name": "Jet Touch Pass",
+                "type": "PASS"
+            },
+            {
+                "name": "Zone Fake Jet",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Jet Sweep",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "slot-right",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Lead Read Opt",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Mtn Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Counter Y",
+                "type": "PASS"
+            },
+            {
+                "name": "Fake Screen Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Bubble",
+                "type": "RPO"
+            },
+            {
+                "name": "PA Deep Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Iso",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read WR Screen",
+                "type": "RPO"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Bubble",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read Y Flat",
+                "type": "RPO"
+            },
+            {
+                "name": "PA Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Glance Post",
+                "type": "RPO"
+            },
+            {
+                "name": "Speed Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "PA SE Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "QB Slot Option",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "spread",
+		"required_pos": {"RB": 1, "TE": 0},
+		"plays": [
+            {
+                "name": "H Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA H Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Whip HB Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "Gt Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Gt Z Tunnel",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Slot Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Read Slot Slide",
+                "type": "RPO"
+            },
+            {
+                "name": "PA Slot Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Shallow Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Smash HB Seam",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "tight-open",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Empty Mtn Mesh Rail",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Mtn Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Empty Mtn Whip Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Drive Stutter Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Fk Drive Stutter",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Clearout",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench Return",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig Z Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Bench Dig Pivot",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals HB Burst",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "tight-y-off-wk",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Pivot Return",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Zone Alert Omaha",
+                "type": "RPO"
+            },
+            {
+                "name": "PA Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Smash Hammer",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Levels",
+                "type": "PASS"
+            },
+            {
+                "name": "Tackle Trap",
+                "type": "RUN"
+            },
+            {
+                "name": "Dagger H-Swing",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Lead Read Option",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "trips",
+		"required_pos": {"RB": 1, "TE": 0},
+		"plays": [
+            {
+                "name": "Stick Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Bubble",
+                "type": "RPO"
+            },
+            {
+                "name": "Curls",
+                "type": "PASS"
+            },
+            {
+                "name": "Slant Smash",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Peek Stick",
+                "type": "RPO"
+            },
+            {
+                "name": "Fade Stops",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "trips-hb-wk",
+		"required_pos": {"RB": 1, "TE": 0},
+		"plays": [
+            {
+                "name": "Quick Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "RPO Alert Bubble",
+                "type": "RPO"
+            },
+            {
+                "name": "Drive",
+                "type": "PASS"
+            },
+            {
+                "name": "Deep Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock H Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Ohio Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Switch",
+                "type": "PASS"
+            },
+            {
+                "name": "Middle Slam",
+                "type": "PASS"
+            },
+            {
+                "name": "Curls",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Mid Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "PA WR In",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "trips-te-flex",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Y Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Hitch N Go",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Fork H Choice",
+                "type": "PASS"
+            },
+            {
+                "name": "Double In Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Shot Crossers",
+                "type": "PASS"
+            },
+            {
+                "name": "Y Out N Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Wheel",
+                "type": "PASS"
+            },
+            {
+                "name": "Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Levels Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "TE In",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Angle",
+                "type": "PASS"
+            },
+            {
+                "name": "PA Fork",
+                "type": "PASS"
+            },
+            {
+                "name": "Dagger",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "wing-slot-offset",
+		"required_pos": {"RB": 1, "TE": 2},
+		"plays": [
+            {
+                "name": "Sft Mtn Counter Y",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft Mtn PA Slot Corner",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn HB Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft Mtn Gt Counter",
+                "type": "RUN"
+            },
+            {
+                "name": "Sft Mtn PA Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Double Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Duo",
+                "type": "RUN"
+            },
+            {
+                "name": "Dragon Spacing",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Smash",
+                "type": "PASS"
+            },
+            {
+                "name": "Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Drive",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Punch",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "wing-tight-nasty",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mesh Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Punch",
+                "type": "RUN"
+            },
+            {
+                "name": "Bench",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Bench Swap",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "y-off-trio-wk",
+		"required_pos": {"RB": 1, "TE": 3},
+		"plays": [
+            {
+                "name": "Sft Mtn Stack Poco",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Stack Salem Y-Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Sft Mtn Stack Shake N Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Smash Go",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Outside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "Mtn PA Deep Over",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock H Option",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Post Dig Shot",
+                "type": "PASS"
+            },
+            {
+                "name": "Corner Strike",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Base",
+                "type": "RUN"
+            },
+            {
+                "name": "PA WR In",
+                "type": "PASS"
+            },
+            {
+                "name": "Outs",
+                "type": "PASS"
+            },
+            {
+                "name": "Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "In Go",
+                "type": "PASS"
+            },
+            {
+                "name": "Deep Out",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick N Up",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Mid Draw",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Fork Zig",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Short Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Unders",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "y-off-trips",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Mtn Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Stick N Nod",
+                "type": "PASS"
+            },
+            {
+                "name": "Mtn Y Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Curls",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter",
+                "type": "RUN"
+            },
+            {
+                "name": "RPO Counter Peek",
+                "type": "RPO"
+            },
+            {
+                "name": "RPO Read Y Flat",
+                "type": "RPO"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Y Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Read Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Sprint Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Direct Snap",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "gun",
+        "subformation": "y-off-trips-wk",
+		"required_pos": {"RB": 1, "TE": 1},
+		"plays": [
+            {
+                "name": "Boomerang Cross Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Boomerang Y Lead Option",
+                "type": "RUN"
+            },
+            {
+                "name": "Boomerang PA Portland",
+                "type": "PASS"
+            },
+            {
+                "name": "Slants",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone Split",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Slide",
+                "type": "PASS"
+            },
+            {
+                "name": "Shallow Sail",
+                "type": "PASS"
+            },
+            {
+                "name": "Fade Stops",
+                "type": "PASS"
+            },
+            {
+                "name": "Shock H Option",
+                "type": "PASS"
+            },
+            {
+                "name": "22 Z In",
+                "type": "PASS"
+            },
+            {
+                "name": "Slot 2 Buc",
+                "type": "PASS"
+            },
+            {
+                "name": "Stick",
+                "type": "PASS"
+            },
+            {
+                "name": "Dig Cross",
+                "type": "PASS"
+            },
+            {
+                "name": "Strong Flood",
+                "type": "PASS"
+            },
+            {
+                "name": "Four Verticals",
+                "type": "PASS"
+            },
+            {
+                "name": "Inside Zone",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Slip Screen",
+                "type": "PASS"
+            },
+            {
+                "name": "Tackle Trap",
+                "type": "RUN"
+            },
+            {
+                "name": "Quick Fork Zig",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Short Post",
+                "type": "PASS"
+            },
+            {
+                "name": "Quick Unders",
+                "type": "PASS"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "offense",
+        "formation": "goal-line",
+        "subformation": "normal",
+		"required_pos": {"RB": 2, "TE": 3},
+		"plays": [
+            {
+                "name": "HB Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Spot",
+                "type": "PASS"
+            },
+            {
+                "name": "QB Sneak",
+                "type": "RUN"
+            },
+            {
+                "name": "Power O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Power O",
+                "type": "PASS"
+            },
+            {
+                "name": "Fb Dive",
+                "type": "RUN"
+            },
+            {
+                "name": "Strong Toss",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Waggle",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Sting",
+                "type": "RUN"
+            },
+            {
+                "name": "HB Split O",
+                "type": "RUN"
+            },
+            {
+                "name": "PA Sprint HB Flat",
+                "type": "PASS"
+            },
+            {
+                "name": "HB Counter Wk",
+                "type": "RUN"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "even-6-1",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Sam Will Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 3 Buzz",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Mlb Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Sam Blitz 3",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "over",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Olb Fire Man",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Free Fire",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Lb Sting 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Cloud Str",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Sam Edge 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Thunder Smoke",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Press",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 1 Contain",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "1 Hole Press",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "over-solid",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Sam 1 Sting",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Hammer O Blast",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky Wk",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Ss Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Saw O Blast",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Hard Flat",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "over-wide",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Fire Man",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 1 Robber",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Sam Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 1 Spy",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "5-2",
+        "subformation": "normal",
+        "required_pos": {"DT": 3, "DE": 2, "MLB": 2, "OLB": 0, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Dt Loop",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Fire Zone 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Pinch",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Trio Sky Zone",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "46",
+        "subformation": "bear",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Engage Eight",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Gap Press",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Wall Stunt",
+                "type": "COVER_3"
+            },
+            {
+                "name": "46 Mild Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Safety Fire",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Slant Weak",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Slant Weak 3",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "double-mug",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Mid Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Overload 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Lb Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Ss Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Dog 3 Buzz",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "load",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "0 Lb Cross Games",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Lb 3 Seam Games",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 3 Buzz Mable",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Lb Cross Games",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Double Bracket",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Overload 3 Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 9",
+                "type": "COVER_9"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_6"
+            },
+            {
+                "name": "1 Double Wr1",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Double Wr2",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 1 Robber",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "load-mug",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Hot Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Lb Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Lbdetwist 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Lb Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Blitz 2",
+                "type": "COVER_2"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "over",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Edge Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Double Bracket",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Buzz Mable",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Over Storm Brave",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Fs Will Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Overload Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 9 Show 2",
+                "type": "COVER_9"
+            },
+            {
+                "name": "Overload 3 Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cov 3 Buzz Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Double Wr1",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Edge Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Lb Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Field Sim 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Bracket Switch Willie",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Sim 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Double Slot",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Double Bracket Switch",
+                "type": "COVER_0"
+            },
+            {
+                "name": "1 Double Te",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover-4 Drop Field",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Sim Pressure 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Double Wr2",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "single-mug",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cov 3 Buzz Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Lb Dog",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Dt Mike Loop 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Db Blitz Tex 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Blitz Tex 3 Sim 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 9",
+                "type": "COVER_9"
+            },
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "wide",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Over Storm Brave",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cov 3 Buzz Match Wk",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2 Contain",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Silver Shoot Pinch",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Lb Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cov 2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cb Zone Blitz",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 9 Show 2",
+                "type": "COVER_9"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "dime",
+        "subformation": "normal",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Db Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Lb Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Buzz Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Dime Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Overload 3 Show 2",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Buzz Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Ss Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 1 Spy",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "3 Double Buzz",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "prevent",
+        "subformation": "3-deep",
+        "required_pos": {"DT": 1, "DE": 2, "MLB": 1, "OLB": 0, "CB": 4, "FS": 2, "SS": 1},
+		"plays": [
+            {
+                "name": "Man 3 Deep",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Prevent",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Cover 3",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Cover 2 Drop",
+                "type": "PREVENT"
+            },
+            {
+                "name": "3 Deep Blitz",
+                "type": "PREVENT"
+            },
+            {
+                "name": "1 Double Buzz",
+                "type": "PREVENT"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "goal-line",
+        "subformation": "5-3",
+        "required_pos": {"DT": 3, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 0},
+		"plays": [
+            {
+                "name": "Gl Man",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Mlb Gap A",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps All",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps A B",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps B",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps All Lb",
+                "type": "GOAL_LINE"
+            }
+        ]
+    },
+    {
+        "team": "49ers",
+        "side": "defense",
+        "formation": "goal-line",
+        "subformation": "6-2",
+        "required_pos": {"DT": 4, "DE": 2, "MLB": 2, "OLB": 0, "CB": 2, "FS": 0, "SS": 1},
+		"plays": [
+            {
+                "name": "60 Pinch",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Base",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Half Out",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Out",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Out Jacks",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Guts",
+                "type": "GOAL_LINE"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "odd-leo",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Saw Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "S2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Pinch Buck O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Pinch Dog 2 Press",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cross 3 Fire",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Storm Brave 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Will Buck 3 Press",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "over",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Olb Fire Man",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Free Fire",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Lb Sting 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Cloud Str",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Sam Edge 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Thunder Smoke",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Press",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 1 Contain",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "1 Hole Press",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "over-solid",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Sam 1 Sting",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Hammer O Blast",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky Wk",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Ss Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Saw O Blast",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Hard Flat",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "4-3",
+        "subformation": "under",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Hammer O Blast",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky Wk",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Fs Fire 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Fs Fire 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Sam Crash 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Sam Crash 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Hard Flat",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover-2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Will Go Fire 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Free Fire O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "1 Hole Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "1 Contain Press",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "46",
+        "subformation": "bear-under",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Engage Eight",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Gap Press",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Lb Dogs 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Lb Dogs",
+                "type": "COVER_0"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "2-4-dbl-mug",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": []
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "2-4-load-mug",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Lb Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Hot Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Lb Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Lb De Twist 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Nickel Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Blitz 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "2-4-5-odd-mug",
+        "required_pos": {"DT": 1, "DE": 1, "MLB": 2, "OLB": 2, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Sam Mike 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Sam Mike 3 Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Overload 3 Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Lb Cross 3 Show 2",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Drop",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Bench Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Pinch 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "3 Buzz Sting Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Pinch O",
+                "type": "COVER_0"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "over",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Edge Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "DoubleBracket",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Buzz Mable",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Over Storm Brave",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Fs Will Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Overload Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 9 Show 2",
+                "type": "COVER_9"
+            },
+            {
+                "name": "Overload 3 Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cov 3 Buzz Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Double Wr1",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Edge Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Lb Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Field Sim 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Bracket Switch Willie",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Sim 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Double Slot",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Double Bracket Switch",
+                "type": "COVER_0"
+            },
+            {
+                "name": "1 Double Te",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Drop Field",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Sim Pressure 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Double Wr2",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "nickel",
+        "subformation": "wide",
+        "required_pos": {"DT": 2, "DE": 2, "MLB": 2, "OLB": 0, "CB": 3, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 1 Hole",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Over Storm Brave",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 3 Sky Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Nickel Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cov 3 Buzz Match Wk",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 2 Invert",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Nickel 2 Trap",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2 Contain",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Silver Shoot Pinch",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "1 Lb Blitz",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cov 2 Invert Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cb Zone Blitz",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Dbl Safety Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 9 Show 2",
+                "type": "COVER_9"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "3-3-5",
+        "subformation": "penny",
+        "required_pos": {"DT": 1, "DE": 2, "MLB": 1, "OLB": 2, "CB": 2, "FS": 1, "SS": 2},
+		"plays": [
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Pinch Blitz O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 3 Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Saw Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover Hole 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Hot Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Robber",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Corner Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Double Bracket",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 9",
+                "type": "COVER_9"
+            },
+            {
+                "name": "Slot Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6 Willie",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 3 Buzz",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Saw Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Sam Mike 3 Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Mike Blitz 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Corner Blitz 2",
+                "type": "COVER_2"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "dime",
+        "subformation": "rush",
+        "required_pos": {"DT": 1, "DE": 2, "MLB": 2, "OLB": 0, "CB": 4, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Mug Sim Pressure",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Mug D T Loop 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Mug Blitz Tex 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Db Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Dime Blitz 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Fs Middle Blitz 3",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 4 Quarters",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Cover 3 Cloud",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 3 Buzz Match",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 6",
+                "type": "COVER_6"
+            },
+            {
+                "name": "Cover 4 Palms",
+                "type": "COVER_4"
+            },
+            {
+                "name": "Cover 2 Hard Flat",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Fox Fire Zone Press",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Cover 1 Contain Spy",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Ss Overload 3",
+                "type": "COVER_3"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "dollar",
+        "subformation": "3-2-mug",
+        "required_pos": {"DT": 1, "DE": 2, "MLB": 2, "OLB": 0, "CB": 4, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Cover 3 Sky",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Dt Mike Loop O",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Dt Mike Loop 1",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Tampa 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Zero Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 2 Drop",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 2 Man",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Db Fire 2",
+                "type": "COVER_2"
+            },
+            {
+                "name": "Cover 1 Robber Press",
+                "type": "COVER_1"
+            },
+            {
+                "name": "Overload 3 Seam",
+                "type": "COVER_3"
+            },
+            {
+                "name": "Overload Blitz",
+                "type": "COVER_0"
+            },
+            {
+                "name": "Cover 4 Drop",
+                "type": "COVER_4"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "prevent",
+        "subformation": "3-deep",
+        "required_pos": {"DT": 1, "DE": 2, "MLB": 2, "OLB": 0, "CB": 4, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Man 3 Deep",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Prevent",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Cover 3",
+                "type": "PREVENT"
+            },
+            {
+                "name": "Cover 2 Drop",
+                "type": "PREVENT"
+            },
+            {
+                "name": "3 Deep Blitz",
+                "type": "PREVENT"
+            },
+            {
+                "name": "1 Double Buzz",
+                "type": "PREVENT"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "goal-line",
+        "subformation": "5-3",
+        "required_pos": {"DT": 2, "DE": 3, "MLB": 1, "OLB": 2, "CB": 1, "FS": 1, "SS": 1},
+		"plays": [
+            {
+                "name": "Gl Man",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Mb Gap A",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps All",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps A B",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps B",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Gaps All Lb",
+                "type": "GOAL_LINE"
+            }
+        ]
+    },
+    {
+        "team": "bears",
+        "side": "defense",
+        "formation": "goal-line",
+        "subformation": "6-2",
+        "required_pos": {"DT": 4, "DE": 2, "MLB": 2, "OLB": 0, "CB": 2, "FS": 0, "SS": 1},
+		"plays": [
+            {
+                "name": "60 Pinch",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Base",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Half Out",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Out",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "60 Out Jacks",
+                "type": "GOAL_LINE"
+            },
+            {
+                "name": "Guts",
+                "type": "GOAL_LINE"
+            }
+        ]
+    }
+]

@@ -1,0 +1,267 @@
+from __future__ import annotations
+import logging
+import uuid
+from enum import auto, Enum
+from typing import Dict, List, Optional
+
+
+logger = logging.getLogger(__name__)
+
+
+class AthletePositionEnum(Enum):
+    # Offense
+    OFFENSE = auto()  # generic offense position
+    QB = auto()
+    SKILL = auto()  # generic skill position
+    RB = auto()
+    WR = auto()
+    TE = auto()
+    OLINE = auto()  # generic offensive line position
+    T = auto()  # generic tackle position
+    G = auto()  # generic guard position
+    LT = auto()
+    LG = auto()
+    C = auto()
+    RG = auto()
+    RT = auto()
+    # Defense
+    DEFENSE = auto()  # generic defense position
+    DLINE = auto()  # generic defensive line position
+    DT = auto()
+    EDGE = auto()  # generic edge rusher position
+    RE = auto()
+    LE = auto()
+    LB = auto()  # generic linebacker position
+    MLB = auto()
+    OLB = auto()  # generic outside linebacker position
+    LOLB = auto()
+    ROLB = auto()
+    DB = auto()  # generic defensive back position
+    CB = auto()
+    S = auto()  # generic safety position
+    FS = auto()
+    SS = auto()
+    # Special Teams
+    SPECIAL_TEAMS = auto()  # generic special teams position
+    RETURNER = auto()  # generic returner position
+    KR = auto()
+    P = auto()
+    K = auto()
+    LS = auto()
+
+    UNKNOWN = auto()
+
+
+class PositionTree:
+    """A tree structure representing athlete positions and their hierarchy."""
+
+    def __init__(
+        self,
+        position: Optional[AthletePositionEnum],
+        children: Optional[Dict[AthletePositionEnum, "PositionTree"]] = None,
+        parent: Optional["PositionTree"] = None,
+    ):
+        self.position = position
+        self.children = children or {}
+        self.parent = parent
+
+        for child in self.children.values():
+            child.parent = self
+
+    def is_leaf(self) -> bool:
+        """Check if the current node is a leaf node (has no children)."""
+        return len(self.children) == 0
+
+    def find_node(self, pos: AthletePositionEnum) -> Optional["PositionTree"]:
+        """Find and return the node corresponding to the given position."""
+        if self.position == pos:
+            return self
+        for child in self.children.values():
+            result = child.find_node(pos)
+            if result is not None:
+                return result
+        return None
+
+    def all_positions(self) -> List[AthletePositionEnum]:
+        """Get a list of all positions in the subtree rooted at this node."""
+        if self.position is not None and self.is_leaf():
+            return [self.position]
+
+        positions: List[AthletePositionEnum] = []
+        for child in self.children.values():
+            positions.extend(child.all_positions())
+        return positions
+
+    def contains(self, pos: AthletePositionEnum) -> bool:
+        """Check if the subtree contains the specified position."""
+        if self.position == pos:
+            return True
+        return any(child.contains(pos) for child in self.children.values())
+
+    def is_child_of(self, parent: AthletePositionEnum) -> bool:
+        """Check if the current node is a child of the specified parent position."""
+        pos = self.parent
+        while pos is not None:
+            if pos.position == parent:
+                return True
+            pos = pos.parent
+        return False
+
+
+POSITION_TREE = PositionTree(
+    None,
+    children={
+        AthletePositionEnum.OFFENSE: PositionTree(
+            AthletePositionEnum.OFFENSE,
+            children={
+                AthletePositionEnum.QB: PositionTree(AthletePositionEnum.QB),
+                AthletePositionEnum.SKILL: PositionTree(
+                    AthletePositionEnum.SKILL,
+                    children={
+                        AthletePositionEnum.RB: PositionTree(AthletePositionEnum.RB),
+                        AthletePositionEnum.WR: PositionTree(AthletePositionEnum.WR),
+                        AthletePositionEnum.TE: PositionTree(AthletePositionEnum.TE),
+                    },
+                ),
+                AthletePositionEnum.OLINE: PositionTree(
+                    AthletePositionEnum.OLINE,
+                    children={
+                        AthletePositionEnum.T: PositionTree(
+                            AthletePositionEnum.T,
+                            children={
+                                AthletePositionEnum.LT: PositionTree(
+                                    AthletePositionEnum.LT
+                                ),
+                                AthletePositionEnum.RT: PositionTree(
+                                    AthletePositionEnum.RT
+                                ),
+                            },
+                        ),
+                        AthletePositionEnum.G: PositionTree(
+                            AthletePositionEnum.G,
+                            children={
+                                AthletePositionEnum.LG: PositionTree(
+                                    AthletePositionEnum.LG
+                                ),
+                                AthletePositionEnum.RG: PositionTree(
+                                    AthletePositionEnum.RG
+                                ),
+                            },
+                        ),
+                        AthletePositionEnum.C: PositionTree(AthletePositionEnum.C),
+                    },
+                ),
+            },
+        ),
+        AthletePositionEnum.DEFENSE: PositionTree(
+            AthletePositionEnum.DEFENSE,
+            children={
+                AthletePositionEnum.DLINE: PositionTree(
+                    AthletePositionEnum.DLINE,
+                    children={
+                        AthletePositionEnum.EDGE: PositionTree(
+                            AthletePositionEnum.EDGE,
+                            children={
+                                AthletePositionEnum.RE: PositionTree(
+                                    AthletePositionEnum.RE
+                                ),
+                                AthletePositionEnum.LE: PositionTree(
+                                    AthletePositionEnum.LE
+                                ),
+                            },
+                        ),
+                        AthletePositionEnum.DT: PositionTree(AthletePositionEnum.DT),
+                    },
+                ),
+                AthletePositionEnum.LB: PositionTree(
+                    AthletePositionEnum.LB,
+                    children={
+                        AthletePositionEnum.MLB: PositionTree(AthletePositionEnum.MLB),
+                        AthletePositionEnum.OLB: PositionTree(
+                            AthletePositionEnum.OLB,
+                            children={
+                                AthletePositionEnum.LOLB: PositionTree(
+                                    AthletePositionEnum.LOLB
+                                ),
+                                AthletePositionEnum.ROLB: PositionTree(
+                                    AthletePositionEnum.ROLB
+                                ),
+                            },
+                        ),
+                    },
+                ),
+                AthletePositionEnum.DB: PositionTree(
+                    AthletePositionEnum.DB,
+                    children={
+                        AthletePositionEnum.CB: PositionTree(AthletePositionEnum.CB),
+                        AthletePositionEnum.S: PositionTree(
+                            AthletePositionEnum.S,
+                            children={
+                                AthletePositionEnum.FS: PositionTree(
+                                    AthletePositionEnum.FS
+                                ),
+                                AthletePositionEnum.SS: PositionTree(
+                                    AthletePositionEnum.SS
+                                ),
+                            },
+                        ),
+                    },
+                ),
+            },
+        ),
+        AthletePositionEnum.SPECIAL_TEAMS: PositionTree(
+            AthletePositionEnum.SPECIAL_TEAMS,
+            children={
+                AthletePositionEnum.RETURNER: PositionTree(
+                    AthletePositionEnum.RETURNER,
+                    children={
+                        AthletePositionEnum.KR: PositionTree(AthletePositionEnum.KR),
+                    },
+                ),
+                AthletePositionEnum.K: PositionTree(AthletePositionEnum.K),
+                AthletePositionEnum.P: PositionTree(AthletePositionEnum.P),
+                AthletePositionEnum.LS: PositionTree(AthletePositionEnum.LS),
+            },
+        ),
+    },
+)
+
+
+class Athlete:
+    def __init__(
+        self,
+        first_name: str,
+        last_name: str,
+        position: AthletePositionEnum,
+        uid: Optional[str] = None,
+    ) -> None:
+        self._uid = uid or str(uuid.uuid4())
+        self._first_name = first_name
+        self._last_name = last_name
+        self._position = position
+
+    @property
+    def uid(self) -> str:
+        return self._uid
+
+    @property
+    def first_name(self) -> str:
+        return self._first_name
+
+    @property
+    def last_name(self) -> str:
+        return self._last_name
+
+    @property
+    def position(self) -> AthletePositionEnum:
+        return self._position
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self) -> str:
+        return f"Athlete({self.full_name}, {self.position.name}, uid={self.uid})"
+
+    def __repr__(self) -> str:
+        return self.__str__()

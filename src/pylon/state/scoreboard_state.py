@@ -1,10 +1,14 @@
 import logging
 from typing import Dict, Optional
 
-from .entities.team import Team
+from ..domain.team import Team
 
 
 logger = logging.getLogger(__name__)
+
+
+class ScoreboardStateError(Exception):
+    pass
 
 
 class Scoreboard:
@@ -25,11 +29,9 @@ class Scoreboard:
 
     def _validate_team(self, team: Team) -> None:
         if team.uid not in self._scores:
-            raise ValueError(f"Team {team.name} is not part of this game")
+            raise ScoreboardStateError(f"Team {team.name} is not part of this game")
 
-    def add_points(
-        self, team: Team, points: int, description: str = ""
-    ) -> None:
+    def add_points(self, team: Team, points: int, description: str = "") -> None:
         """Add points to a team's score, optionally with a description for logging."""
         self._validate_team(team)
         old_score = self._scores[team.uid]
@@ -42,22 +44,6 @@ class Scoreboard:
             logger.info(
                 f"{team.name} score updated: {old_score} -> {self._scores[team.uid]}"
             )
-
-    # Convenience scoring methods
-    def touchdown(self, team: Team) -> None:
-        self.add_points(team, 6, "touchdown")
-
-    def field_goal(self, team: Team) -> None:
-        self.add_points(team, 3, "field goal")
-
-    def extra_point(self, team: Team) -> None:
-        self.add_points(team, 1, "extra point")
-
-    def two_point_conversion(self, team: Team) -> None:
-        self.add_points(team, 2, "two-point conversion")
-
-    def safety(self, team: Team) -> None:
-        self.add_points(team, 2, "safety")
 
     # Query methods
     def current_score(self, team: Team) -> int:

@@ -1,10 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, Type, TypeVar, cast
 import logging
 
 from .model import TypedModel
 
 
 logger = logging.getLogger(__name__)
+
+
+T = TypeVar("T", bound=TypedModel[Any, Any])
 
 
 class ModelRegistryError(Exception):
@@ -35,9 +38,7 @@ class ModelRegistry:
     ) -> None:
         if model.name in self._models:
             if not override:
-                raise DuplicateModelError(
-                    f"Model '{model.name}' is already registered"
-                )
+                raise DuplicateModelError(f"Model '{model.name}' is already registered")
             logger.warning(f"Overwriting model '{model.name}' in registry")
         self._models[model.name] = model
 
@@ -52,6 +53,9 @@ class ModelRegistry:
             logger.error(f"Model '{name}' is not registered")
             raise ModelNotFoundError(f"Model '{name}' is not registered")
         return self._models[name]
+
+    def get_typed(self, name: str, t: Type[T]) -> T:
+        return cast(T, self.get(name))
 
     def clear(self) -> None:
         self._models.clear()
