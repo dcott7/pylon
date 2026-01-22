@@ -10,8 +10,8 @@ from ...rng import RNG
 
 if TYPE_CHECKING:
     from ...state.game_state import GameState
-    from ...state.drive_state import DriveState
-    from ...state.play_state import PlayState
+    from ...state.drive_record import DriveRecord
+    from ...state.play_record import PlayRecord
 
 
 logger = logging.getLogger(__name__)
@@ -79,12 +79,12 @@ class LeagueRules(ABC):
     def on_drive_end(
         self,
         game_state: "GameState",
-        drive_state: "DriveState",
+        drive_record: "DriveRecord",
     ) -> None: ...
 
     @abstractmethod
     def on_play_end(
         self,
         game_state: "GameState",
-        play_state: "PlayState",
+        play_record: "PlayRecord",
     ) -> None: ...

@@ -2,9 +2,9 @@ import logging
 from simpy import Environment
 from typing import Optional
 
-from ..state.play_state import PlayState
+from ..state.play_record import PlayRecord
 from ..state.game_state import GameState
-from ..state.drive_state import DriveState
+from ..state.drive_record import DriveRecord
 from ..domain.rules.base import LeagueRules
 from ..models.registry import ModelRegistry
 from ..rng import RNG
@@ -36,19 +36,19 @@ class DriveEngine:
         self.models = models
         self.rng = rng
         self.rules = rules
-        self.drive_state = DriveState(self.game_state)
+        self.drive_record = DriveRecord(self.game_state)
         self.play_engine = PlayEngine(env, game_state, models, rng, self.rules)
 
-    def run(self) -> DriveState:
-        last_play: Optional[PlayState] = None
+    def run(self) -> DriveRecord:
+        last_play: Optional[PlayRecord] = None
 
         while not self.is_drive_over():
             self.run_pre_play_hooks()
 
-            play_state = self.play_engine.run()
-            last_play = play_state
-            self.drive_state.add_play(play_state)
-            self.game_state.apply_play(play_state)  # updates the GameState
+            play_record = self.play_engine.run()
+            last_play = play_record
+            self.drive_record.add_play(play_record)
+            self.game_state.apply_play(play_record)  # updates the GameState
             self.run_post_play_hooks()
 
         if last_play is None:
@@ -56,10 +56,10 @@ class DriveEngine:
             logger.error(msg)
             raise DriveExecutionError(msg)
 
-        self.drive_state.finalize(last_play, self.game_state)
+        self.drive_record.finalize(last_play, self.game_state)
         # schedule things like kickoffs and extra points based on drive result
-        self.rules.on_drive_end(self.game_state, self.drive_state)
-        return self.drive_state
+        self.rules.on_drive_end(self.game_state, self.drive_record)
+        return self.drive_record
 
     def is_drive_over(self) -> bool:
         return self.game_state.is_drive_over()

@@ -3,7 +3,7 @@ from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
-from ..state.play_state import PlayState, PlayParticipantType
+from ..state.play_record import PlayRecord, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
 from ..rng import RNG
@@ -33,17 +33,17 @@ class PassPlayEngine:
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
-        play_state: PlayState,
+        play_record: PlayRecord,
     ) -> None:
         self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
-        self.play_state = play_state
+        self.play_record = play_record
 
     def run(self) -> None:
-        assert self.play_state.off_play_call is not None
-        assert self.play_state.off_play_call.play_type == PlayTypeEnum.PASS
+        assert self.play_record.off_play_call is not None
+        assert self.play_record.off_play_call.play_type == PlayTypeEnum.PASS
 
         passer = self.get_passer()
         targetted = self.get_targetted_receiver()
@@ -59,17 +59,17 @@ class PassPlayEngine:
         # else:
         #     is_intercepted = self.is_intercepted(passer, targetted, air_yards)
         #     if is_intercepted:
-        #         self.play_state.is_turnover = True
+        #         self.play_record.is_turnover = True
         #         logger.debug("Pass was intercepted.")
         #     else:
-        #         self.play_state.is_clock_running = False  # incomplete pass stops clock
+        #         self.play_record.is_clock_running = False  # incomplete pass stops clock
         #         logger.debug("Pass was incomplete.")
 
-        self.play_state.yards_gained = yards_gained
+        self.play_record.yards_gained = yards_gained
         logger.debug(f"Pass Play Yards Gained: {yards_gained}")
         # TODO: Add logic for tackler, fumble etc.
-        self.play_state.add_participant(passer.uid, PlayParticipantType.PASSER)
-        self.play_state.add_participant(targetted.uid, PlayParticipantType.RECEIVER)
+        self.play_record.add_participant(passer.uid, PlayParticipantType.PASSER)
+        self.play_record.add_participant(targetted.uid, PlayParticipantType.RECEIVER)
 
     def get_passer(self) -> Athlete:
         passer_select_model = self.models.get_typed(
@@ -78,7 +78,7 @@ class PassPlayEngine:
         )
         passer = passer_select_model.execute(
             PasserSelectionContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(f"Passer selected: {passer.first_name} {passer.last_name}")
@@ -91,7 +91,7 @@ class PassPlayEngine:
         )
         targetted = targetted_select_model.execute(
             TargettedSelectionContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(
@@ -106,7 +106,7 @@ class PassPlayEngine:
         )
         airyards = airyard_model.execute(
             AirYardsContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(f"Air Yards: {airyards}")
@@ -121,7 +121,7 @@ class PassPlayEngine:
             CompletionContext(
                 self.game_state,
                 self.rng,
-                self.play_state.off_personnel_assignments,
+                self.play_record.off_personnel_assignments,
                 passer,
                 targetted,
                 air_yards,
@@ -142,7 +142,7 @@ class PassPlayEngine:
             YardsAfterCatchContext(
                 self.game_state,
                 self.rng,
-                self.play_state.off_personnel_assignments,
+                self.play_record.off_personnel_assignments,
             )
         )
         logger.debug(f"Yards After Catch: {yac}")

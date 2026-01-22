@@ -3,7 +3,7 @@ from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
-from ..state.play_state import PlayState, PlayParticipantType
+from ..state.play_record import PlayParticipantType, PlayExecutionData
 from ..domain.athlete import Athlete
 from ..rng import RNG
 from ..models.personnel import (
@@ -28,17 +28,17 @@ class KickoffPlayEngine:
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
-        play_state: PlayState,
+        play_execution_data: PlayExecutionData,
     ) -> None:
         self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
-        self.play_state = play_state
+        self.play_data = play_execution_data
 
     def run(self) -> None:
         # we should not have any play call for a kickoff
-        assert self.play_state.off_play_call is None
+        assert self.play_data.off_play_call is None
 
         kicker = self.get_kicker()
         returner = self.get_returner()
@@ -46,14 +46,12 @@ class KickoffPlayEngine:
         # distance from the returning team's goal line
         return_distance = self.get_return_distance(returner)
 
-        self.play_state.add_participant(kicker.uid, PlayParticipantType.KICKER)
-        self.play_state.add_participant(returner.uid, PlayParticipantType.RETURNER)
+        self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
+        self.play_data.add_participant(returner.uid, PlayParticipantType.RETURNER)
         # current distance is from where the kicking team is kicking off from (usually their 35)
         # the kicking team is in possession of the ball at that spot prior to the kickoff
-        self.play_state.yards_gained = (
-            -return_distance
-        )  # this will change once we implement kickoff distance
-        self.play_state.is_possession_change = True
+        self.play_data.set_yards_gained(-return_distance)
+        self.play_data.set_is_possession_change(True)
 
     def get_kicker(self) -> Athlete:
         kicker_select_model = self.models.get_typed(

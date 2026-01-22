@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import auto, Enum
 import logging
 from typing import TYPE_CHECKING, Dict, Optional, List
+import uuid
 
 from .game_clock import GameClock
 from .possession_state import PossessionState
@@ -10,10 +11,11 @@ from ..domain.team import Team
 from ..domain.rules.base import KickoffSetup, ExtraPointSetup
 from ..engine.timeout import TimeoutManager
 from ..models.misc import CoinTossChoice
+from .snapshot import ClockSnapshot, PossessionSnapshot, ScoreSnapshot
 
 if TYPE_CHECKING:
-    from .drive_state import DriveState
-    from .play_state import PlayState
+    from .drive_record import DriveRecord
+    from .play_record import PlayRecord
 
 
 logger = logging.getLogger(__name__)
@@ -33,6 +35,219 @@ class GameStatus(Enum):
     COMPLETE = auto()
 
 
+class GameSnapshot:
+    def __init__(self, game_state: Optional["GameState"] = None) -> None:
+        self.pos_team: Optional[Team] = game_state.pos_team if game_state else None
+        self.def_team: Optional[Team] = game_state.def_team if game_state else None
+        self.clock_snapshot: ClockSnapshot = (
+            ClockSnapshot(game_state.clock) if game_state else ClockSnapshot(None)
+        )
+        self.possession_snapshot: PossessionSnapshot = (
+            PossessionSnapshot(game_state.possession)
+            if game_state
+            else PossessionSnapshot(None)
+        )
+        self.scoreboard_snapshot: ScoreSnapshot = (
+            ScoreSnapshot(
+                game_state.scoreboard,
+                game_state.pos_team,
+                game_state.def_team,
+            )
+            if game_state
+            else ScoreSnapshot(None, None, None)
+        )
+
+    # ==============================
+    # Validation
+    # ==============================
+    def is_finalized(self) -> bool:
+        return (
+            self.pos_team is not None
+            and self.def_team is not None
+            and self.clock_snapshot.is_finalized()
+            and self.possession_snapshot.is_finalized()
+            and self.scoreboard_snapshot.is_finalized()
+        )
+
+
+class GameExecutionData:
+    def __init__(self) -> None:
+        self._status: GameStatus = GameStatus.NOT_STARTED
+        self._coin_toss_winner: Optional[Team] = None
+        self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
+        self._pending_kickoff: Optional[KickoffSetup] = None
+        self._pending_extra_point: Optional[ExtraPointSetup] = None
+        self.drives: List["DriveRecord"] = []
+
+    # ==============================
+    # Setters
+    # ==============================
+    def set_status(self, status: GameStatus) -> None:
+        self._status = status
+        logger.debug(f"Set status to {status.name}")
+
+    def set_coin_toss_winner(self, team: Team) -> None:
+        self._coin_toss_winner = team
+        logger.debug(f"Set coin_toss_winner to {team.name}")
+
+    def set_coin_toss_winner_choice(self, choice: CoinTossChoice) -> None:
+        self._coin_toss_winner_choice = choice
+        logger.debug(f"Set coin_toss_winner_choice choice to {choice.name}")
+
+    def set_pending_kickoff(self, kickoff_setup: KickoffSetup) -> None:
+        self._pending_kickoff = kickoff_setup
+        # TODO: Update possession state for kickoff accordingly to:
+        # kickoff_setup.kicking_team, kickoff_setup.receiving_team and kickoff_setup.spot
+        logger.debug(f"Set pending_kickoff to {kickoff_setup}")
+
+    def set_pending_extra_point(self, extra_point_setup: ExtraPointSetup) -> None:
+        self._pending_extra_point = extra_point_setup
+        # TODO: Update possession state for extra point attempt accordingly to:
+        # extra_point_setup.kicking_team and extra_point_setup.spot
+        self._pending_extra_point = extra_point_setup
+        logger.debug(f"Set pending_extra_point to {extra_point_setup}")
+
+    def add_drive(self, drive_record: "DriveRecord") -> None:
+        if not drive_record.is_finalized():
+            msg = "Attempted to add unfinalized DriveRecord to GameState."
+            logger.error(msg)
+            raise GameStateError(msg)
+
+        # Ensure consistency between GameExecutionData and DriveRecord by comparing
+        # the current state to the end state of the last drive / last play.
+        # self._assert_consistency()
+
+        self.drives.append(drive_record)
+        logger.debug(f"Drive {drive_record.uid} added to game state.")
+
+    def start_game(self) -> None:
+        if self.status != GameStatus.NOT_STARTED:
+            logger.error("Attempted to start a game that has already started")
+            raise GameStateError("Game already started")
+
+        self.set_status(GameStatus.IN_PROGRESS)
+
+    def end_game(self) -> None:
+        if self.status != GameStatus.IN_PROGRESS:
+            logger.error("Attempted to end a game that is not in progress")
+            raise GameStateError("Game not in progress")
+
+        self.set_status(GameStatus.COMPLETE)
+
+    # ==============================
+    # Getters
+    # ==============================
+    @property
+    def status(self) -> GameStatus:
+        return self._status
+
+    @property
+    def coin_toss_winner(self) -> Optional[Team]:
+        return self._coin_toss_winner
+
+    @property
+    def coin_toss_winner_choice(self) -> Optional[CoinTossChoice]:
+        return self._coin_toss_winner_choice
+
+    @property
+    def pending_kickoff(self) -> Optional[KickoffSetup]:
+        return self._pending_kickoff
+
+    @property
+    def pending_extra_point(self) -> Optional[ExtraPointSetup]:
+        return self._pending_extra_point
+
+    @property
+    def last_drive(self) -> Optional["DriveRecord"]:
+        if not self.drives:
+            logger.warning("No drives found in game state.")
+            return None
+        return self.drives[-1]
+
+    # ==============================
+
+    # ==============================
+    def consume_pending_kickoff(self) -> KickoffSetup:
+        ko = self._pending_kickoff
+        if ko is None:
+            logger.error("Attempted to consume a kickoff when there is none pending.")
+            raise GameStateError("No pending kickoff to consume.")
+
+        self._pending_kickoff = None
+        logger.debug("Consumed pending kickoff.")
+        return ko
+
+    def consume_pending_extra_point(self) -> ExtraPointSetup:
+        ep = self._pending_extra_point
+        if ep is None:
+            logger.error(
+                "Attempted to consume an extra point when there is none pending."
+            )
+            raise GameStateError("No pending extra point to consume.")
+
+        self._pending_extra_point = None
+        logger.debug("Consumed pending extra point.")
+        return ep
+
+
+class GameRecord:
+    def __init__(self, start_game_state: GameState) -> None:
+        self.uid: str = str(uuid.uuid4())
+        self._start_snapshot: GameSnapshot = GameSnapshot(start_game_state)
+        self._end_snapshot: GameSnapshot = GameSnapshot(None)
+
+    # ==============================
+    # Getters
+    # ==============================
+    @property
+    def start(self) -> GameSnapshot:
+        return self._start_snapshot
+
+    @property
+    def end(self) -> GameSnapshot:
+        return self._end_snapshot
+
+    # ==============================
+    # Validation
+    # ==============================
+    def is_finalized(self) -> bool:
+        return self._start_snapshot.is_finalized() and self._end_snapshot.is_finalized()
+
+
+class GameRules:
+    @staticmethod
+    def is_game_over(game_state: GameState) -> bool:
+        if game_state.clock.is_expired():
+            logger.info("Game over: clock expired")
+            return True
+        # TODO: add overtime rules, mercy rule, etc.
+        return False
+
+    @staticmethod
+    def is_end_of_half(game_state: GameState) -> bool:
+        if (
+            game_state.clock.current_quarter in [2, 4]
+            and game_state.clock.time_remaining <= 0
+        ):
+            logger.info("End of half condition met")
+            return True
+        return False
+
+    @staticmethod
+    def is_drive_over(game_state: GameState) -> bool:
+        if (
+            GameRules.is_game_over(game_state)
+            or GameRules.is_end_of_half(game_state)
+            or game_state.last_play_was_scoring()
+            or game_state.possession_changed()
+            or game_state.last_play_was_kick()
+        ):
+            logger.info("Drive over condition met by GameRules")
+            return True
+
+        return False
+
+
 class GameState:
     """
     Authoritative, mutable, live game state owned by the GameEngine.
@@ -46,21 +261,16 @@ class GameState:
         scoreboard: Scoreboard,
         timeout_mgr: TimeoutManager,
     ) -> None:
-        self._game_status = GameStatus.NOT_STARTED
-        self._home_team = home_team
-        self._away_team = away_team
-        self._clock = clock
-        self._scoreboard = scoreboard
-        self._timeout_mgr = timeout_mgr
-        self._coin_toss_winner: Optional[Team] = None
-        self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
-        self._pending_kickoff: Optional[KickoffSetup] = None
-        self._pending_extra_point: Optional[ExtraPointSetup] = None
+        self._home_team: Team = home_team
+        self._away_team: Team = away_team
+        self._clock: GameClock = clock
+        self._scoreboard: Scoreboard = scoreboard
+        self._timeout_mgr: TimeoutManager = timeout_mgr
         self.ot_possessions: Dict[str, int] = {
             self._home_team.uid: 0,
             self._away_team.uid: 0,
         }  # team uid -> number of OT possessions
-        self.first_ot_possession_complete: bool
+        self.first_ot_possession_complete: bool = False
         # default starting possession
         self._possession = PossessionState(
             pos_team=home_team,
@@ -68,126 +278,48 @@ class GameState:
             down=1,
             distance=10,
         )
-        self.last_drive: Optional["DriveState"] = None
-        self.drives: List["DriveState"] = []
 
     # ===============================
-    # Life Cycle Methods
+    # Setters
     # ===============================
-    def start_game(self) -> None:
-        if self._game_status != GameStatus.NOT_STARTED:
-            logger.error("Attempted to start a game that has already started")
-
-            raise GameStateError("Game already started")
-        self._game_status = GameStatus.IN_PROGRESS
-        logger.info("Game started")
-
-    def end_game(self) -> None:
-        if self._game_status != GameStatus.IN_PROGRESS:
-            logger.error("Attempted to end a game that is not in progress")
-            raise GameStateError("Game not in progress")
-
-        self._game_status = GameStatus.COMPLETE
-        logger.info("Game ended")
-
-    def is_game_over(self) -> bool:
-        if self.clock.is_expired():
-            return True
-        # TODO: add overtime rules, mercy rule, etc.
-        return False
-
-    def is_end_of_half(self) -> bool:
-        if self.clock.current_quarter in [2, 4] and self.clock.time_remaining <= 0:
-            return True
-        return False
-
-    def is_drive_over(self) -> bool:
-        if (
-            self.is_game_over()
-            or self.is_end_of_half()
-            or self.last_play_was_scoring()
-            or self.possession_changed()
-            or self.last_play_was_kick()
-        ):
-            return True
-
-        return False
-
-    # ===============================
-    # Core State Manipulation
-    # ===============================
-
-    def update_possession(self, play_state: "PlayState") -> None:
-        assert play_state.end_pos_team is not None
-        assert play_state.end_yardline is not None
-        assert play_state.end_down is not None
-        assert play_state.end_distance is not None
-        self._possession.update_possession(play_state.end_pos_team)
-        self._possession.update_down(play_state.end_down)
-        self._possession.update_distance(play_state.end_distance)
-        self._possession.update_ball_position(play_state.end_yardline)
-        if play_state.is_possession_change:
-            self._possession.flip_field()
-
-    def add_drive(self, drive_state: "DriveState") -> None:
-        if not drive_state.is_finalized():
-            msg = "Attempted to add unfinalized DriveState to GameState."
-            logger.error(msg)
-            raise GameStateError(msg)
-
-        self.last_drive = drive_state
-        self._assert_consistency()  # ensure consistency between GameState and DriveState
-
-        self.drives.append(drive_state)
-        logger.debug(f"Drive {drive_state.uid} added to game state.")
-
     def set_possession(self, team: Team) -> None:
         self._possession.set_possession(team)
         logger.debug(f"Possession set to team: {team.name}")
 
     # ===============================
-    # Pending phase transitions
+    # Getters
     # ===============================
-    def set_pending_kickoff(self, kickoff_setup: KickoffSetup) -> None:
-        self.possession.set_state(
-            kickoff_setup.kicking_team, kickoff_setup.kickoff_spot, down=0, distance=0
-        )
-        self._pending_kickoff = kickoff_setup
+    @property
+    def home_team(self) -> Team:
+        return self._home_team
 
-    def consume_pending_kickoff(self) -> KickoffSetup:
-        if self._pending_kickoff is None:
-            msg = "No pending kickoff to consume."
-            logger.error(msg)
-            raise GameStateError(msg)
+    @property
+    def away_team(self) -> Team:
+        return self._away_team
 
-        ko = self._pending_kickoff
-        self._pending_kickoff = None
-        return ko
+    @property
+    def clock(self) -> GameClock:
+        return self._clock
 
-    def has_pending_kickoff(self) -> bool:
-        return self._pending_kickoff is not None
+    @property
+    def scoreboard(self) -> Scoreboard:
+        return self._scoreboard
 
-    def set_pending_extra_point(self, extra_point_setup: ExtraPointSetup) -> None:
-        self.possession.set_state(
-            extra_point_setup.kicking_team,
-            extra_point_setup.spot,
-            down=0,
-            distance=extra_point_setup.spot,
-        )
-        self._pending_extra_point = extra_point_setup
+    @property
+    def timeout_mgr(self) -> TimeoutManager:
+        return self._timeout_mgr
 
-    def consume_pending_extra_point(self) -> ExtraPointSetup:
-        if self._pending_extra_point is None:
-            msg = "No pending extra point attempt to consume."
-            logger.error(msg)
-            raise GameStateError(msg)
+    @property
+    def possession(self) -> PossessionState:
+        return self._possession
 
-        ep = self._pending_extra_point
-        self._pending_extra_point = None
-        return ep
+    @property
+    def pos_team(self) -> Team:
+        return self.possession.pos_team
 
-    def has_pending_extra_point(self) -> bool:
-        return self._pending_extra_point is not None
+    @property
+    def def_team(self) -> Team:
+        return self.opponent(self.possession.pos_team)
 
     # ===============================
     # Derived state queries
@@ -242,82 +374,12 @@ class GameState:
 
         return self.last_drive.last_play.is_possession_change
 
-    def set_coin_toss_winner(self, team: Team) -> None:
-        if self._coin_toss_winner is not None:
-            logger.error("Attempted to set coin toss winner more than once")
-            raise GameStateError("Coin toss winner already set")
-
-        self._coin_toss_winner = team
-        logger.info(f"Coin toss winner set to team: {team.name}")
-
-    def set_coin_toss_winner_choice(self, choice: CoinTossChoice) -> None:
-        if self._coin_toss_winner is None:
-            logger.error("Attempted to set coin toss winner choice before winner")
-            raise GameStateError("Coin toss winner not set")
-
-        self._coin_toss_winner_choice = choice
-        logger.info(
-            f"Coin toss winner {self._coin_toss_winner.name} chose to {choice.name}"
-        )
-
-    # ===============================
-    # Accessors
-    # ===============================
-
-    @property
-    def possession(self) -> PossessionState:
-        return self._possession
-
-    @property
-    def pos_team(self) -> Team:
-        return self._possession.pos_team
-
-    @property
-    def def_team(self) -> Team:
-        return (
-            self._away_team
-            if self.possession.pos_team == self._home_team
-            else self._home_team
-        )
-
-    @property
-    def game_status(self) -> GameStatus:
-        return self._game_status
-
-    @property
-    def home_team(self) -> Team:
-        return self._home_team
-
-    @property
-    def away_team(self) -> Team:
-        return self._away_team
-
-    @property
-    def clock(self) -> GameClock:
-        return self._clock
-
-    @property
-    def scoreboard(self) -> Scoreboard:
-        return self._scoreboard
-
-    @property
-    def timeout_mgr(self) -> TimeoutManager:
-        return self._timeout_mgr
-
-    @property
-    def coin_toss_winner(self) -> Optional[Team]:
-        return self._coin_toss_winner
-
-    @property
-    def coin_toss_winner_choice(self) -> Optional[CoinTossChoice]:
-        return self._coin_toss_winner_choice
-
     # ===============================
     # Internal Consistency Checks
     # ===============================
 
     def _assert_consistency(self) -> None:
-        """Assert internal consistency between GameState and DriveState/PlayState."""
+        """Assert internal consistency between GameState and DriveRecord/PlayRecord."""
         assert self.last_drive is not None
         ld = self.last_drive
 
@@ -378,44 +440,3 @@ class GameState:
             )
             logger.error(msg)
             raise GameStateConsistencyError(msg)
-
-
-class GameStateUpdater:
-    """Applies PlayState updates to the GameState."""
-
-    def __init__(self, game_state: GameState) -> None:
-        self._game_state = game_state
-
-    def apply_play(self, play_state: "PlayState") -> None:
-        self._update_clock(play_state)
-        if play_state.is_scoring_play:
-            self._update_scoreboard(play_state)
-        self._update_possession(play_state)
-        self._update_timeouts(play_state)
-
-    def _update_clock(self, play_state: "PlayState") -> None:
-        assert play_state.end_quarter is not None
-        assert play_state.end_time is not None
-        assert play_state.end_is_clock_running is not None
-        assert play_state.time_elapsed is not None
-        assert play_state.end_is_clock_running is not None
-
-        # consume the time elapsed for this play
-        self._game_state.clock.env.timeout(play_state.time_elapsed)
-        self._game_state.clock.clock_is_running = play_state.end_is_clock_running
-
-    def _update_scoreboard(self, play_state: "PlayState") -> None:
-        assert play_state.is_scoring_play
-        assert play_state.scoring_team is not None
-        assert play_state.end_pos_team_score is not None
-        self._game_state.scoreboard.add_points(
-            play_state.scoring_team,
-            play_state.end_pos_team_score - play_state.start_pos_team_score,
-        )
-
-    def _update_possession(self, play_state: "PlayState") -> None:
-        self._game_state.update_possession(play_state)
-
-    def _update_timeouts(self, play_state: "PlayState") -> None:
-        # TODO: implement timeout updates
-        pass

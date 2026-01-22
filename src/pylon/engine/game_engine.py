@@ -98,14 +98,14 @@ class GameEngine:
         self.rules.start_game(self.game_state, self.models, self.rng)
 
         while not self.game_state.is_game_over():
-            drive_state = DriveEngine(
+            drive_record = DriveEngine(
                 self.env, self.game_state, self.models, self.rng, self.rules
             ).run()
 
             if self.game_state.is_end_of_half():
                 self.rules.start_half(self.game_state, self.models, self.rng)
 
-            self.game_state.add_drive(drive_state)
+            self.game_state.add_drive(drive_record)
             yield self.env.timeout(0)  # allow SimPy scheduling
 
         self.game_state.end_game()

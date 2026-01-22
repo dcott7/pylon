@@ -3,7 +3,7 @@ from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
-from ..state.play_state import PlayState, PlayParticipantType
+from ..state.play_record import PlayRecord, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
 from ..rng import RNG
@@ -31,17 +31,17 @@ class PuntPlayEngine:
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
-        play_state: PlayState,
+        play_record: PlayRecord,
     ) -> None:
         self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
-        self.play_state = play_state
+        self.play_record = play_record
 
     def run(self) -> None:
-        assert self.play_state.off_play_call is not None
-        assert self.play_state.off_play_call.play_type == PlayTypeEnum.PUNT
+        assert self.play_record.off_play_call is not None
+        assert self.play_record.off_play_call.play_type == PlayTypeEnum.PUNT
 
         punter = self.get_punter()
         punt_distance = self.get_punt_distance()
@@ -49,10 +49,10 @@ class PuntPlayEngine:
         return_distance = self.get_return_distance(returner)
         # TODO: Add logic for touchback, fair catch, etc.
 
-        self.play_state.add_participant(punter.uid, PlayParticipantType.PUNTER)
-        self.play_state.add_participant(returner.uid, PlayParticipantType.RETURNER)
-        self.play_state.yards_gained = punt_distance - return_distance
-        self.play_state.is_possession_change = True
+        self.play_record.add_participant(punter.uid, PlayParticipantType.PUNTER)
+        self.play_record.add_participant(returner.uid, PlayParticipantType.RETURNER)
+        self.play_record.yards_gained = punt_distance - return_distance
+        self.play_record.is_possession_change = True
 
     def get_punter(self) -> Athlete:
         punter_select_model = self.models.get_typed(
@@ -61,7 +61,7 @@ class PuntPlayEngine:
         )
         punter = punter_select_model.execute(
             PunterSelectionContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(f"Punter selected: {punter.first_name} {punter.last_name}")
@@ -74,7 +74,7 @@ class PuntPlayEngine:
         )
         returner = returner_select_model.execute(
             PuntReturnerSelectionContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(f"Returner selected: {returner.first_name} {returner.last_name}")
@@ -87,7 +87,7 @@ class PuntPlayEngine:
         )
         punt_distance = punt_dist_model.execute(
             PuntDistanceContext(
-                self.game_state, self.rng, self.play_state.off_personnel_assignments
+                self.game_state, self.rng, self.play_record.off_personnel_assignments
             )
         )
         logger.debug(f"Punt Distance: {punt_distance}")
@@ -102,7 +102,7 @@ class PuntPlayEngine:
             PuntReturnDistanceContext(
                 self.game_state,
                 self.rng,
-                self.play_state.off_personnel_assignments,
+                self.play_record.off_personnel_assignments,
                 returner,
             )
         )
