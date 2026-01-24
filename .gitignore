@@ -11,3 +11,6 @@ wheels/
 
 # Other
 drop_plays_tables.sh
+
+# Logs
+*.log
