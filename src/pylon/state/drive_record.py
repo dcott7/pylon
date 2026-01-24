@@ -5,14 +5,11 @@ import logging
 import uuid
 
 from ..domain.team import Team
-
-# from ..domain.playbook import PlayTypeEnum
-from ..domain.rules.base import ScoringTypeEnum
 from .snapshot import ClockSnapshot, PossessionSnapshot, ScoreSnapshot
 
 if TYPE_CHECKING:
     from .game_state import GameState
-    from .play_record import PlayRecord, PlayFinalizationError
+    from .play_record import PlayRecord, PlayFinalizationError, ScoringTypeEnum
 
 
 logger = logging.getLogger(__name__)
@@ -34,102 +31,6 @@ class DriveEndResult(Enum):
 class DriveStatus(Enum):
     COMPLETED = "completed"
     IN_PROGRESS = "in_progress"
-
-
-# class DriveRecordUpdater:
-#     def __init__(self, drive_record: DriveRecord) -> None:
-#         self._ds = drive_record
-
-#     def apply_play(self, play_record: "PlayRecord", game_state: "GameState") -> None:
-#         self._update_clock(play_record)
-#         if play_record.is_possession_change:
-#             self._update_scoreboard(play_record)
-#         self._update_possession(play_record)
-#         self._update_result(play_record, game_state)
-
-#     def _update_possession(self, play_record: "PlayRecord") -> None:
-#         if self._ds.end_def_team is not None or self._ds.end_pos_team is not None:
-#             msg = (
-#                 "Attempted to update possession state of already finalized DriveRecord."
-#             )
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         assert play_record.end_pos_team is not None
-#         assert play_record.end_def_team is not None
-
-#         self._ds.end_pos_team = play_record.end_pos_team
-#         self._ds.end_def_team = play_record.end_def_team
-
-#     def _update_clock(self, play_record: "PlayRecord") -> None:
-#         if self._ds.end_quarter is not None or self._ds.end_time is not None:
-#             msg = "Attempted to finalize time info of already finalized DriveRecord."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         assert play_record.end_quarter is not None
-#         assert play_record.end_time is not None
-
-#         self._ds.end_quarter = play_record.end_quarter
-#         self._ds.end_time = play_record.end_time
-#         self._ds.time_elapsed = self._ds.start_time - play_record.end_time
-
-#     def _update_scoreboard(self, play_record: "PlayRecord") -> None:
-#         if (
-#             self._ds.end_pos_team_score is not None
-#             or self._ds.end_def_team_score is not None
-#         ):
-#             msg = "Attempted to finalize scores of already finalized DriveRecord."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         self._ds.end_pos_team_score = play_record.end_pos_team_score
-#         self._ds.end_def_team_score = play_record.end_def_team_score
-#         self._ds.is_scoring_drive = play_record.is_scoring_play
-
-#     def _update_yardline(self, play_record: "PlayRecord") -> None:
-#         if self._ds.end_yardline is not None:
-#             msg = "Attempted to finalize yardline of already finalized DriveRecord."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         assert play_record.end_yardline is not None
-
-#         self._ds.end_yardline = play_record.end_yardline
-#         self._ds.yards_gained = self._ds.start_yardline - play_record.end_yardline
-
-#     def _update_result(
-#         self, play_record: "PlayRecord", game_state: "GameState"
-#     ) -> None:
-#         if self._ds.result is not None:
-#             msg = "Attempted to finalize result of already finalized DriveRecord."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         last_off_play_call = play_record.off_play_call
-#         if last_off_play_call is None:
-#             msg = "Cannot finalize DriveRecord result without offensive play call."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         if play_record.is_scoring_play:
-#             result = DriveEndResult.SCORE
-#         elif play_record.is_turnover:
-#             result = DriveEndResult.TURNOVER
-#         elif game_state.is_end_of_half():
-#             result = DriveEndResult.END_OF_HALF
-#         elif game_state.is_game_over():
-#             result = DriveEndResult.END_OF_GAME
-#         elif last_off_play_call.play_type == PlayTypeEnum.PUNT:
-#             result = DriveEndResult.PUNT
-#         elif last_off_play_call.play_type == PlayTypeEnum.FIELD_GOAL:
-#             result = DriveEndResult.FIELD_GOAL_ATTEMPT
-#         else:
-#             msg = "Cannot determine DriveEndResult from last play and game state."
-#             logger.error(msg)
-#             raise DriveFinalizationError(msg)
-
-#         self._ds.result = result
 
 
 class DriveSnapshot:
@@ -155,7 +56,7 @@ class DriveSnapshot:
         )
 
     # ==============================
-    # Validation
+    # Validators
     # ==============================
     def is_finalized(self) -> bool:
         return (
@@ -269,7 +170,7 @@ class DriveExecutionData:
         return self._plays[-1]
 
     # ==============================
-    # Validation
+    # Validators
     # ==============================
     def is_finalized(self) -> bool:
         return (
@@ -299,7 +200,15 @@ class DriveRecord:
         return self._end_snapshot
 
     # ==============================
-    # Validation
+    # Validators
     # ==============================
     def is_finalized(self) -> bool:
         return self._start_snapshot.is_finalized() and self._end_snapshot.is_finalized()
+
+    def set_end_state(self, end_game_state: GameState) -> None:
+        if self.is_finalized():
+            msg = "Cannot set end state on a finalized DriveRecord."
+            logger.error(msg)
+            raise DriveFinalizationError(msg)
+
+        self._end_snapshot = DriveSnapshot(end_game_state)

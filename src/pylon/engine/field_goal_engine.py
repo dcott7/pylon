@@ -1,9 +1,8 @@
 import logging
-from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
-from ..state.play_record import PlayRecord, PlayParticipantType
+from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
 from ..rng import RNG
@@ -17,36 +16,36 @@ logger = logging.getLogger(__name__)
 class FieldGoalPlayEngine:
     def __init__(
         self,
-        env: Environment,
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
-        play_record: PlayRecord,
+        play_data: PlayExecutionData,
     ) -> None:
-        self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
-        self.play_record = play_record
+        self.play_data = play_data
 
     def run(self) -> None:
-        assert self.play_record.off_play_call is not None
-        assert self.play_record.off_play_call.play_type == PlayTypeEnum.FIELD_GOAL
+        assert self.play_data.off_play_call is not None
+        assert self.play_data.off_play_call.play_type == PlayTypeEnum.FIELD_GOAL
 
         kicker = self.get_kicker()
         is_fg_good = self.is_fg_good(kicker)
 
         yards_gained: int = 0
         if is_fg_good:
-            yards_gained = self.play_record.start_yardline  # yards to goal line
+            yards_gained = (
+                self.game_state.possession.ball_position
+            )  # yards to goal line
             logger.debug(
                 f"Field Goal is GOOD. Yards Gained: {yards_gained} "
                 "(field goal distance)"
             )
 
-        self.play_record.yards_gained = yards_gained
+        self.play_data.set_yards_gained(yards_gained)
         logger.debug(f"Field Goal Play Yards Gained: {yards_gained}")
-        self.play_record.add_participant(kicker.uid, PlayParticipantType.KICKER)
+        self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
 
     def get_kicker(self) -> Athlete:
         kicker_select_model = self.models.get_typed(
@@ -55,7 +54,7 @@ class FieldGoalPlayEngine:
         )
         kicker = kicker_select_model.execute(
             KickerSelectionContext(
-                self.game_state, self.rng, self.play_record.off_personnel_assignments
+                self.game_state, self.rng, self.play_data.off_personnel_assignments
             )
         )
         logger.debug(f"Kicker selected: {kicker.first_name} {kicker.last_name}")
@@ -70,7 +69,7 @@ class FieldGoalPlayEngine:
             FieldGoalContext(
                 self.game_state,
                 self.rng,
-                self.play_record.off_personnel_assignments,
+                self.play_data.off_personnel_assignments,
                 kicker,
             )
         )

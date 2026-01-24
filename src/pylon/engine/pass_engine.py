@@ -1,9 +1,8 @@
 import logging
-from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
-from ..state.play_record import PlayRecord, PlayParticipantType
+from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
 from ..rng import RNG
@@ -29,21 +28,19 @@ logger = logging.getLogger(__name__)
 class PassPlayEngine:
     def __init__(
         self,
-        env: Environment,
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
-        play_record: PlayRecord,
+        play_data: PlayExecutionData,
     ) -> None:
-        self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
-        self.play_record = play_record
+        self.play_data = play_data
 
     def run(self) -> None:
-        assert self.play_record.off_play_call is not None
-        assert self.play_record.off_play_call.play_type == PlayTypeEnum.PASS
+        assert self.play_data.off_play_call is not None
+        assert self.play_data.off_play_call.play_type == PlayTypeEnum.PASS
 
         passer = self.get_passer()
         targetted = self.get_targetted_receiver()
@@ -65,11 +62,11 @@ class PassPlayEngine:
         #         self.play_record.is_clock_running = False  # incomplete pass stops clock
         #         logger.debug("Pass was incomplete.")
 
-        self.play_record.yards_gained = yards_gained
+        self.play_data.set_yards_gained(yards_gained)
         logger.debug(f"Pass Play Yards Gained: {yards_gained}")
         # TODO: Add logic for tackler, fumble etc.
-        self.play_record.add_participant(passer.uid, PlayParticipantType.PASSER)
-        self.play_record.add_participant(targetted.uid, PlayParticipantType.RECEIVER)
+        self.play_data.add_participant(passer.uid, PlayParticipantType.PASSER)
+        self.play_data.add_participant(targetted.uid, PlayParticipantType.RECEIVER)
 
     def get_passer(self) -> Athlete:
         passer_select_model = self.models.get_typed(
@@ -78,7 +75,7 @@ class PassPlayEngine:
         )
         passer = passer_select_model.execute(
             PasserSelectionContext(
-                self.game_state, self.rng, self.play_record.off_personnel_assignments
+                self.game_state, self.rng, self.play_data.off_personnel_assignments
             )
         )
         logger.debug(f"Passer selected: {passer.first_name} {passer.last_name}")
@@ -91,7 +88,7 @@ class PassPlayEngine:
         )
         targetted = targetted_select_model.execute(
             TargettedSelectionContext(
-                self.game_state, self.rng, self.play_record.off_personnel_assignments
+                self.game_state, self.rng, self.play_data.off_personnel_assignments
             )
         )
         logger.debug(
@@ -106,7 +103,7 @@ class PassPlayEngine:
         )
         airyards = airyard_model.execute(
             AirYardsContext(
-                self.game_state, self.rng, self.play_record.off_personnel_assignments
+                self.game_state, self.rng, self.play_data.off_personnel_assignments
             )
         )
         logger.debug(f"Air Yards: {airyards}")
@@ -121,7 +118,7 @@ class PassPlayEngine:
             CompletionContext(
                 self.game_state,
                 self.rng,
-                self.play_record.off_personnel_assignments,
+                self.play_data.off_personnel_assignments,
                 passer,
                 targetted,
                 air_yards,
@@ -142,7 +139,7 @@ class PassPlayEngine:
             YardsAfterCatchContext(
                 self.game_state,
                 self.rng,
-                self.play_record.off_personnel_assignments,
+                self.play_data.off_personnel_assignments,
             )
         )
         logger.debug(f"Yards After Catch: {yac}")

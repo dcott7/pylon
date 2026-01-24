@@ -11,6 +11,11 @@ T = TypeVar("T")
 
 
 class RNG:
+    """
+    Random Number Generator wrapper class. Uses Python's built-in random module
+    to generate random numbers with an optional seed for reproducibility.
+    """
+
     def __init__(self, seed: Optional[int] = None) -> None:
         if seed is None:
             seed = int(time.time_ns() & 0xFFFFFFFF)
@@ -19,10 +24,16 @@ class RNG:
         self._seed = seed
         self._rng = random.Random(seed)
 
+    # ===============================
+    # Getters
+    # ===============================
     @property
     def seed(self) -> int:
         return self._seed
 
+    # ===============================
+    # Random Methods
+    # ===============================
     def random(self) -> float:
         return self._rng.random()
 

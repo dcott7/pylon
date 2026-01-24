@@ -1,14 +1,24 @@
 from __future__ import annotations
-import logging
-import uuid
 from enum import auto, Enum
+import logging
 from typing import Dict, List, Optional
+import uuid
 
 
 logger = logging.getLogger(__name__)
 
 
 class AthletePositionEnum(Enum):
+    """
+    Enumeration of all football positions used in the simulation.
+
+    The enum includes both specific positions (e.g., QB, LT, CB)
+    and generic grouping positions (e.g., SKILL, OLINE, DB).
+    These grouping positions are used by formation validators,
+    personnel selection models, and fallback logic when a more
+    specific position is not available.
+    """
+
     # Offense
     OFFENSE = auto()  # generic offense position
     QB = auto()
@@ -53,7 +63,16 @@ class AthletePositionEnum(Enum):
 
 
 class PositionTree:
-    """A tree structure representing athlete positions and their hierarchy."""
+    """
+    A tree structure representing athlete positions and their hierarchy. This
+    allows for easy traversal and querying of position relationships. Each node
+    in the tree represents a position and can have multiple child positions. This
+    allows for grouping of positions (e.g., SKILL, OLINE) and defining parent-child
+    relationships between positions. This also allows us to have fallback logic when
+    a specific position is not available by traversing up the tree to more generic
+    positions. For example, if a WR is not available, we can fallback to SKILL, then
+    OFFENSE.
+    """
 
     def __init__(
         self,
@@ -68,6 +87,9 @@ class PositionTree:
         for child in self.children.values():
             child.parent = self
 
+    # ==============================
+    # Tree Operations
+    # ==============================
     def is_leaf(self) -> bool:
         """Check if the current node is a leaf node (has no children)."""
         return len(self.children) == 0
@@ -106,6 +128,60 @@ class PositionTree:
                 return True
             pos = pos.parent
         return False
+
+
+class Athlete:
+    """
+    Domain model representing an athlete in the simulation. This class
+    encapsulates the athlete's personal information and position. An
+    athlete is uniquely identified by a UUID and assigned a specific position
+    from the AthletePositionEnum. Atheltes will be on a team roster and
+    can participate in a play during a game as a PlayParticipant.
+    """
+
+    def __init__(
+        self,
+        first_name: str,
+        last_name: str,
+        position: AthletePositionEnum,
+        uid: Optional[str] = None,
+    ) -> None:
+        self._uid = uid or str(uuid.uuid4())
+        self._first_name = first_name
+        self._last_name = last_name
+        self._position = position
+
+    # ==============================
+    # Getters
+    # ==============================
+    @property
+    def uid(self) -> str:
+        return self._uid
+
+    @property
+    def first_name(self) -> str:
+        return self._first_name
+
+    @property
+    def last_name(self) -> str:
+        return self._last_name
+
+    @property
+    def position(self) -> AthletePositionEnum:
+        return self._position
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+    # ==============================
+    # String Representations
+    # ==============================
+    def __str__(self) -> str:
+        return f"Athlete({self.full_name}, {self.position.name}, uid={self.uid})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 POSITION_TREE = PositionTree(
@@ -225,43 +301,3 @@ POSITION_TREE = PositionTree(
         ),
     },
 )
-
-
-class Athlete:
-    def __init__(
-        self,
-        first_name: str,
-        last_name: str,
-        position: AthletePositionEnum,
-        uid: Optional[str] = None,
-    ) -> None:
-        self._uid = uid or str(uuid.uuid4())
-        self._first_name = first_name
-        self._last_name = last_name
-        self._position = position
-
-    @property
-    def uid(self) -> str:
-        return self._uid
-
-    @property
-    def first_name(self) -> str:
-        return self._first_name
-
-    @property
-    def last_name(self) -> str:
-        return self._last_name
-
-    @property
-    def position(self) -> AthletePositionEnum:
-        return self._position
-
-    @property
-    def full_name(self) -> str:
-        return f"{self.first_name} {self.last_name}"
-
-    def __str__(self) -> str:
-        return f"Athlete({self.full_name}, {self.position.name}, uid={self.uid})"
-
-    def __repr__(self) -> str:
-        return self.__str__()

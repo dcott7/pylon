@@ -15,8 +15,8 @@ class Scoreboard:
     """
     Tracks the score of a football game.
 
-    This is a passive, SimPy-friendly state container. It does not
-    manage time; scores are updated by external play/outcome events.
+    This is a passive state container. Scores are updated by external
+    play/outcome events.
 
     Attributes:
         _scores (Dict[str, int]): Mapping from team UID to current score.
@@ -31,19 +31,14 @@ class Scoreboard:
         if team.uid not in self._scores:
             raise ScoreboardStateError(f"Team {team.name} is not part of this game")
 
-    def add_points(self, team: Team, points: int, description: str = "") -> None:
+    def add_points(self, team: Team, points: int) -> None:
         """Add points to a team's score, optionally with a description for logging."""
         self._validate_team(team)
         old_score = self._scores[team.uid]
         self._scores[team.uid] += points
-        if description:
-            logger.info(
-                f"{team.name} {description}: {old_score} -> {self._scores[team.uid]}"
-            )
-        else:
-            logger.info(
-                f"{team.name} score updated: {old_score} -> {self._scores[team.uid]}"
-            )
+        logger.info(
+            f"{team.name} score updated: {old_score} -> {self._scores[team.uid]}"
+        )
 
     # Query methods
     def current_score(self, team: Team) -> int:

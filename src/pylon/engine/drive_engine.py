@@ -1,10 +1,9 @@
 import logging
-from simpy import Environment
 from typing import Optional
 
 from ..state.play_record import PlayRecord
-from ..state.game_state import GameState
-from ..state.drive_record import DriveRecord
+from ..state.game_state import GameState, GameStateUpdater
+from ..state.drive_record import DriveRecord, DriveExecutionData
 from ..domain.rules.base import LeagueRules
 from ..models.registry import ModelRegistry
 from ..rng import RNG
@@ -25,44 +24,49 @@ class DriveEngine:
 
     def __init__(
         self,
-        env: Environment,
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
         rules: LeagueRules,
     ) -> None:
-        self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng
         self.rules = rules
         self.drive_record = DriveRecord(self.game_state)
-        self.play_engine = PlayEngine(env, game_state, models, rng, self.rules)
+        self.play_engine = PlayEngine(game_state, models, rng, self.rules)
 
     def run(self) -> DriveRecord:
         last_play: Optional[PlayRecord] = None
+        drive_data = DriveExecutionData()
 
         while not self.is_drive_over():
+            # create snapshots of the current game state before the play
+            play_record = PlayRecord(self.game_state)
+            # execute the play
+            play_data = self.play_engine.run()
+
             self.run_pre_play_hooks()
 
-            play_record = self.play_engine.run()
-            last_play = play_record
-            self.drive_record.add_play(play_record)
-            self.game_state.apply_play(play_record)  # updates the GameState
+            GameStateUpdater.apply_play_data(self.game_state, play_data, self.rules)
+
+            play_record.set_end_state(self.game_state)
+            drive_data.add_play(play_record)
+
             self.run_post_play_hooks()
 
+        # ensure at least one play was run
         if last_play is None:
             msg = "Drive ended without running any plays."
             logger.error(msg)
             raise DriveExecutionError(msg)
 
-        self.drive_record.finalize(last_play, self.game_state)
-        # schedule things like kickoffs and extra points based on drive result
+        self.drive_record.set_end_state(self.game_state)
         self.rules.on_drive_end(self.game_state, self.drive_record)
         return self.drive_record
 
     def is_drive_over(self) -> bool:
-        return self.game_state.is_drive_over()
+        return self.rules.is_drive_over(self.game_state)
 
     def run_pre_play_hooks(self) -> None:
         """Run any pre-play hooks, such as penalties or special conditions."""

@@ -1,5 +1,4 @@
 import logging
-from simpy import Environment
 
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
@@ -24,13 +23,11 @@ logger = logging.getLogger(__name__)
 class KickoffPlayEngine:
     def __init__(
         self,
-        env: Environment,
         game_state: GameState,
         models: ModelRegistry,
         rng: RNG,
         play_execution_data: PlayExecutionData,
     ) -> None:
-        self.env = env
         self.game_state = game_state
         self.models = models
         self.rng = rng

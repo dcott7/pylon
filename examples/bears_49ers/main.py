@@ -1,6 +1,5 @@
 import logging
 import sqlite3
-import simpy
 from pathlib import Path
 from typing import Dict
 
@@ -40,7 +39,7 @@ def main():
     home = teams["Bears"]
     away = teams["49ers"]
 
-    ge = GameEngine(simpy.Environment(), home_team=home, away_team=away)
+    ge = GameEngine(home_team=home, away_team=away)
     ge.run()
 
 
