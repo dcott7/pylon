@@ -1,4 +1,4 @@
-from enum import auto, Enum
+from enum import Enum
 import logging
 from typing import Dict, List, Optional, Set
 import uuid
@@ -22,8 +22,8 @@ class PlayCallInitializationError(Exception):
 
 
 class PlaySideEnum(Enum):
-    OFFENSE = auto()
-    DEFENSE = auto()
+    OFFENSE = "OFFENSE"
+    DEFENSE = "DEFENSE"
 
 
 class PlayTypeEnum(Enum):
@@ -33,19 +33,19 @@ class PlayTypeEnum(Enum):
     """
 
     # Offense
-    RUN = auto()
-    PASS = auto()
-    RPO = auto()
-    QB_KNEEL = auto()
-    QB_SPIKE = auto()
+    RUN = "RUN"
+    PASS = "PASS"
+    RPO = "RPO"
+    QB_KNEEL = "QB_KNEEL"
+    QB_SPIKE = "QB_SPIKE"
     # Special Teams
-    PUNT = auto()
-    FIELD_GOAL = auto()
-    KICKOFF = auto()
-    EXTRA_POINT = auto()
-    TWO_POINT_CONVERSION = auto()
+    PUNT = "PUNT"
+    FIELD_GOAL = "FIELD_GOAL"
+    KICKOFF = "KICKOFF"
+    EXTRA_POINT = "EXTRA_POINT"
+    TWO_POINT_CONVERSION = "TWO_POINT_CONVERSION"
     # Defense # TODO: Implement defensive play types
-    DEFENSIVE_PLAY = auto()
+    DEFENSIVE_PLAY = "DEFENSIVE_PLAY"
 
     def is_kick(self) -> bool:
         return self in {

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from enum import auto, Enum
+from enum import Enum
 import logging
 from typing import Dict, List, Optional
 import uuid
@@ -20,46 +20,46 @@ class AthletePositionEnum(Enum):
     """
 
     # Offense
-    OFFENSE = auto()  # generic offense position
-    QB = auto()
-    SKILL = auto()  # generic skill position
-    RB = auto()
-    WR = auto()
-    TE = auto()
-    OLINE = auto()  # generic offensive line position
-    T = auto()  # generic tackle position
-    G = auto()  # generic guard position
-    LT = auto()
-    LG = auto()
-    C = auto()
-    RG = auto()
-    RT = auto()
+    OFFENSE = "OFFENSE"  # generic offense position
+    QB = "QB"
+    SKILL = "SKILL"  # generic skill position
+    RB = "RB"
+    WR = "WR"
+    TE = "TE"
+    OLINE = "OLINE"  # generic offensive line position
+    T = "T"  # generic tackle position
+    G = "G"  # generic guard position
+    LT = "LT"
+    LG = "LG"
+    C = "C"
+    RG = "RG"
+    RT = "RT"
     # Defense
-    DEFENSE = auto()  # generic defense position
-    DLINE = auto()  # generic defensive line position
-    DT = auto()
-    EDGE = auto()  # generic edge rusher position
-    RE = auto()
-    LE = auto()
-    LB = auto()  # generic linebacker position
-    MLB = auto()
-    OLB = auto()  # generic outside linebacker position
-    LOLB = auto()
-    ROLB = auto()
-    DB = auto()  # generic defensive back position
-    CB = auto()
-    S = auto()  # generic safety position
-    FS = auto()
-    SS = auto()
+    DEFENSE = "DEFENSE"  # generic defense position
+    DLINE = "DLINE"  # generic defensive line position
+    DT = "DT"
+    EDGE = "EDGE"  # generic edge rusher position
+    RE = "RE"
+    LE = "LE"
+    LB = "LB"  # generic linebacker position
+    MLB = "MLB"
+    OLB = "OLB"  # generic outside linebacker position
+    LOLB = "LOLB"
+    ROLB = "ROLB"
+    DB = "DB"  # generic defensive back position
+    CB = "CB"
+    S = "S"  # generic safety position
+    FS = "FS"
+    SS = "SS"
     # Special Teams
-    SPECIAL_TEAMS = auto()  # generic special teams position
-    RETURNER = auto()  # generic returner position
-    KR = auto()
-    P = auto()
-    K = auto()
-    LS = auto()
-
-    UNKNOWN = auto()
+    SPECIAL_TEAMS = "SPECIAL_TEAMS"  # generic special teams position
+    RETURNER = "RETURNER"  # generic returner position
+    KR = "KR"
+    P = "P"
+    K = "K"
+    LS = "LS"
+    # Fallback
+    UNKNOWN = "UNKNOWN"
 
 
 class PositionTree:
