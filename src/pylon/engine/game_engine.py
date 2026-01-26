@@ -32,6 +32,8 @@ from ..models.specialteams import (
     DefaultPuntDistanceModel,
     DefaultPuntReturnDistanceModel,
     DefaultKickoffReturnDistanceModel,
+    DefaultKickoffDistanceModel,
+    DefaultKickoffTouchbackDecisionModel,
 )
 from ..models.misc import (
     DefaultPlayTimeElapsedModel,
@@ -57,10 +59,12 @@ class GameEngine:
         user_models: Optional[List[TypedModel[Any, Any]]] = None,
         rng: RNG = RNG(),
         rules: LeagueRules = NFLRules(),  # type: ignore
+        max_drives: Optional[int] = 100,
     ) -> None:
         self.models = ModelRegistry()
         self.rng = rng
         self.rules = rules
+        self.max_drives = max_drives
         self.game_state = GameState(
             home_team=home_team,
             away_team=away_team,
@@ -78,15 +82,20 @@ class GameEngine:
     def _game_loop(self):
         game_data = GameExecutionData()
         # implementation is tbd...
-        self.game_state.start_game()  # Initialize game state
+        game_data.start_game()  # Initialize game state
         # Apply the league-specific rules for starting the game. This is
         # typically where the opening kickoff is set up.
         self.rules.start_game(self.game_state, self.models, self.rng)
 
+        drive_count = 0
         while not self.rules.is_game_over(self.game_state):
             drive_record = DriveEngine(
                 self.game_state, self.models, self.rng, self.rules
             ).run()
+            drive_count += 1
+            if self.max_drives is not None and drive_count >= self.max_drives:
+                logger.info("Maximum drives reached. Ending game.")
+                break
 
             if self.rules.is_half_over(self.game_state):
                 # possible scheduling of post halftime kickoff, etc.
@@ -95,7 +104,7 @@ class GameEngine:
             game_data.add_drive(drive_record)
 
         # implementation is tbd...
-        self.game_state.end_game()
+        game_data.end_game()
 
     def _register_default_models(self) -> None:
         self.models.register_model(DefaultOffensivePlayCallModel())
@@ -120,6 +129,8 @@ class GameEngine:
         self.models.register_model(DefaultPlaceKickerSelectionModel())
         self.models.register_model(DefaultKickoffReturnerSelectionModel())
         self.models.register_model(DefaultKickoffReturnDistanceModel())
+        self.models.register_model(DefaultKickoffDistanceModel())
+        self.models.register_model(DefaultKickoffTouchbackDecisionModel())
         self.models.register_model(DefaultDefensivePlayCallModel())
 
     def _override_default_models(self, models: List[TypedModel[Any, Any]]) -> None:

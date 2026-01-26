@@ -3,7 +3,7 @@ from typing import Optional
 
 from ..state.play_record import PlayRecord
 from ..state.game_state import GameState, GameStateUpdater
-from ..state.drive_record import DriveRecord, DriveExecutionData
+from ..state.drive_record import DriveRecord
 from ..domain.rules.base import LeagueRules
 from ..models.registry import ModelRegistry
 from ..rng import RNG
@@ -38,9 +38,10 @@ class DriveEngine:
 
     def run(self) -> DriveRecord:
         last_play: Optional[PlayRecord] = None
-        drive_data = DriveExecutionData()
+        play_count = 0
+        max_plays = 50  # Safety limit to prevent infinite loops during testing
 
-        while not self.is_drive_over():
+        while not self.is_drive_over(play_count) and play_count < max_plays:
             # create snapshots of the current game state before the play
             play_record = PlayRecord(self.game_state)
             # execute the play
@@ -51,9 +52,10 @@ class DriveEngine:
             GameStateUpdater.apply_play_data(self.game_state, play_data, self.rules)
 
             play_record.set_end_state(self.game_state)
-            drive_data.add_play(play_record)
+            last_play = play_record
 
             self.run_post_play_hooks()
+            play_count += 1
 
         # ensure at least one play was run
         if last_play is None:
@@ -65,8 +67,11 @@ class DriveEngine:
         self.rules.on_drive_end(self.game_state, self.drive_record)
         return self.drive_record
 
-    def is_drive_over(self) -> bool:
-        return self.rules.is_drive_over(self.game_state)
+    def is_drive_over(self, play_count: int) -> bool:
+        # Get the possession team that started this drive
+        drive_start_team = self.drive_record.start.pos_team
+        assert drive_start_team is not None
+        return self.rules.is_drive_over(self.game_state, drive_start_team, play_count)
 
     def run_pre_play_hooks(self) -> None:
         """Run any pre-play hooks, such as penalties or special conditions."""

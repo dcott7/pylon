@@ -57,11 +57,8 @@ class PossessionSnapshot:
     # Validators
     # ==============================
     def is_finalized(self) -> bool:
-        return (
-            self.yardline is not None
-            and self.down is not None
-            and self.distance is not None
-        )
+        # Yardline must always be set, but down/distance may be None during special plays like kickoffs
+        return self.yardline is not None
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, PossessionSnapshot):

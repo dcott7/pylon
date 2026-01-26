@@ -6,10 +6,10 @@ import uuid
 
 from ..domain.team import Team
 from .snapshot import ClockSnapshot, PossessionSnapshot, ScoreSnapshot
+from .play_record import PlayRecord, PlayFinalizationError, ScoringTypeEnum
 
 if TYPE_CHECKING:
     from .game_state import GameState
-    from .play_record import PlayRecord, PlayFinalizationError, ScoringTypeEnum
 
 
 logger = logging.getLogger(__name__)

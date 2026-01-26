@@ -79,7 +79,8 @@ def lookup_team_id(cur: sqlite3.Cursor, raw_name: str) -> int:
 conn = sqlite3.connect("data/football.db")
 cur = conn.cursor()
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS def_formations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -90,18 +91,22 @@ CREATE TABLE IF NOT EXISTS def_formations (
     FOREIGN KEY(parent_id) REFERENCES def_formations(id),
     UNIQUE(parent_id, name)
 );
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS def_personnel_packages (
     name TEXT PRIMARY KEY,
     dl INTEGER,
     lb INTEGER
 )
-""")
+"""
+)
 
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS def_plays (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -113,18 +118,22 @@ CREATE TABLE IF NOT EXISTS def_plays (
     FOREIGN KEY(formation_id) REFERENCES def_formations(id),
     FOREIGN KEY(team_id) REFERENCES teams(espn_id)
 );
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS def_play_tags (
     play_id INTEGER,
     tag TEXT,
     FOREIGN KEY(play_id) REFERENCES def_plays(id),
     UNIQUE(play_id, tag)
 );
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS off_formations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -139,18 +148,22 @@ CREATE TABLE IF NOT EXISTS off_formations (
     FOREIGN KEY(parent_id) REFERENCES off_formations(id),
     UNIQUE(parent_id, name)
 )
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS off_personnel_packages (
     name TEXT PRIMARY KEY,
     rb INTEGER,
     te INTEGER,
     wr INTEGER
 )
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS off_plays (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -163,16 +176,19 @@ CREATE TABLE IF NOT EXISTS off_plays (
     FOREIGN KEY(personnel_name) REFERENCES off_personnel_packages(name),
     FOREIGN KEY(team_id) REFERENCES teams(espn_id)
 )
-""")
+"""
+)
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS off_play_tags (
     play_id INTEGER,
     tag TEXT,
     FOREIGN KEY(play_id) REFERENCES off_plays(id),
     UNIQUE(play_id, tag)
 )
-""")
+"""
+)
 
 conn.commit()
 

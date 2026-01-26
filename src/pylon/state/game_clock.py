@@ -2,21 +2,25 @@ class GameClock:
     """Football game clock wrapper for seconds elapsed.
 
     Tracks quarters, time remaining, overtime, and two-minute warnings.
-    All state is derived from the `seconds_elapsed`; the clock itself does not
+    All state is derived from the `seconds_elapsed` getter; the clock itself does not
     advance or keep time.
     """
 
     def __init__(
         self,
-        seconds_elapsed: int,
+        get_seconds_elapsed,
         minutes_per_quarter: int = 15,
         num_reg_quarters: int = 4,
     ) -> None:
-        self.seconds_elapsed = seconds_elapsed
+        self._get_seconds_elapsed = get_seconds_elapsed
         self.min_per_qtr = minutes_per_quarter
         self.num_reg_qtrs = num_reg_quarters
         self.total_game_sec = self.min_per_qtr * self.num_reg_qtrs * 60
         self.clock_is_running: bool = False
+
+    @property
+    def seconds_elapsed(self) -> int:
+        return self._get_seconds_elapsed()
 
     def is_overtime(self) -> bool:
         return self.current_quarter > self.num_reg_qtrs

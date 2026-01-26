@@ -37,10 +37,12 @@ def load_formations(
     # -------------------------
     # OFFENSE
     # -------------------------
-    cur.execute("""
+    cur.execute(
+        """
         SELECT id, name, parent_id, qb, rb, te, wr, t, g, c
         FROM off_formations
-    """)
+    """
+    )
     off_rows = cur.fetchall()
 
     off_formations: Dict[int, Formation] = {}
@@ -83,10 +85,12 @@ def load_formations(
     # -------------------------
     # DEFENSE
     # -------------------------
-    cur.execute("""
+    cur.execute(
+        """
         SELECT id, name, parent_id, dl, lb, db
         FROM def_formations
-    """)
+    """
+    )
     def_rows = cur.fetchall()
 
     for row in def_rows:

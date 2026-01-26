@@ -71,6 +71,7 @@ class PossessionState:
     # Mutators
     # ==============================
     def advance_ball(self, yards: int) -> None:
+        assert self._distance is not None
         self._ball_position += yards
         self._distance -= yards
         logger.debug(
@@ -85,3 +86,13 @@ class PossessionState:
     def flip_field(self) -> None:
         self._ball_position = PossessionState.FIELD_LENGTH - self._ball_position
         logger.debug(f"Field flipped. New ball position: {self._ball_position}.")
+
+    # ===============================
+    # Validators
+    # ===============================
+    def assert_down_and_distance_set(self) -> None:
+        if self._down is not None and self._distance is not None:
+            return
+        msg = "Down and distance must be set for the current possession."
+        logger.error(msg)
+        raise ValueError(msg)

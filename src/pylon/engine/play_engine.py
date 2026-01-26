@@ -73,11 +73,23 @@ class PlayEngine:
         if self.game_state.clock.clock_is_running:
             # how much time does the team run off before the play starts?
             self.set_preplay_clock_runoff(play_data)
+        else:
+            play_data.set_preplay_clock_runoff(0)
 
         self.set_play_calls(play_data)
         self.set_personnel_assignments(play_data)
         self.execute_play_based_on_type(play_data)
         self.set_play_time_elapsed(play_data)
+
+        # Set whether clock is running after the play (for now, assume it keeps running)
+        play_data.set_is_clock_running(self.game_state.clock.clock_is_running)
+
+        # TODO: These should be set by the specific play engines, not here
+        # For now, default to no possession change or turnover
+        if play_data.is_possession_change is None:
+            play_data.set_is_possession_change(False)
+        if play_data.is_turnover is None:
+            play_data.set_is_turnover(False)
 
         return play_data
 
@@ -267,4 +279,10 @@ class PlayEngine:
     def _run_kickoff(self, play_data: PlayExecutionData) -> None:
         self.game_state.consume_pending_kickoff()
 
-        KickoffPlayEngine(self.game_state, self.models, self.rng, play_data).run()
+        # Kickoffs don't have pre-play clock runoff
+        play_data.set_preplay_clock_runoff(0)
+
+        KickoffPlayEngine(self.game_state, self.models, self.rng, play_data, self.rules).run()
+
+        # Set time elapsed for the kickoff play
+        self.set_play_time_elapsed(play_data)

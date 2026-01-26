@@ -31,7 +31,7 @@ def main():
     DB_PATH = DATA_DIR / "football.db"
     conn = sqlite3.connect(DB_PATH)
 
-    # logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.DEBUG)
     logging.basicConfig(level=logging.DEBUG, filename="pylon.log", filemode="w")
 
     teams = load_teams(conn)

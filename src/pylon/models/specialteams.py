@@ -63,6 +63,36 @@ class KickoffReturnDistanceContext:
         self.returner = returner
 
 
+class KickoffDistanceContext:
+    """Context for determining how far a kickoff travels."""
+
+    def __init__(
+        self,
+        game_state: GameState,
+        rng: RNG,
+        kicker: Athlete,
+    ) -> None:
+        self.game_state = game_state
+        self.rng = rng
+        self.kicker = kicker
+
+
+class KickoffTouchbackDecisionContext:
+    """Context for deciding whether to take a touchback or return."""
+
+    def __init__(
+        self,
+        game_state: GameState,
+        rng: RNG,
+        returner: Athlete,
+        landing_spot: int,  # Where the ball lands (from receiving team's goal line)
+    ) -> None:
+        self.game_state = game_state
+        self.rng = rng
+        self.returner = returner
+        self.landing_spot = landing_spot
+
+
 class PuntDistanceModel(TypedModel[PuntDistanceContext, int]):
     def __init__(self) -> None:
         super().__init__(name="punt_distance")
@@ -141,3 +171,46 @@ class KickoffReturnDistanceModel(TypedModel[KickoffReturnDistanceContext, int]):
 class DefaultKickoffReturnDistanceModel(KickoffReturnDistanceModel):
     def execute(self, context: KickoffReturnDistanceContext) -> int:
         return context.rng.randint(0, 40)  # TODO: make this more realistic
+
+
+class KickoffDistanceModel(TypedModel[KickoffDistanceContext, int]):
+    """Model to determine how far the kickoff travels."""
+
+    def __init__(self) -> None:
+        super().__init__(name="kickoff_distance")
+
+    @abstractmethod
+    def execute(self, context: KickoffDistanceContext) -> int: ...
+
+
+class DefaultKickoffDistanceModel(KickoffDistanceModel):
+    """Default implementation: kickoffs travel 55-75 yards."""
+
+    def execute(self, context: KickoffDistanceContext) -> int:
+        # In NFL, kickoffs from 35 typically travel 60-70 yards
+        # Landing in endzone (65+ yards) or at goal line area
+        return context.rng.randint(55, 75)
+
+
+class KickoffTouchbackDecisionModel(TypedModel[KickoffTouchbackDecisionContext, bool]):
+    """Model to decide if returner takes touchback or attempts return."""
+
+    def __init__(self) -> None:
+        super().__init__(name="kickoff_touchback_decision")
+
+    @abstractmethod
+    def execute(self, context: KickoffTouchbackDecisionContext) -> bool: ...
+
+
+class DefaultKickoffTouchbackDecisionModel(KickoffTouchbackDecisionModel):
+    """Default: take touchback if deep in endzone, return if near goal line."""
+
+    def execute(self, context: KickoffTouchbackDecisionContext) -> bool:
+        # If ball lands more than 5 yards deep in endzone, usually take touchback
+        # If at goal line or just in endzone, more likely to return
+        if context.landing_spot < -5:  # Deep in endzone
+            return context.rng.random() < 0.9  # 90% take touchback
+        elif context.landing_spot < 0:  # Shallow endzone
+            return context.rng.random() < 0.6  # 60% take touchback
+        else:  # Outside endzone
+            return False  # Always return

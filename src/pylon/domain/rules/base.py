@@ -10,7 +10,7 @@ from ...rng import RNG
 if TYPE_CHECKING:
     from ...state.game_state import GameState
     from ...state.drive_record import DriveRecord
-    from ...state.play_record import PlayRecord, ScoringTypeEnum
+    from ...state.play_record import PlayRecord, ScoringTypeEnum, PlayExecutionData
 
 
 logger = logging.getLogger(__name__)
@@ -18,6 +18,29 @@ logger = logging.getLogger(__name__)
 
 class LeagueRulesError(Exception):
     pass
+
+
+class FirstDownRule:
+    """
+    Configuration for first down rules, defining how many yards are needed for a
+    first down and the maximum number of downs allowed.
+    """
+
+    def __init__(self, first_down_yards: int = 10, max_downs: int = 4) -> None:
+        assert first_down_yards > 0
+        assert max_downs > 0
+        self.first_down_yards = first_down_yards
+        self.max_downs = max_downs
+
+    def is_first_down(self, yards_gained: int, distance: int) -> bool:
+        """Check if the yards gained is enough for a first down."""
+        return yards_gained >= distance
+
+    def is_turnover_on_downs(
+        self, current_down: int, yards_gained: int, distance: int
+    ) -> bool:
+        """Check if the play resulted in a turnover on downs."""
+        return current_down >= self.max_downs and yards_gained < distance
 
 
 class KickoffSetup:
@@ -80,8 +103,13 @@ class LeagueRules(ABC):
     MINUTES_PER_QUARTER: int
     QUARTERS_PER_HALF: int
     TIMEOUTS_PER_HALF: int
+    KICKOFF_SPOT: int
+    EXTRA_POINT_SPOT: int
+    FIELD_LENGTH: int
     MAX_DOWNS: int
     FIRST_DOWN_YARDS: int
+    KICKOFF_TOUCHBACK_SPOT: int
+    DEFAULT_TOUCHBACK_SPOT: int
     SCORING_VALUES: Dict[ScoringTypeEnum, int]
 
     # ==============================
@@ -89,7 +117,10 @@ class LeagueRules(ABC):
     # ==============================
     def get_scoring_value(self, scoring_type: ScoringTypeEnum) -> int:
         if scoring_type not in self.SCORING_VALUES:
-            logger.warning(f"Scoring type {scoring_type} not recognized. Returning 0.")
+            msg = f"Scoring type {scoring_type} not recognized."
+            logger.error(msg)
+            raise LeagueRulesError(msg)
+
         return self.SCORING_VALUES.get(scoring_type, 0)
 
     @abstractmethod
@@ -117,8 +148,16 @@ class LeagueRules(ABC):
         ...
 
     @abstractmethod
-    def is_drive_over(self, game_state: "GameState") -> bool:
-        """Determines if a drive is over."""
+    def is_drive_over(
+        self, game_state: "GameState", drive_possession_team: Team, play_count: int
+    ) -> bool:
+        """Determines if a drive is over.
+
+        Args:
+            game_state: Current game state
+            drive_possession_team: Team that had possession at start of drive
+            play_count: Number of plays run in this drive so far
+        """
         ...
 
     # LeagueRules should only decide, not mutate. The GameStateUpdater
@@ -143,4 +182,82 @@ class LeagueRules(ABC):
         play_record: "PlayRecord",
     ) -> None:
         """Called at the end of each play."""
+        ...
+
+    @abstractmethod
+    def is_first_down(self, yards_gained: int, distance: int) -> bool:
+        """Determine if the yards gained is enough for a first down."""
+        ...
+
+    @abstractmethod
+    def is_turnover_on_downs(
+        self, current_down: int, yards_gained: int, distance: int
+    ) -> bool:
+        """Determine if the play results in a turnover on downs."""
+        ...
+
+    def is_touchdown(self, end_spot: int, possession_changed: bool) -> bool:
+        """Determine if the play resulted in a touchdown."""
+        # Offense reaches endzone without possession change
+        if end_spot >= 100 and not possession_changed:
+            return True
+        # Defense returns turnover to endzone
+        if end_spot <= 0 and possession_changed:
+            return True
+        return False
+
+    def is_safety(self, end_spot: int, possession_changed: bool) -> bool:
+        """Determine if the play resulted in a safety."""
+        # Offense tackled in their own endzone
+        return end_spot <= 0 and not possession_changed
+
+    def is_touchback(
+        self, end_spot: int, possession_changed: bool, is_kick: bool
+    ) -> bool:
+        """Determine if the play resulted in a touchback."""
+        # Defense takes over in their endzone on a kick play
+        return end_spot >= 100 and possession_changed and is_kick
+
+    def get_next_down(self, current_down: int, yards_gained: int, distance: int) -> int:
+        """Determine the next down number based on the play result."""
+        if self.is_first_down(yards_gained, distance):
+            return 1  # Reset to first down
+        return current_down + 1
+
+    def get_next_distance(
+        self, ball_position: int, yards_gained: int, distance: int
+    ) -> int:
+        """Determine the next distance to go based on the play result."""
+        if self.is_first_down(yards_gained, distance):
+            # First down - reset distance
+            return min(self.FIRST_DOWN_YARDS, ball_position)
+        # Same series, reduce distance by yards gained
+        return distance - yards_gained
+
+    @abstractmethod
+    def handle_post_score_possession(
+        self, game_state: "GameState", play_data: "PlayExecutionData"
+    ) -> None:
+        """
+        Called after a score to determine what happens next (typically a kickoff).
+        LeagueRules should decide, GameStateUpdater will apply.
+        """
+        ...
+
+    @abstractmethod
+    def handle_touchback(
+        self, game_state: "GameState", play_data: "PlayExecutionData"
+    ) -> None:
+        """
+        Called when a touchback occurs to set up possession properly.
+        LeagueRules should decide, GameStateUpdater will apply.
+        """
+        ...
+
+    @abstractmethod
+    def get_touchback_spot(self, is_kickoff: bool) -> int:
+        """
+        Returns the yard line where the ball is placed after a touchback.
+        For NFL, this is the 25 yard line.
+        """
         ...

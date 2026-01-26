@@ -15,7 +15,7 @@ class TimeoutManager:
             away_team.uid: self._max_timeouts,
         }
         logger.debug(
-            f"Initialized TimeoutManager with teams {home_team} vs {away_team}, "
+            f"Initialized TimeoutManager with teams {home_team.name} vs {away_team.name}, "
             f"{self._max_timeouts} each"
         )
 

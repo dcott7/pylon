@@ -227,6 +227,26 @@ class PlayExecutionData:
     # Validators
     # ==============================
     def is_finalized(self) -> bool:
+        # For special teams plays like kickoffs, play calls may be None
+        # Check if this looks like a kickoff (no play calls but has possession change)
+        is_special_play = (
+            self.off_play_call is None
+            and self.def_play_call is None
+            and self.is_possession_change is True
+        )
+
+        if is_special_play:
+            # For special plays, we just need the basic fields
+            return (
+                self.time_elapsed is not None
+                and self.preplay_clock_runoff is not None
+                and self.yards_gained is not None
+                and self.is_clock_running is not None
+                and self.is_possession_change is not None
+                and self.is_turnover is not None
+            )
+
+        # For regular plays, we need play calls too
         return (
             self.off_play_call is not None
             and self.def_play_call is not None
@@ -237,6 +257,42 @@ class PlayExecutionData:
             and self.is_possession_change is not None
             and self.is_turnover is not None
         )
+
+    def assert_is_finalized(self) -> None:
+        """Check that all necessary components are set to finalize the play."""
+        if self.is_finalized():
+            return
+
+        # Debug output to show which fields are missing
+        missing = []
+        if self.off_play_call is None:
+            missing.append("off_play_call")
+        if self.def_play_call is None:
+            missing.append("def_play_call")
+        if self.time_elapsed is None:
+            missing.append("time_elapsed")
+        if self.preplay_clock_runoff is None:
+            missing.append("preplay_clock_runoff")
+        if self.yards_gained is None:
+            missing.append("yards_gained")
+        if self.is_clock_running is None:
+            missing.append("is_clock_running")
+        if self.is_possession_change is None:
+            missing.append("is_possession_change")
+        if self.is_turnover is None:
+            missing.append("is_turnover")
+
+        msg = f"PlayExecutionData is not finalized. Missing required fields: {', '.join(missing)}"
+        logger.error(msg)
+        raise PlayFinalizationError(msg)
+
+    def assert_fg_good_set(self) -> None:
+        """Check that fg_good is set if the play is a field goal attempt."""
+        if self.fg_good is not None:
+            return
+        msg = "fg_good must be set for a field goal attempt."
+        logger.error(msg)
+        raise PlayRecordError(msg)
 
     def assert_is_ready_to_execute(self) -> None:
         """Check that all necessary components are set to execute the play."""
@@ -290,7 +346,7 @@ class PlayRecord:
         return self._start_snapshot.is_finalized() and self._end_snapshot.is_finalized()
 
     def set_end_state(self, end_game_state: GameState) -> None:
-        if not self.is_finalized():
+        if self.is_finalized():
             msg = "Cannot set end state on a finalized PlayRecord."
             logger.error(msg)
             raise PlayFinalizationError(msg)

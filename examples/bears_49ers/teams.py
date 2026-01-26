@@ -58,6 +58,6 @@ def load_team(conn: sqlite3.Connection, team_name: str) -> Optional[Team]:
         roster=roster,
         uid=str(team_id),  # stable identifier
     )
-    logger.info(f"Loaded team: {team} ({team_id})")
+    logger.info(f"Loaded team: {team.name} ({team_id})")
 
     return team
