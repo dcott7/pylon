@@ -77,7 +77,7 @@ def main() -> None:
     runner = SimulationRunner(
         home_team=home,
         away_team=away,
-        num_reps=100,
+        num_reps=50,
         base_seed=42,
         rules=NFLRules(),
         db_manager=db_manager,
