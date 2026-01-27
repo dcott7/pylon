@@ -130,7 +130,7 @@ class DefaultOffensivePlayerAssignmentModel(OffensivePlayerAssignmentModel):
     Formation is used ONLY for alignment, never for player selection.
     """
 
-    BASE_OFFENSE: dict[AthletePositionEnum, int] = {
+    BASE_OFFENSE: Dict[AthletePositionEnum, int] = {
         AthletePositionEnum.QB: 1,
         AthletePositionEnum.LT: 1,
         AthletePositionEnum.LG: 1,
@@ -141,7 +141,7 @@ class DefaultOffensivePlayerAssignmentModel(OffensivePlayerAssignmentModel):
 
     def execute(
         self, context: PlayerAssignmentContext
-    ) -> dict[AthletePositionEnum, list[Athlete]]:
+    ) -> Dict[AthletePositionEnum, List[Athlete]]:
         team = context.game_state.pos_team
         play = context.play_call
         formation = play.formation
@@ -155,11 +155,11 @@ class DefaultOffensivePlayerAssignmentModel(OffensivePlayerAssignmentModel):
             logger.error(msg)
             raise ModelExecutionError(msg)
 
-        selected: list[Athlete] = []
+        selected: List[Athlete] = []
 
         # pick players using PositionTree
-        def pick(position: AthletePositionEnum, count: int) -> list[Athlete]:
-            chosen: list[Athlete] = []
+        def pick(position: AthletePositionEnum, count: int) -> List[Athlete]:
+            chosen: List[Athlete] = []
 
             # Start at the leaf node for this position
             node = POSITION_TREE.children[AthletePositionEnum.OFFENSE].find_node(
@@ -212,8 +212,8 @@ class DefaultOffensivePlayerAssignmentModel(OffensivePlayerAssignmentModel):
         if len(set(selected)) != 11:
             raise ModelExecutionError("Duplicate players selected")
 
-        # dictionary to hold formation assignments
-        assignments: dict[AthletePositionEnum, list[Athlete]] = {
+        # Dictionary to hold formation assignments
+        assignments: Dict[AthletePositionEnum, List[Athlete]] = {
             pos: [] for pos in formation.position_counts
         }
 
