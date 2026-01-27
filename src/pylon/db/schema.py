@@ -8,10 +8,13 @@ Dimension tables focus on static/reference data:
 - Positions: Position reference data
 - Formations: Formation reference data
 - Personnel: Personnel groupings (11 personnel, 12 personnel, etc.)
+
+Fact tables:
+- ModelInvocation: Captures typed user model calls, inputs, outputs, and metadata
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from sqlalchemy import (
     Column,
@@ -19,6 +22,7 @@ from sqlalchemy import (
     Enum as SQLEnum,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Table,
     Text,
@@ -55,7 +59,7 @@ class Team(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Team UID
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     abbreviation: Mapped[Optional[str]] = mapped_column(String(3), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
     athletes: Mapped[List["Athlete"]] = relationship(
@@ -89,7 +93,7 @@ class Athlete(Base):
     position: Mapped[AthletePositionEnum] = mapped_column(
         SQLEnum(AthletePositionEnum), nullable=False
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
     teams: Mapped[List["Team"]] = relationship(
@@ -120,7 +124,7 @@ class Position(Base):
         String, ForeignKey("position.id"), nullable=True
     )
     is_leaf: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Self-referential relationship for position hierarchy
     children: Mapped[List["Position"]] = relationship(
@@ -150,7 +154,7 @@ class Formation(Base):
         String, ForeignKey("formation.id"), nullable=True
     )
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Self-referential relationship for subformations
     subformations: Mapped[List["Formation"]] = relationship(
@@ -177,7 +181,7 @@ class Personnel(Base):
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     side: Mapped[PlaySideEnum] = mapped_column(SQLEnum(PlaySideEnum), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
     plays: Mapped[List["Play"]] = relationship(
@@ -219,7 +223,7 @@ class Play(Base):
     )
 
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
     team: Mapped["Team"] = relationship(
@@ -249,7 +253,63 @@ class Playbook(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Playbook UID
     team_id: Mapped[str] = mapped_column(String, ForeignKey("team.id"), nullable=False)
     side: Mapped[PlaySideEnum] = mapped_column(SQLEnum(PlaySideEnum), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     def __repr__(self) -> str:
         return f"Playbook(id={self.id}, team_id={self.team_id}, side={self.side})"
+
+
+class ModelInvocation(Base):
+    """
+    Fact: Model invocation tracking.
+
+    Captures every call to a typed user model, including:
+    - Input context (serialized to JSON)
+    - Output/return value (serialized to JSON with return type discriminator)
+    - Execution metadata (game, drive, play, engine phase)
+    - Performance metrics (duration, errors)
+
+    This enables analysis, debugging, and replayability of model decisions.
+    """
+
+    __tablename__ = "model_invocation"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)  # Unique invocation ID
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    # Model identification
+    model_name: Mapped[str] = mapped_column(
+        String, nullable=False
+    )  # e.g., "DefaultOffensivePlayCallModel"
+    model_type: Mapped[str] = mapped_column(
+        String, nullable=False
+    )  # e.g., "offensive_play_call", "passer_selection"
+    model_version: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # Optional version tag
+
+    # Game context references (foreign keys optional for flexibility)
+    game_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    drive_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    play_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    engine_phase: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # e.g., "play_call", "personnel_selection"
+
+    # Input context (serialized)
+    context: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+    # Output/return value (serialized)
+    output: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    return_type: Mapped[str] = mapped_column(
+        String, nullable=False
+    )  # Discriminator: "PlayCall", "Athlete", "float", etc.
+
+    # RNG state for replayability (optional)
+    rng_seed: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    # Performance metrics
+    duration_ms: Mapped[Optional[float]] = mapped_column(nullable=True)
+    error: Mapped[Optional[str]] = mapped_column(
+        Text, nullable=True
+    )  # If execution failed

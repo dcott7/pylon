@@ -5,6 +5,7 @@ Provides schema definitions and data access layer for persisting
 game data to SQL databases.
 """
 
+from .database import DatabaseManager
 from .schema import (
     Base,
     Team,
@@ -14,11 +15,13 @@ from .schema import (
     Personnel,
     Play,
     Playbook,
+    ModelInvocation,
 )
 from ..domain.athlete import AthletePositionEnum
 from ..domain.playbook import PlaySideEnum, PlayTypeEnum
 
 __all__ = [
+    "DatabaseManager",
     "Base",
     "Team",
     "Athlete",
@@ -27,6 +30,7 @@ __all__ = [
     "Personnel",
     "Play",
     "Playbook",
+    "ModelInvocation",
     "AthletePositionEnum",
     "PlaySideEnum",
     "PlayTypeEnum",
