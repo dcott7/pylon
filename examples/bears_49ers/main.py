@@ -1,10 +1,13 @@
 import logging
 import sqlite3
+import json
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 from pylon.domain.team import Team
-from pylon.engine.game_engine import GameEngine
+from pylon.domain.rules.nfl import NFLRules
+from pylon.engine import SimulationRunner
+from pylon.db import DatabaseManager
 
 from .teams import load_team
 
@@ -13,6 +16,7 @@ TEAM_NAMES = ["Bears", "49ers"]
 
 
 def load_teams(conn: sqlite3.Connection) -> Dict[str, Team]:
+    """Load Bear and 49ers teams from the example database."""
     teams: Dict[str, Team] = {}
     for team_name in TEAM_NAMES:
         team = load_team(conn, team_name)
@@ -26,21 +30,98 @@ def load_teams(conn: sqlite3.Connection) -> Dict[str, Team]:
     return teams
 
 
-def main():
-    DATA_DIR = Path(__file__).parent.parent.parent / "data"
-    DB_PATH = DATA_DIR / "football.db"
-    conn = sqlite3.connect(DB_PATH)
+def main() -> None:
+    # Setup paths
+    EXAMPLE_DIR = Path(__file__).parent
+    ROOT_DIR = EXAMPLE_DIR.parent.parent
+    DATA_DIR = ROOT_DIR / "data"
+    INPUT_DB_PATH = DATA_DIR / "football.db"
+    PYLON_DB_PATH = EXAMPLE_DIR / "pylon_sim.db"
 
-    # logging.basicConfig(level=logging.DEBUG)
-    logging.basicConfig(level=logging.DEBUG, filename="pylon.log", filemode="w")
+    # Clean up old database to avoid constraint violations on re-runs
+    if Path(PYLON_DB_PATH).exists():
+        Path(PYLON_DB_PATH).unlink()
 
-    teams = load_teams(conn)
+    # Setup logging
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(EXAMPLE_DIR / "pylon.log"),
+            logging.StreamHandler(),
+        ],
+    )
+    logger = logging.getLogger(__name__)
+
+    logger.info("=" * 80)
+    logger.info("Pylon Bears vs 49ers Simulation")
+    logger.info("=" * 80)
+
+    # Load teams from example database
+    example_conn = sqlite3.connect(INPUT_DB_PATH)
+    teams = load_teams(example_conn)
+    example_conn.close()
 
     home = teams["Bears"]
     away = teams["49ers"]
 
-    ge = GameEngine(home_team=home, away_team=away)
-    ge.run()
+    logger.info(f"Home: {home.name}")
+    logger.info(f"Away: {away.name}")
+
+    # Initialize Pylon database for persistence
+    db_manager = DatabaseManager(f"sqlite:///{PYLON_DB_PATH}")
+    db_manager.init_db()
+
+    # Run multi-rep simulation (10 reps)
+    logger.info("\n--- Running multi-rep simulation (10 reps) ---")
+    runner = SimulationRunner(
+        home_team=home,
+        away_team=away,
+        num_reps=100,
+        base_seed=42,
+        rules=NFLRules(),
+        db_manager=db_manager,
+        experiment_name="Bears vs 49ers - 10 Rep Test",
+        experiment_description="Test run of multi-rep simulation with database persistence",
+    )
+    results = runner.run()
+
+    # Log aggregate results
+    logger.info("\n" + "=" * 80)
+    logger.info("Simulation Results")
+    logger.info("=" * 80)
+    logger.info(f"Experiment ID: {results['experiment_id']}")
+    logger.info(f"Total Reps: {results['num_reps']}")
+    logger.info(f"Total Time: {results['elapsed_time']:.2f}s")
+
+    agg = results["aggregate"]
+    logger.info(
+        f"{home.name} Record: {agg['home_wins']}-{agg['away_wins']}-{agg['ties']} "
+        f"({agg['home_win_pct']:.1%})"
+    )
+    logger.info(f"{home.name} Avg Score: {agg['avg_home_score']:.1f}")
+    logger.info(f"{away.name} Avg Score: {agg['avg_away_score']:.1f}")
+    logger.info(f"Avg Game Duration: {agg['avg_duration_seconds']:.2f}s")
+
+    # Save results to JSON
+    results_file = EXAMPLE_DIR / "simulation_results.json"
+    with open(results_file, "w") as f:
+        # Filter out game details for cleaner output
+        output: Dict[str, Any] = {
+            "experiment": {
+                "id": results["experiment_id"],
+                "name": results["experiment_name"],
+                "num_reps": results["num_reps"],
+                "base_seed": results["base_seed"],
+                "elapsed_time": results["elapsed_time"],
+            },
+            "aggregate": results["aggregate"],
+        }
+        json.dump(output, f, indent=2)
+    logger.info(f"\nResults saved to: {results_file}")
+
+    logger.info(f"Database persisted to: {PYLON_DB_PATH}")
+    logger.info("=" * 80)
 
 
 if __name__ == "__main__":

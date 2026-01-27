@@ -121,6 +121,37 @@ class DatabaseManager:
         finally:
             session.close()
 
+    def insert_dimension_data_or_ignore(
+        self,
+        *objects: Any,
+    ) -> None:
+        """
+        Insert dimension data, ignoring duplicates (based on primary key or unique constraints).
+
+        Useful for idempotent dimension data insertion where duplicates may exist.
+
+        Args:
+            *objects: ORM objects to insert (Team, Athlete, Formation, etc.)
+        """
+        session = self.get_session()
+        try:
+            for obj in objects:
+                # Merge handles both inserts and updates, ignoring errors for duplicates
+                try:
+                    session.merge(obj)
+                except Exception as obj_err:
+                    logger.debug(f"Skipping duplicate object: {obj_err}")
+                    session.rollback()
+                    continue
+            session.commit()
+            logger.debug(f"Inserted/merged {len(objects)} dimension object(s).")
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to insert dimension data: {e}")
+            raise
+        finally:
+            session.close()
+
     def insert_model_invocations(
         self,
         invocations: list[Any],

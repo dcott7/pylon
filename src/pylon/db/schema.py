@@ -11,6 +11,8 @@ Dimension tables focus on static/reference data:
 
 Fact tables:
 - ModelInvocation: Captures typed user model calls, inputs, outputs, and metadata
+- Experiment: Metadata for simulation experiments (groups of game replications)
+- Game: Individual game results (one per simulation rep)
 """
 
 from datetime import datetime
@@ -309,3 +311,121 @@ class ModelInvocation(Base):
     error: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True
     )  # If execution failed
+
+    def __repr__(self) -> str:
+        return f"ModelInvocation(id={self.id}, model={self.model_name}, type={self.return_type})"
+
+
+class Experiment(Base):
+    """
+    Fact: Experiment metadata.
+
+    Represents a simulation experiment—a collection of game replications with
+    varying seeds and/or model configurations. Used to track and organize
+    multiple runs of the same matchup for statistical analysis.
+
+    Attributes:
+        id: Unique experiment identifier (UUID).
+        name: Human-readable experiment name.
+        description: Detailed description of experiment purpose/configuration.
+        num_reps: Number of replications planned/completed.
+        base_seed: Base random seed for deterministic rep generation.
+        created_at: Timestamp when experiment was created.
+    """
+
+    __tablename__ = "experiment"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)  # Experiment UID
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    num_reps: Mapped[int] = mapped_column(Integer, nullable=False)
+    base_seed: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    # Relationships
+    games: Mapped[List["Game"]] = relationship(
+        "Game",
+        back_populates="experiment",
+    )
+
+    def __repr__(self) -> str:
+        return f"Experiment(id={self.id}, name={self.name}, reps={self.num_reps})"
+
+
+class Game(Base):
+    """
+    Fact: Individual game result.
+
+    Represents a single game simulation result—one replication within an experiment.
+    Captures final score, metadata, and links to dimension data (teams) and other
+    fact data (model invocations, drives, plays).
+
+    Attributes:
+        id: Unique game identifier (UUID).
+        experiment_id: Reference to parent experiment (optional for standalone games).
+        rep_number: Replication number within experiment (1-based).
+        seed: Random seed used for this specific game run.
+        home_team_id: Reference to home team dimension.
+        away_team_id: Reference to away team dimension.
+        home_score: Final score for home team.
+        away_score: Final score for away team.
+        winner_id: Reference to winning team (nullable for ties).
+        total_plays: Total number of plays executed.
+        total_drives: Total number of drives executed.
+        duration_seconds: Real-world execution time.
+        final_quarter: Final quarter when game ended.
+        created_at: Timestamp when game was simulated.
+    """
+
+    __tablename__ = "game"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)  # Game UID
+    experiment_id: Mapped[Optional[str]] = mapped_column(
+        String, ForeignKey("experiment.id"), nullable=True
+    )
+    rep_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    seed: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Team references
+    home_team_id: Mapped[str] = mapped_column(
+        String, ForeignKey("team.id"), nullable=False
+    )
+    away_team_id: Mapped[str] = mapped_column(
+        String, ForeignKey("team.id"), nullable=False
+    )
+
+    # Final results
+    home_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    away_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    winner_id: Mapped[Optional[str]] = mapped_column(
+        String, ForeignKey("team.id"), nullable=True
+    )
+
+    # Game statistics
+    total_plays: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_drives: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    duration_seconds: Mapped[Optional[float]] = mapped_column(nullable=True)
+    final_quarter: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    # Relationships
+    experiment: Mapped[Optional["Experiment"]] = relationship(
+        "Experiment",
+        back_populates="games",
+    )
+    home_team: Mapped["Team"] = relationship(
+        "Team",
+        foreign_keys=[home_team_id],
+    )
+    away_team: Mapped["Team"] = relationship(
+        "Team",
+        foreign_keys=[away_team_id],
+    )
+    winner: Mapped[Optional["Team"]] = relationship(
+        "Team",
+        foreign_keys=[winner_id],
+    )
+
+    def __repr__(self) -> str:
+        return f"Game(id={self.id}, rep={self.rep_number}, score={self.home_score}-{self.away_score})"

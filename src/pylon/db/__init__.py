@@ -10,6 +10,11 @@ from .repositories import (
     DimensionRepository,
     TeamRepository,
     AthleteRepository,
+    FormationRepository,
+    PersonnelRepository,
+    PlayRepository,
+    ExperimentRepository,
+    GameRepository,
 )
 from .schema import (
     Base,
@@ -21,6 +26,8 @@ from .schema import (
     Play,
     Playbook,
     ModelInvocation,
+    Experiment,
+    Game,
 )
 from ..domain.athlete import AthletePositionEnum
 from ..domain.playbook import PlaySideEnum, PlayTypeEnum
@@ -30,6 +37,11 @@ __all__ = [
     "DimensionRepository",
     "TeamRepository",
     "AthleteRepository",
+    "FormationRepository",
+    "PersonnelRepository",
+    "PlayRepository",
+    "ExperimentRepository",
+    "GameRepository",
     "Base",
     "Team",
     "Athlete",
@@ -39,6 +51,8 @@ __all__ = [
     "Play",
     "Playbook",
     "ModelInvocation",
+    "Experiment",
+    "Game",
     "AthletePositionEnum",
     "PlaySideEnum",
     "PlayTypeEnum",

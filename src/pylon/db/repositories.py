@@ -6,7 +6,8 @@ and ORM objects (from schema), and provide persistence operations.
 """
 
 import logging
-from typing import Dict, List
+from typing import Dict, List, Optional
+import uuid
 
 from ..domain.athlete import Athlete as DomainAthlete
 from ..domain.team import Team as DomainTeam
@@ -19,6 +20,8 @@ from .schema import Team as OrmTeam
 from .schema import Formation as OrmFormation
 from .schema import Personnel as OrmPersonnel
 from .schema import Play as OrmPlay
+from .schema import Experiment as OrmExperiment
+from .schema import Game as OrmGame
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +219,8 @@ class FormationRepository:
         """
         Convert and persist multiple domain Formations.
 
+        Duplicates (by ID or name) are silently ignored.
+
         Args:
             domain_formations: List of domain Formation objects.
 
@@ -223,8 +228,10 @@ class FormationRepository:
             List of persisted ORM Formation objects.
         """
         orm_formations = [self.to_orm(formation) for formation in domain_formations]
-        self.db.insert_dimension_data(*orm_formations)
-        logger.info(f"Persisted {len(orm_formations)} formation(s).")
+        self.db.insert_dimension_data_or_ignore(*orm_formations)
+        logger.info(
+            f"Persisted {len(orm_formations)} formation(s) (duplicates ignored)."
+        )
         return orm_formations
 
 
@@ -282,6 +289,8 @@ class PersonnelRepository:
         """
         Convert and persist multiple domain Personnel.
 
+        Duplicates (by ID) are silently ignored.
+
         Args:
             domain_personnels: List of domain Personnel objects.
 
@@ -289,8 +298,10 @@ class PersonnelRepository:
             List of persisted ORM Personnel objects.
         """
         orm_personnels = [self.to_orm(personnel) for personnel in domain_personnels]
-        self.db.insert_dimension_data(*orm_personnels)
-        logger.info(f"Persisted {len(orm_personnels)} personnel(s).")
+        self.db.insert_dimension_data_or_ignore(*orm_personnels)
+        logger.info(
+            f"Persisted {len(orm_personnels)} personnel(s) (duplicates ignored)."
+        )
         return orm_personnels
 
 
@@ -376,6 +387,8 @@ class PlayRepository:
         """
         Convert and persist multiple domain PlayCalls.
 
+        Duplicates (by ID) are silently ignored.
+
         Args:
             domain_plays: List of domain PlayCall objects.
             team_id: Team UID that owns these plays.
@@ -397,9 +410,146 @@ class PlayRepository:
             )
             for play in domain_plays
         ]
-        self.db.insert_dimension_data(*orm_plays)
-        logger.info(f"Persisted {len(orm_plays)} play(s).")
+        self.db.insert_dimension_data_or_ignore(*orm_plays)
+        logger.info(f"Persisted {len(orm_plays)} play(s) (duplicates ignored).")
         return orm_plays
+
+
+class ExperimentRepository:
+    """
+    Repository for Experiment fact data.
+
+    Handles persistence of experiment metadata—simulation runs grouped
+    for statistical analysis.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the ExperimentRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def create(
+        self,
+        name: str,
+        num_reps: int,
+        base_seed: int,
+        description: Optional[str] = None,
+        experiment_id: Optional[str] = None,
+    ) -> OrmExperiment:
+        """
+        Create and persist a new experiment.
+
+        Args:
+            name: Human-readable experiment name.
+            num_reps: Number of replications planned.
+            base_seed: Base random seed for deterministic rep generation.
+            description: Optional detailed description.
+            experiment_id: Optional explicit ID (auto-generated if None).
+
+        Returns:
+            Persisted ORM Experiment object.
+        """
+        orm_experiment = OrmExperiment(
+            id=experiment_id or str(uuid.uuid4()),
+            name=name,
+            description=description,
+            num_reps=num_reps,
+            base_seed=base_seed,
+        )
+        self.db.insert_dimension_data(orm_experiment)
+        logger.info(
+            f"Persisted experiment: {orm_experiment.name} (id={orm_experiment.id})"
+        )
+        return orm_experiment
+
+
+class GameRepository:
+    """
+    Repository for Game fact data.
+
+    Handles persistence of individual game simulation results—one per rep.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the GameRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def create(
+        self,
+        seed: int,
+        home_team_id: str,
+        away_team_id: str,
+        home_score: int,
+        away_score: int,
+        winner_id: Optional[str],
+        total_plays: int,
+        total_drives: int,
+        final_quarter: int,
+        experiment_id: Optional[str] = None,
+        rep_number: Optional[int] = None,
+        duration_seconds: Optional[float] = None,
+        game_id: Optional[str] = None,
+    ) -> OrmGame:
+        """
+        Create and persist a new game result.
+
+        Args:
+            seed: Random seed used for this game.
+            home_team_id: Home team UID.
+            away_team_id: Away team UID.
+            home_score: Final home team score.
+            away_score: Final away team score.
+            winner_id: Winning team UID (None for ties).
+            total_plays: Number of plays executed.
+            total_drives: Number of drives executed.
+            final_quarter: Final quarter when game ended.
+            experiment_id: Optional parent experiment reference.
+            rep_number: Optional replication number within experiment.
+            duration_seconds: Optional execution time.
+            game_id: Optional explicit ID (auto-generated if None).
+
+        Returns:
+            Persisted ORM Game object.
+        """
+        orm_game = OrmGame(
+            id=game_id or str(uuid.uuid4()),
+            experiment_id=experiment_id,
+            rep_number=rep_number,
+            seed=seed,
+            home_team_id=home_team_id,
+            away_team_id=away_team_id,
+            home_score=home_score,
+            away_score=away_score,
+            winner_id=winner_id,
+            total_plays=total_plays,
+            total_drives=total_drives,
+            duration_seconds=duration_seconds,
+            final_quarter=final_quarter,
+        )
+        self.db.insert_dimension_data(orm_game)
+        logger.info(
+            f"Persisted game: {orm_game.id} (rep={orm_game.rep_number}, score={orm_game.home_score}-{orm_game.away_score})"
+        )
+        return orm_game
+
+    def save_batch(self, games: List[OrmGame]) -> None:
+        """
+        Batch persist multiple game results.
+
+        Args:
+            games: List of ORM Game objects to persist.
+        """
+        self.db.insert_dimension_data(*games)
+        logger.info(f"Persisted {len(games)} game(s).")
 
 
 class DimensionRepository:
@@ -434,8 +584,8 @@ class DimensionRepository:
         This includes:
         - Teams (home and away)
         - Athletes (all players from both rosters)
-        - Formations (unique formations from all plays)
-        - Personnel (unique personnel from all plays)
+        - Formations (unique formations from all plays, deduped across both teams by UID)
+        - Personnel (unique personnel from all plays, deduped across both teams by UID)
         - Plays (all play templates from both teams' playbooks)
 
         Args:
@@ -452,7 +602,17 @@ class DimensionRepository:
         if all_athletes:
             self.athletes.save_batch(all_athletes)
 
-        # Extract and persist formations, personnel, and plays from playbooks
+        # Collect all formations and personnel from both teams' playbooks
+        # (deduped globally by UID since both teams share standard NFL formations/personnel)
+        all_formations: Dict[str, DomainFormation] = {}  # uid -> formation
+        all_personnels: Dict[str, DomainPersonnel] = {}  # uid -> personnel
+        team_play_maps: Dict[
+            str, Dict[str, str]
+        ] = {}  # team_uid -> {play_uid -> formation_uid}
+        team_personnel_maps: Dict[
+            str, Dict[str, str]
+        ] = {}  # team_uid -> {play_uid -> personnel_uid}
+
         for team in [home_team, away_team]:
             # Collect plays from both offensive and defensive playbooks
             off_plays = team.off_playbook.plays if team.off_playbook else []
@@ -462,33 +622,43 @@ class DimensionRepository:
             if not all_plays:
                 continue
 
-            # Extract unique formations from plays (if they have formations)
-            formations: List[DomainFormation] = []
             formation_map: Dict[str, str] = {}  # play_uid -> formation_uid
+            personnel_map: Dict[str, str] = {}  # play_uid -> personnel_uid
+
+            # Extract formations and personnel from plays
             for play in all_plays:
                 if hasattr(play, "formation") and play.formation:
-                    formations.append(play.formation)
+                    # Deduplicate by UID (both teams use same NFL formations with same IDs)
+                    if play.formation.uid not in all_formations:
+                        all_formations[play.formation.uid] = play.formation
                     formation_map[play.uid] = play.formation.uid
 
-            if formations:
-                # Deduplicate formations by UID
-                unique_formations = {f.uid: f for f in formations}.values()
-                self.formations.save_batch(list(unique_formations))
-
-            # Extract unique personnel from plays (if they have personnel)
-            personnels: List[DomainPersonnel] = []
-            personnel_map: Dict[str, str] = {}  # play_uid -> personnel_uid
-            for play in all_plays:
                 if hasattr(play, "personnel") and play.personnel_package:
-                    personnels.append(play.personnel_package)
+                    # Deduplicate by uid
+                    if play.personnel_package.uid not in all_personnels:
+                        all_personnels[play.personnel_package.uid] = (
+                            play.personnel_package
+                        )
                     personnel_map[play.uid] = play.personnel_package.uid
 
-            if personnels:
-                # Deduplicate personnel by UID
-                unique_personnels = {p.uid: p for p in personnels}.values()
-                self.personnel.save_batch(list(unique_personnels))
+            team_play_maps[team.uid] = formation_map
+            team_personnel_maps[team.uid] = personnel_map
 
-            # Persist plays (with references to formations and personnel)
-            self.plays.save_batch(all_plays, team.uid, formation_map, personnel_map)
+        # Persist deduplicated formations and personnel
+        if all_formations:
+            self.formations.save_batch(list(all_formations.values()))
+        if all_personnels:
+            self.personnel.save_batch(list(all_personnels.values()))
+
+        # Persist plays for both teams
+        for team in [home_team, away_team]:
+            off_plays = team.off_playbook.plays if team.off_playbook else []
+            def_plays = team.def_playbook.plays if team.def_playbook else []
+            all_plays = off_plays + def_plays
+
+            if all_plays:
+                formation_map = team_play_maps.get(team.uid, {})
+                personnel_map = team_personnel_maps.get(team.uid, {})
+                self.plays.save_batch(all_plays, team.uid, formation_map, personnel_map)
 
         logger.info("Game dimension data persisted successfully.")

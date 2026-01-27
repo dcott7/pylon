@@ -57,8 +57,16 @@ class DriveEngine:
             self.run_post_play_hooks()
             play_count += 1
 
-        # ensure at least one play was run
+        # ensure at least one play was run; allow empty drive when a pending kickoff/half transition is in progress
         if last_play is None:
+            if self.game_state.has_pending_kickoff():
+                logger.info(
+                    "Skipping empty drive because a pending kickoff/half transition is in progress."
+                )
+                self.drive_record.set_end_state(self.game_state)
+                self.rules.on_drive_end(self.game_state, self.drive_record)
+                return self.drive_record
+
             msg = "Drive ended without running any plays."
             logger.error(msg)
             raise DriveExecutionError(msg)

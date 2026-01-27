@@ -59,7 +59,10 @@ class GameEngine:
         user_models: Optional[List[TypedModel[Any, Any]]] = None,
         rng: RNG = RNG(),
         rules: LeagueRules = NFLRules(),  # type: ignore
-        max_drives: Optional[int] = 100,
+        # the maximum number of drives before forcing game end. It should
+        # normally be None, but can be set for testing purposes If getting
+        # an infinite loop.
+        max_drives: Optional[int] = None,
     ) -> None:
         self.models = ModelRegistry()
         self.rng = rng
