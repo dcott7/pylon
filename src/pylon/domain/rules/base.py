@@ -1,3 +1,24 @@
+"""
+Abstract base rules and configurations for football simulations.
+
+This module defines the LeagueRules interface that all league implementations must follow.
+It also provides supporting data classes for configuring special plays like kickoffs and
+extra points.
+
+Key concepts:
+- LeagueRules is the decision-maker for game flow: it decides what should happen according
+  to the rule set, but does not mutate GameState directly.
+- GameEngine and specific play engines call into LeagueRules to determine when transitions
+  should occur (game start, halves, drive end, game end, etc.).
+- Concrete implementations (e.g., NFLRules) override these methods to define league-specific
+  behavior (quarter lengths, field dimensions, scoring, etc.).
+
+Supporting classes:
+- FirstDownRule: Configuration for first down yardage and down limits
+- KickoffSetup: Configuration for kickoff plays
+- ExtraPointSetup: Configuration for extra point attempts
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
@@ -17,13 +38,25 @@ logger = logging.getLogger(__name__)
 
 
 class LeagueRulesError(Exception):
+    """
+    Exception raised when a rule constraint is violated or an invalid state is encountered
+    during rule evaluation.
+    """
+
     pass
 
 
 class FirstDownRule:
     """
-    Configuration for first down rules, defining how many yards are needed for a
-    first down and the maximum number of downs allowed.
+    Configuration for first down rules.
+
+    Encapsulates the yardage needed for a first down and the maximum number of downs
+    allowed in a possession. Provides utilities for determining first down and turnover
+    on downs scenarios.
+
+    Attributes:
+        first_down_yards: Number of yards needed to gain a first down (default: 10).
+        max_downs: Maximum number of downs before turnover on downs (default: 4).
     """
 
     def __init__(self, first_down_yards: int = 10, max_downs: int = 4) -> None:
@@ -33,26 +66,62 @@ class FirstDownRule:
         self.max_downs = max_downs
 
     def is_first_down(self, yards_gained: int, distance: int) -> bool:
-        """Check if the yards gained is enough for a first down."""
+        """
+        Determine if a play resulted in a first down.
+
+        Args:
+            yards_gained: Yards gained on the play.
+            distance: Yards needed for a first down.
+
+        Returns:
+            True if yards_gained >= distance, False otherwise.
+        """
         return yards_gained >= distance
 
     def is_turnover_on_downs(
         self, current_down: int, yards_gained: int, distance: int
     ) -> bool:
-        """Check if the play resulted in a turnover on downs."""
+        """
+        Determine if a play resulted in a turnover on downs.
+
+        Args:
+            current_down: The current down (1-based).
+            yards_gained: Yards gained on the play.
+            distance: Yards needed for a first down.
+
+        Returns:
+            True if the play is on the last down and did not achieve a first down.
+        """
         return current_down >= self.max_downs and yards_gained < distance
 
 
 class KickoffSetup:
     """
-    Configuration for the kickoff play at the start of a half or after a score.
-    The kicking team and receiving team must be different, and the kickoff spot
-    must be between 1 and 99 (inclusive).
+    Configuration for a kickoff play.
+
+    Stores the teams involved and the field position where the kickoff occurs.
+    Validates that teams are different and the spot is on a valid part of the field.
+
+    Attributes:
+        kicking_team: The team performing the kickoff.
+        receiving_team: The team receiving the kickoff.
+        kickoff_spot: Yard line where the kickoff occurs (1-99, where 1 is own goal line).
     """
 
     def __init__(
         self, kicking_team: Team, receiving_team: Team, kickoff_spot: int
     ) -> None:
+        """
+        Initialize a KickoffSetup.
+
+        Args:
+            kicking_team: The team performing the kickoff.
+            receiving_team: The team receiving the kickoff.
+            kickoff_spot: Yard line (1-99). Must be different from receiving team.
+
+        Raises:
+            AssertionError: If spot is outside 1-99 or teams are the same.
+        """
         assert kickoff_spot >= 1
         assert kickoff_spot <= 99
         assert kicking_team != receiving_team
@@ -63,11 +132,27 @@ class KickoffSetup:
 
 class ExtraPointSetup:
     """
-    Configuration for the extra point attempt after a touchdown. The kicking team
-    attempts the extra point from the specified spot on the field.
+    Configuration for an extra point attempt after a touchdown.
+
+    Stores the team attempting the extra point and the field position from which
+    the attempt is made.
+
+    Attributes:
+        kicking_team: The team attempting the extra point.
+        spot: Yard line where the extra point attempt occurs (1-99).
     """
 
     def __init__(self, kicking_team: Team, spot: int) -> None:
+        """
+        Initialize an ExtraPointSetup.
+
+        Args:
+            kicking_team: The team attempting the extra point.
+            spot: Yard line for the attempt (1-99).
+
+        Raises:
+            AssertionError: If spot is outside 1-99.
+        """
         assert spot >= 1
         assert spot <= 99
         self.kicking_team = kicking_team

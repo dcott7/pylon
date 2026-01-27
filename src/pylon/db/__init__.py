@@ -6,6 +6,11 @@ game data to SQL databases.
 """
 
 from .database import DatabaseManager
+from .repositories import (
+    DimensionRepository,
+    TeamRepository,
+    AthleteRepository,
+)
 from .schema import (
     Base,
     Team,
@@ -22,6 +27,9 @@ from ..domain.playbook import PlaySideEnum, PlayTypeEnum
 
 __all__ = [
     "DatabaseManager",
+    "DimensionRepository",
+    "TeamRepository",
+    "AthleteRepository",
     "Base",
     "Team",
     "Athlete",

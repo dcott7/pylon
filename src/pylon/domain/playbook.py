@@ -1,3 +1,39 @@
+"""
+Playbook domain models for Pylon simulations.
+
+Defines the abstractions for representing plays and playbooks—collections of play
+templates that teams use to execute game strategy. This module provides:
+
+- PlaySideEnum: Enumeration distinguishing offensive vs defensive plays.
+
+- PlayTypeEnum: Categorization of plays (RUN, PASS, RPO, PUNT, FIELD_GOAL, KICKOFF,
+  EXTRA_POINT, TWO_POINT_CONVERSION, DEFENSIVE_PLAY) for filtering and organization.
+
+- Formation: Represents alignment patterns (e.g., "Shotgun Trips Right", "Cover 2").
+  Can have sub-formations for nested/variant alignments. Supports both offensive and
+  defensive formations.
+
+- Personnel: Represents player groupings (e.g., "11 Personnel" = 1 RB, 1 TE, 3 WR).
+  Used to validate and standardize player packages during play setup.
+
+- Play/PlayCall: Individual play template with:
+  - Unique UID and name
+  - Play type and side (offense/defense)
+  - Associated formation and personnel
+  - Optional play-specific data
+  - Validation on initialization (formation/personnel compatibility)
+
+- Playbook: Collection of plays, organized by side. Teams maintain offensive and
+  defensive playbooks.
+
+Key design:
+- Formations and Personnel can be shared across plays and teams
+- Formations support sub-formations for modeling formation variants
+- Plays can have optional formation/personnel (for flexibility)
+- Formation/Personnel are validated at play creation time
+- PlayCall is a play with execution-specific context (down, distance, etc.)
+"""
+
 from enum import Enum
 import logging
 from typing import Dict, List, Optional, Set

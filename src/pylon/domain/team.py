@@ -1,3 +1,29 @@
+"""
+Team domain model for Pylon simulations.
+
+Defines the Team abstraction representing a football team with its core components:
+
+- Unique identity (UID) and name
+- Offensive and defensive playbooks (collections of play templates)
+- Roster of athletes (players on the team)
+
+Key capabilities:
+- Add players to the team's roster
+- Add plays to the appropriate playbook (offensive or defensive)
+- Access roster and playbooks through properties
+
+Teams serve as the primary unit of organization in the simulation:
+- Each game involves two teams (home and away)
+- Teams own playbooks that define available plays
+- Teams maintain rosters of athletes who participate in plays
+- PlayExecutionData captures which athletes participated and their roles
+
+Design notes:
+- Team UIDs are auto-generated or provided explicitly for persistence/replay
+- Playbooks are lazily initialized if not provided at construction
+- Roster is mutable (can add players during setup)
+"""
+
 import logging
 import uuid
 from typing import List, Optional

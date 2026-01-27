@@ -1,3 +1,30 @@
+"""
+Athlete domain model and position hierarchy for Pylon simulations.
+
+Defines the core abstractions for representing individual players and their positions
+within the football hierarchy. This module provides:
+
+- AthletePositionEnum: Complete enumeration of football positions including generic
+  groupings (SKILL, OLINE, DB, DLINE, etc.) and specific positions (QB, WR, CB, etc.).
+  Generic positions enable fallback logic for personnel selection when specific
+  positions are unavailable.
+
+- PositionTree: Hierarchical tree structure representing position relationships and
+  parent-child dependencies. Enables efficient traversal, containment checks, and
+  fallback logic based on position hierarchy.
+
+- Athlete: Domain model for individual players, storing first name, last name, position,
+  and a unique UUID. Athletes are roster members and can participate in plays.
+
+- POSITION_TREE: Pre-built singleton position hierarchy used throughout the simulation
+  for personnel validation, selection, and fallback logic.
+
+Key design:
+- Positions are bidirectional (can traverse up to generic groups or down to specifics)
+- Position tree enables flexible personnel matching and fallback strategies
+- Athletes are immutable once created (identity-based, not equality-based)
+"""
+
 from __future__ import annotations
 from enum import Enum
 import logging

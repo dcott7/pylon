@@ -1,3 +1,17 @@
+"""
+National Football League (NFL) ruleset implementation.
+
+Defines all NFL-specific constants and rules including:
+- Game structure (15-minute quarters, 2 halves, 4 downs, 10-yard first downs)
+- Field dimensions and kickoff/extra point spots
+- Scoring values (touchdown=6, field goal=3, safety=2, etc.)
+- Game flow (coin toss, kickoffs, halves, drive ends, game end conditions)
+
+The NFLRules class implements the LeagueRules interface and is responsible for
+deciding what should happen according to NFL rules. It interacts with the model
+registry to make decisions (coin toss winner, kick/receive choice, etc.).
+"""
+
 from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
@@ -29,16 +43,49 @@ logger = logging.getLogger(__name__)
 
 
 class NFLRules(LeagueRules):
+    """
+    Official National Football League ruleset.
+
+    Defines all constants and behaviors for NFL simulations:
+
+    Game Structure:
+    - 15 minutes per quarter (900 seconds)
+    - 2 quarters per half (1,800 seconds/half)
+    - 4 quarters per game
+    - 3 timeouts per team per half
+
+    Field Rules:
+    - 100-yard field (plus end zones)
+    - Kickoffs from the 35-yard line
+    - Extra point attempts from the 15-yard line
+    - 10-yard first down requirement
+    - Touchback spots at 20-yard line (default) or 35-yard line (kickoff)
+
+    Scoring:
+    - Touchdown: 6 points
+    - Field Goal: 3 points
+    - Safety: 2 points
+    - Extra Point (kick): 1 point
+    - Extra Point (two-point conversion): 2 points
+    """
+
+    # Game structure constants
     MINUTES_PER_QUARTER = 15
     QUARTERS_PER_HALF = 2
     TIMEOUTS_PER_HALF = 3
+
+    # Field position constants
     KICKOFF_SPOT = 35
     EXTRA_POINT_SPOT = 15
-    FIRST_DOWN_YARDS = 10
-    FIELD_LENGTH = 100
-    MAX_DOWNS = 4
-    KICKOFF_TOUCHBACK_SPOT = 35
     DEFAULT_TOUCHBACK_SPOT = 20
+    KICKOFF_TOUCHBACK_SPOT = 35
+    FIELD_LENGTH = 100
+
+    # Play rules constants
+    FIRST_DOWN_YARDS = 10
+    MAX_DOWNS = 4
+
+    # Scoring values
     SCORING_VALUES = {
         ScoringTypeEnum.TOUCHDOWN: 6,
         ScoringTypeEnum.FIELD_GOAL: 3,
@@ -46,12 +93,26 @@ class NFLRules(LeagueRules):
         ScoringTypeEnum.EXTRA_POINT_KICK: 1,
         ScoringTypeEnum.EXTRA_POINT_TWO_POINT: 2,
     }
+
+    # First down rule configuration
     first_down_rule = FirstDownRule(FIRST_DOWN_YARDS, MAX_DOWNS)
 
     def start_game(
         self, game_state: "GameState", models: ModelRegistry, rng: RNG
     ) -> None:
-        """Perform coin toss and set up the opening kickoff of the game."""
+        """
+        Execute the opening sequence of an NFL game.
+
+        Involves:
+        1. Conducting the coin toss (determines which team gets to choose)
+        2. Asking the coin toss winner whether to kick or receive
+        3. Setting up the opening kickoff with the appropriate teams
+
+        Args:
+            game_state: Current game state to update.
+            models: Model registry for accessing coin toss and choice models.
+            rng: Random number generator for reproducibility.
+        """
         coin_toss_winner = models.get_typed(
             "coin_toss_winner",
             CoinTossWinnerModel,  # type: ignore
@@ -89,7 +150,17 @@ class NFLRules(LeagueRules):
     def start_half(
         self, game_state: "GameState", models: ModelRegistry, rng: RNG
     ) -> None:
-        """Set up the kickoff to start a new half."""
+        """
+        Execute the opening sequence of a new half (after half-time).
+
+        In the NFL, the team that did not kick off in the previous half receives
+        the kickoff in the new half. This method sets up the kickoff.
+
+        Args:
+            game_state: Current game state to update.
+            models: Model registry (unused, but required by interface).
+            rng: Random number generator (unused, but required by interface).
+        """
         # In NFL, the team that didn't kick in the first half kicks in the second half
         current_possession_team = game_state.pos_team
         kicking_team = game_state.opponent(current_possession_team)
@@ -106,7 +177,18 @@ class NFLRules(LeagueRules):
         )
 
     def is_game_over(self, game_state: "GameState") -> bool:
-        """Check if the game should end based on game clock."""
+        """
+        Determine if the game should end.
+
+        The game ends when the game clock is expired (time_remaining <= 0) after
+        the completion of the 4th quarter (current_quarter >= 4).
+
+        Args:
+            game_state: Current game state.
+
+        Returns:
+            True if the game should end, False otherwise.
+        """
         # Game is over when the clock is expired after the 4th quarter
         is_over = (
             game_state.clock.is_expired() and game_state.clock.current_quarter >= 4
@@ -118,7 +200,18 @@ class NFLRules(LeagueRules):
         return is_over
 
     def is_half_over(self, game_state: "GameState") -> bool:
-        """Check if the current half should end."""
+        """
+        Determine if the current half should end.
+
+        A half ends after 2 quarters are completed. This occurs when the quarter
+        changes from 2 to 3 (end of 1st half) or from 4+ (end of 2nd half/game).
+
+        Args:
+            game_state: Current game state.
+
+        Returns:
+            True if the current half should end, False otherwise.
+        """
         # Half is over when we complete 2 quarters (quarter 2) or end of game (quarter 4)
         # A quarter ends when time_remaining reaches 0 for that quarter
         quarter_length = game_state.clock.min_per_qtr * 60
@@ -131,9 +224,25 @@ class NFLRules(LeagueRules):
         ]
 
     def is_drive_over(
-        self, game_state: "GameState", drive_possession_team: Team, play_count: int
+        self, game_state: "GameState", drive_possession_team: "Team", play_count: int
     ) -> bool:
-        """Check if a drive is over."""
+        """
+        Determine if a drive should end.
+
+        A drive ends when:
+        - Possession has changed (turnover, turnover on downs, score)
+        - A pending kickoff is set (after a score) and at least one play has been run
+        - The half is over
+        - The game is over
+
+        Args:
+            game_state: Current game state.
+            drive_possession_team: The team that started the drive.
+            play_count: Number of plays executed during this drive.
+
+        Returns:
+            True if the drive should end, False otherwise.
+        """
         # A drive ends when:
         # 1. Possession changed (turnover, turnover on downs)
         # 2. There's a pending kickoff (after a score) AND we've run at least one play
