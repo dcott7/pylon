@@ -149,11 +149,9 @@ class Formation(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Formation UID
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    side: Mapped[PlaySideEnum] = mapped_column(SQLEnum(PlaySideEnum), nullable=False)
     parent_formation_id: Mapped[Optional[str]] = mapped_column(
         String, ForeignKey("formation.id"), nullable=True
     )
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Self-referential relationship for subformations
@@ -164,7 +162,7 @@ class Formation(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Formation(id={self.id}, name={self.name}, side={self.side})"
+        return f"Formation(id={self.id}, name={self.name})"
 
 
 class Personnel(Base):
@@ -179,8 +177,6 @@ class Personnel(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Personnel UID
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    side: Mapped[PlaySideEnum] = mapped_column(SQLEnum(PlaySideEnum), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
@@ -190,7 +186,7 @@ class Personnel(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Personnel(id={self.id}, name={self.name}, side={self.side})"
+        return f"Personnel(id={self.id}, name={self.name})"
 
 
 class Play(Base):
