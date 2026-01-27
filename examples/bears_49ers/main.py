@@ -44,7 +44,7 @@ def main() -> None:
 
     # Setup logging
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.FileHandler(EXAMPLE_DIR / "pylon.log"),
@@ -72,8 +72,8 @@ def main() -> None:
     db_manager = DatabaseManager(f"sqlite:///{PYLON_DB_PATH}")
     db_manager.init_db()
 
-    # Run multi-rep simulation (10 reps)
-    logger.info("\n--- Running multi-rep simulation (10 reps) ---")
+    # Run multi-rep simulation (50 reps) with per-rep logs under ./log
+    logger.info("\n--- Running multi-rep simulation (50 reps) ---")
     runner = SimulationRunner(
         home_team=home,
         away_team=away,
@@ -83,6 +83,9 @@ def main() -> None:
         db_manager=db_manager,
         experiment_name="Bears vs 49ers - 10 Rep Test",
         experiment_description="Test run of multi-rep simulation with database persistence",
+        log_dir=EXAMPLE_DIR / "log",
+        log_level=logging.INFO,  # Log all details for debugging
+        max_drives=100,  # Uncomment to limit drives per game for debugging infinate loops
     )
     results = runner.run()
 
@@ -95,13 +98,17 @@ def main() -> None:
     logger.info(f"Total Time: {results['elapsed_time']:.2f}s")
 
     agg = results["aggregate"]
-    logger.info(
-        f"{home.name} Record: {agg['home_wins']}-{agg['away_wins']}-{agg['ties']} "
-        f"({agg['home_win_pct']:.1%})"
-    )
-    logger.info(f"{home.name} Avg Score: {agg['avg_home_score']:.1f}")
-    logger.info(f"{away.name} Avg Score: {agg['avg_away_score']:.1f}")
-    logger.info(f"Avg Game Duration: {agg['avg_duration_seconds']:.2f}s")
+    if "failed_reps" in agg and agg["failed_reps"] > 0:
+        logger.warning(f"Failed Reps: {agg['failed_reps']}")
+
+    if "home_wins" in agg:
+        logger.info(
+            f"{home.name} Record: {agg['home_wins']}-{agg['away_wins']}-{agg['ties']} "
+            f"({agg['home_win_pct']:.1%})"
+        )
+        logger.info(f"{home.name} Avg Score: {agg['avg_home_score']:.1f}")
+        logger.info(f"{away.name} Avg Score: {agg['avg_away_score']:.1f}")
+        logger.info(f"Avg Game Duration: {agg['avg_duration_seconds']:.2f}s")
 
     # Save results to JSON
     results_file = EXAMPLE_DIR / "simulation_results.json"

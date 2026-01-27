@@ -1,3 +1,5 @@
+"""Punt engine: simulates punt selection, distance, and return."""
+
 import logging
 
 from ..state.game_state import GameState

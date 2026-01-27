@@ -1,3 +1,10 @@
+"""Authoritative game state: clock, possession, score, and pending specials.
+
+GameState owns the single source of truth for in-game mutable state while engines
+and models read/update it. It wires together the clock, scoreboard, possession,
+pending kickoffs/extra points, and drive/play records.
+"""
+
 from __future__ import annotations
 from enum import auto, Enum
 import logging

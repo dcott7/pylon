@@ -1,3 +1,13 @@
+"""Clock utilities for deriving quarter and remaining time from elapsed seconds.
+
+The GameClock is a thin view over an external source of truth for elapsed seconds
+provided by GameState. It never advances itself; all derived properties are
+computed on demand from the supplied getter.
+"""
+
+from typing import Callable
+
+
 class GameClock:
     """Football game clock wrapper for seconds elapsed.
 
@@ -8,7 +18,7 @@ class GameClock:
 
     def __init__(
         self,
-        get_seconds_elapsed,
+        get_seconds_elapsed: Callable[[], int],
         minutes_per_quarter: int = 15,
         num_reg_quarters: int = 4,
     ) -> None:

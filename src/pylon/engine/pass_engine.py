@@ -1,3 +1,5 @@
+"""Pass play engine: selects passer/receiver and computes pass outcomes."""
+
 import logging
 
 from ..state.game_state import GameState

@@ -262,7 +262,11 @@ class NFLRules(LeagueRules):
             logger.debug(f"Drive ended due to pending kickoff ({play_count} plays run)")
             return True
 
-        if self.is_half_over(game_state):
+        # Don't end drive on half-over if we haven't run any plays yet and have a pending kickoff.
+        # The kickoff needs to execute first.
+        if self.is_half_over(game_state) and not (
+            play_count == 0 and game_state.has_pending_kickoff()
+        ):
             logger.debug(f"Drive ended due to half ending ({play_count} plays run)")
             return True
 

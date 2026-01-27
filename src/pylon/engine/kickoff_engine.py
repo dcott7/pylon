@@ -1,3 +1,5 @@
+"""Kickoff engine: simulates kickoff distance, return, and touchback logic."""
+
 import logging
 
 from ..state.game_state import GameState

@@ -14,3 +14,4 @@ drop_plays_tables.sh
 
 # Logs
 *.log
+*.log.*

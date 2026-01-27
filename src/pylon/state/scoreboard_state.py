@@ -1,3 +1,5 @@
+"""Scoreboard state container for tracking points by team during a game."""
+
 import logging
 from typing import Dict, Optional
 

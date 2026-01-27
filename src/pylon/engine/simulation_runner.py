@@ -9,6 +9,7 @@ and model comparison experiments.
 import logging
 import time
 import uuid
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .game_engine import GameEngine
@@ -56,6 +57,8 @@ class SimulationRunner:
         db_manager: Optional[DatabaseManager] = None,
         experiment_name: Optional[str] = None,
         experiment_description: Optional[str] = None,
+        log_dir: Optional[Path | str] = None,
+        log_level: int = logging.INFO,
     ) -> None:
         """
         Initialize the SimulationRunner.
@@ -80,6 +83,8 @@ class SimulationRunner:
         self.rules = rules
         self.max_drives = max_drives
         self.db_manager = db_manager
+        self.log_dir = Path(log_dir) if log_dir is not None else Path("./log")
+        self.log_level = log_level
 
         # Experiment metadata
         self.experiment_id = str(uuid.uuid4())
@@ -111,6 +116,9 @@ class SimulationRunner:
         if self.db_manager:
             self._persist_dimension_data()
             self._persist_experiment_metadata()
+
+        # Ensure log directory exists for per-rep logs
+        self.log_dir.mkdir(parents=True, exist_ok=True)
 
         # Run all replications
         for rep_number in range(1, self.num_reps + 1):
@@ -150,6 +158,18 @@ class SimulationRunner:
         Returns:
             Dictionary with game result metadata.
         """
+        # Attach per-rep log file to capture all module logs for this game
+        rep_log_path = self.log_dir / f"pylon.log.{rep_number}"
+        rep_handler = logging.FileHandler(rep_log_path, mode="w")
+        rep_handler.setLevel(self.log_level)
+        rep_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
+        root_logger = logging.getLogger()
+        previous_level = root_logger.level
+        root_logger.addHandler(rep_handler)
+        root_logger.setLevel(min(previous_level, self.log_level))
+
         rng = RNG(seed)
         game_start = time.time()
 
@@ -176,6 +196,9 @@ class SimulationRunner:
         elif away_score > home_score:
             winner_id = self.away_team.uid
 
+        # Determine game status
+        status = "failed" if engine.max_drives_reached else "completed"
+
         game_result: Dict[str, Any] = {
             "rep_number": rep_number,
             "seed": seed,
@@ -184,6 +207,7 @@ class SimulationRunner:
             "winner_id": winner_id,
             "final_quarter": game_state.clock.current_quarter,
             "duration_seconds": game_duration,
+            "status": status,
             # TODO: Add total_plays and total_drives once GameExecutionData is accessible
             "total_plays": 0,
             "total_drives": 0,
@@ -194,9 +218,14 @@ class SimulationRunner:
             self._persist_game_result(game_result)
 
         logger.info(
-            f"Rep {rep_number} complete: {home_score}-{away_score} "
+            f"Rep {rep_number} complete [{status}]: {home_score}-{away_score} "
             f"(Q{game_state.clock.current_quarter}, {game_duration:.2f}s)"
         )
+
+        # Detach per-rep handler
+        root_logger.removeHandler(rep_handler)
+        rep_handler.close()
+        root_logger.setLevel(previous_level)
 
         return game_result
 
@@ -234,6 +263,7 @@ class SimulationRunner:
             experiment_id=self.experiment_id,
             rep_number=game_result["rep_number"],
             duration_seconds=game_result["duration_seconds"],
+            status=game_result["status"],
         )
 
     def _compute_aggregate_stats(self) -> Dict[str, Any]:
@@ -241,31 +271,38 @@ class SimulationRunner:
         if not self.game_results:
             return {}
 
+        completed_games = [g for g in self.game_results if g.get("status") != "failed"]
+        failed_reps = sum(1 for g in self.game_results if g.get("status") == "failed")
+
+        if not completed_games:
+            return {"failed_reps": failed_reps}
+
         home_wins = sum(
-            1 for g in self.game_results if g["winner_id"] == self.home_team.uid
+            1 for g in completed_games if g["winner_id"] == self.home_team.uid
         )
         away_wins = sum(
-            1 for g in self.game_results if g["winner_id"] == self.away_team.uid
+            1 for g in completed_games if g["winner_id"] == self.away_team.uid
         )
-        ties = sum(1 for g in self.game_results if g["winner_id"] is None)
+        ties = sum(1 for g in completed_games if g["winner_id"] is None)
 
-        avg_home_score = sum(g["home_score"] for g in self.game_results) / len(
-            self.game_results
+        avg_home_score = sum(g["home_score"] for g in completed_games) / len(
+            completed_games
         )
-        avg_away_score = sum(g["away_score"] for g in self.game_results) / len(
-            self.game_results
+        avg_away_score = sum(g["away_score"] for g in completed_games) / len(
+            completed_games
         )
-        avg_duration = sum(g["duration_seconds"] for g in self.game_results) / len(
-            self.game_results
+        avg_duration = sum(g["duration_seconds"] for g in completed_games) / len(
+            completed_games
         )
 
         return {
             "home_wins": home_wins,
             "away_wins": away_wins,
             "ties": ties,
-            "home_win_pct": home_wins / len(self.game_results),
-            "away_win_pct": away_wins / len(self.game_results),
+            "home_win_pct": home_wins / len(completed_games),
+            "away_win_pct": away_wins / len(completed_games),
             "avg_home_score": avg_home_score,
             "avg_away_score": avg_away_score,
             "avg_duration_seconds": avg_duration,
+            "failed_reps": failed_reps,
         }

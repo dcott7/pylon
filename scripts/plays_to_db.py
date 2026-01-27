@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS def_formations (
 cur.execute(
     """
 CREATE TABLE IF NOT EXISTS def_personnel_packages (
-    name TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
     dl INTEGER,
     lb INTEGER
 )
@@ -112,10 +113,11 @@ CREATE TABLE IF NOT EXISTS def_plays (
     name TEXT,
     play_type TEXT,
     formation_id INTEGER,
-    personnel_name TEXT,
+    personnel_id INTEGER,
     side TEXT,
     team_id INTEGER,
     FOREIGN KEY(formation_id) REFERENCES def_formations(id),
+    FOREIGN KEY(personnel_id) REFERENCES def_personnel_packages(id),
     FOREIGN KEY(team_id) REFERENCES teams(espn_id)
 );
 """
@@ -124,6 +126,7 @@ CREATE TABLE IF NOT EXISTS def_plays (
 cur.execute(
     """
 CREATE TABLE IF NOT EXISTS def_play_tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     play_id INTEGER,
     tag TEXT,
     FOREIGN KEY(play_id) REFERENCES def_plays(id),
@@ -154,7 +157,8 @@ CREATE TABLE IF NOT EXISTS off_formations (
 cur.execute(
     """
 CREATE TABLE IF NOT EXISTS off_personnel_packages (
-    name TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
     rb INTEGER,
     te INTEGER,
     wr INTEGER
@@ -169,11 +173,11 @@ CREATE TABLE IF NOT EXISTS off_plays (
     name TEXT,
     play_type TEXT,
     formation_id INTEGER,
-    personnel_name TEXT,
+    personnel_id INTEGER,
     side TEXT,
     team_id INTEGER,
     FOREIGN KEY(formation_id) REFERENCES off_formations(id),
-    FOREIGN KEY(personnel_name) REFERENCES off_personnel_packages(name),
+    FOREIGN KEY(personnel_id) REFERENCES off_personnel_packages(id),
     FOREIGN KEY(team_id) REFERENCES teams(espn_id)
 )
 """
@@ -182,6 +186,7 @@ CREATE TABLE IF NOT EXISTS off_plays (
 cur.execute(
     """
 CREATE TABLE IF NOT EXISTS off_play_tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     play_id INTEGER,
     tag TEXT,
     FOREIGN KEY(play_id) REFERENCES off_plays(id),
@@ -244,6 +249,17 @@ for name, rb, te, wr in OFF_PERSONNEL_PACKAGES:
     )
 
 conn.commit()
+
+# Cache personnel package IDs for FK use
+def_personnel_ids: Dict[str, int] = {}
+cur.execute("SELECT id, name FROM def_personnel_packages")
+for pid, name in cur.fetchall():
+    def_personnel_ids[name] = pid
+
+off_personnel_ids: Dict[str, int] = {}
+cur.execute("SELECT id, name FROM off_personnel_packages")
+for pid, name in cur.fetchall():
+    off_personnel_ids[name] = pid
 
 # ---------------------------------------------------------
 # Phase 1: Insert all formations (parent_id NULL)
@@ -389,14 +405,14 @@ for team_data in plays_data:
         cur.execute(
             """
             INSERT INTO def_plays
-            (name, play_type, formation_id, personnel_name, side, team_id)
+            (name, play_type, formation_id, personnel_id, side, team_id)
             VALUES (?, ?, ?, ?, ?, ?)
         """,
             (
                 play_name,
                 "DEFENSIVE_PLAY",
                 formation_id,
-                personnel,
+                def_personnel_ids[personnel],
                 "DEFENSE",
                 team_id,
             ),
@@ -438,10 +454,17 @@ for team_data in plays_data:
         cur.execute(
             """
             INSERT INTO off_plays
-            (name, play_type, formation_id, personnel_name, side, team_id)
+            (name, play_type, formation_id, personnel_id, side, team_id)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (play_name, play_type, formation_id, personnel, side, team_id),
+            (
+                play_name,
+                play_type,
+                formation_id,
+                off_personnel_ids[personnel],
+                side,
+                team_id,
+            ),
         )
 
         play_id = cur.lastrowid

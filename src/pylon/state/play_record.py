@@ -1,3 +1,9 @@
+"""Play-level state, participants, and snapshots.
+
+Defines play execution records, participant roles, scoring types, and snapshots of
+game state before/after a play for downstream analysis and consistency checks.
+"""
+
 from __future__ import annotations
 from enum import Enum
 import logging
@@ -264,7 +270,7 @@ class PlayExecutionData:
             return
 
         # Debug output to show which fields are missing
-        missing = []
+        missing: List[str] = []
         if self.off_play_call is None:
             missing.append("off_play_call")
         if self.def_play_call is None:

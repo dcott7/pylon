@@ -1,3 +1,9 @@
+"""Mutable possession state: offense, ball spot, down, and distance.
+
+Used by GameState as the authoritative view of who has the ball and where. Mutable
+so engines can advance the ball and change possession as plays execute.
+"""
+
 import logging
 from typing import Optional
 

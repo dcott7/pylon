@@ -1,3 +1,5 @@
+"""Snapshot helpers for clock, possession, and scoreboard state."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 

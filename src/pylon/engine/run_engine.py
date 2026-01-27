@@ -1,3 +1,5 @@
+"""Run play engine: handles execution of rushing plays including yardage outcomes."""
+
 import logging
 
 from ..state.game_state import GameState

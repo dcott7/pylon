@@ -52,7 +52,8 @@ class Team:
         roster: Optional[List[Athlete]] = None,
         uid: Optional[str] = None,
     ) -> None:
-        self.uid = uid or str(uuid.uuid4())
+        # Keep uid stable across reloads (use provided UID when available)
+        self._uid = uid or str(uuid.uuid4())
         self.name = name
         self._off_playbook = off_playbook or Playbook()
         self._def_playbook = def_playbook or Playbook()
@@ -92,3 +93,7 @@ class Team:
     @property
     def def_playbook(self) -> Playbook:
         return self._def_playbook
+
+    @property
+    def uid(self) -> str:
+        return self._uid

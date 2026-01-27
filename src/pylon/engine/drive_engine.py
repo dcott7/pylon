@@ -1,3 +1,5 @@
+"""Drive-level simulation loop: executes plays until drive ends per league rules."""
+
 import logging
 from typing import Optional
 

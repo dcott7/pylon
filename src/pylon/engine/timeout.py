@@ -1,3 +1,5 @@
+"""Timeout helpers for managing per-team timeout counts and validation."""
+
 import logging
 from typing import Dict
 

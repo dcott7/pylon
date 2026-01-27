@@ -46,6 +46,9 @@ from ..models.misc import (
 logger = logging.getLogger(__name__)
 
 
+"""Game-level orchestrator: runs drives, applies rules, and advances GameState."""
+
+
 class GameEngine:
     """
     Main game engine responsible for managing the game loop and integrating
@@ -68,6 +71,7 @@ class GameEngine:
         self.rng = rng
         self.rules = rules
         self.max_drives = max_drives
+        self.max_drives_reached = False
         self.game_state = GameState(
             home_team=home_team,
             away_team=away_team,
@@ -97,7 +101,8 @@ class GameEngine:
             ).run()
             drive_count += 1
             if self.max_drives is not None and drive_count >= self.max_drives:
-                logger.info("Maximum drives reached. Ending game.")
+                logger.error("Maximum drives reached. Ending game as FAILED.")
+                self.max_drives_reached = True
                 break
 
             if self.rules.is_half_over(self.game_state):

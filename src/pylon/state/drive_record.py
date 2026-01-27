@@ -1,3 +1,9 @@
+"""Drive-level state and snapshots used during simulation.
+
+Captures drive execution metadata (status, elapsed time, yards, scoring info) and
+provides snapshots of clock, possession, and scoreboard at drive boundaries.
+"""
+
 from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional

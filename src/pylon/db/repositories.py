@@ -498,6 +498,7 @@ class GameRepository:
         rep_number: Optional[int] = None,
         duration_seconds: Optional[float] = None,
         game_id: Optional[str] = None,
+        status: str = "completed",
     ) -> OrmGame:
         """
         Create and persist a new game result.
@@ -516,6 +517,7 @@ class GameRepository:
             rep_number: Optional replication number within experiment.
             duration_seconds: Optional execution time.
             game_id: Optional explicit ID (auto-generated if None).
+            status: Game status - 'completed' or 'failed'. Defaults to 'completed'.
 
         Returns:
             Persisted ORM Game object.
@@ -534,6 +536,7 @@ class GameRepository:
             total_drives=total_drives,
             duration_seconds=duration_seconds,
             final_quarter=final_quarter,
+            status=status,
         )
         self.db.insert_dimension_data(orm_game)
         logger.info(

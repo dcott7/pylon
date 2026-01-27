@@ -137,30 +137,33 @@ def load_formations(
     return off_formations, def_formations
 
 
-def load_personnel_packages(conn: sqlite3.Connection) -> Dict[str, PersonnelPackage]:
+def load_personnel_packages(
+    conn: sqlite3.Connection,
+) -> Tuple[Dict[int, PersonnelPackage], Dict[int, PersonnelPackage]]:
     cur = conn.cursor()
-    packages: Dict[str, PersonnelPackage] = {}
+    off_packages: Dict[int, PersonnelPackage] = {}
+    def_packages: Dict[int, PersonnelPackage] = {}
 
     # -------------------------
     # OFFENSE
     # -------------------------
-    cur.execute("SELECT name, rb, te, wr FROM off_personnel_packages")
-    for name, rb, te, wr in cur.fetchall():
-        packages[name] = PersonnelPackage(
+    cur.execute("SELECT id, name, rb, te, wr FROM off_personnel_packages")
+    for pid, name, rb, te, wr in cur.fetchall():
+        off_packages[pid] = PersonnelPackage(
             name=name,
             counts={
                 AthletePositionEnum.RB: rb,
                 AthletePositionEnum.TE: te,
                 AthletePositionEnum.WR: wr,
             },
-            uid=name,
+            uid=str(pid),
         )
 
     # -------------------------
     # DEFENSE
     # -------------------------
-    cur.execute("SELECT name, dl, lb FROM def_personnel_packages")
-    for name, dl, lb in cur.fetchall():
+    cur.execute("SELECT id, name, dl, lb FROM def_personnel_packages")
+    for pid, name, dl, lb in cur.fetchall():
         # Compute DB count automatically
         db = 11 - (dl + lb)
 
@@ -190,13 +193,13 @@ def load_personnel_packages(conn: sqlite3.Connection) -> Dict[str, PersonnelPack
         all_positions = dline_positions + lb_positions + db_positions
         counts = Counter(all_positions)
 
-        packages[name] = PersonnelPackage(
+        def_packages[pid] = PersonnelPackage(
             name=name,
             counts=counts,
-            uid=name,
+            uid=str(pid),
         )
 
-    return packages
+    return off_packages, def_packages
 
 
 def load_plays_for_team(
@@ -204,7 +207,8 @@ def load_plays_for_team(
     team_espn_id: int,
     off_formations: Dict[int, Formation],
     def_formations: Dict[int, Formation],
-    personnel: Dict[str, PersonnelPackage],
+    off_personnel: Dict[int, PersonnelPackage],
+    def_personnel: Dict[int, PersonnelPackage],
 ) -> List[PlayCall]:
     cur = conn.cursor()
     plays: List[PlayCall] = []
@@ -212,14 +216,14 @@ def load_plays_for_team(
     # --- OFFENSE ---
     cur.execute(
         """
-        SELECT id, name, play_type, formation_id, personnel_name, side
+        SELECT id, name, play_type, formation_id, personnel_id, side
         FROM off_plays
         WHERE team_id = ?
     """,
         (team_espn_id,),
     )
 
-    for pid, name, play_type, formation_id, personnel_name, side in cur.fetchall():
+    for pid, name, play_type, formation_id, personnel_id, side in cur.fetchall():
         cur.execute("SELECT tag FROM off_play_tags WHERE play_id = ?", (pid,))
         tags = [row[0] for row in cur.fetchall()]
 
@@ -228,7 +232,7 @@ def load_plays_for_team(
                 name=name,
                 play_type=PlayTypeEnum[play_type],
                 formation=off_formations[formation_id],
-                personnel_package=personnel[personnel_name],
+                personnel_package=off_personnel[personnel_id],
                 side=PlaySideEnum[side],
                 tags=tags,
                 uid=str(pid),
@@ -238,14 +242,14 @@ def load_plays_for_team(
     # --- DEFENSE ---
     cur.execute(
         """
-        SELECT id, name, play_type, formation_id, personnel_name, side
+        SELECT id, name, play_type, formation_id, personnel_id, side
         FROM def_plays
         WHERE team_id = ?
     """,
         (team_espn_id,),
     )
 
-    for pid, name, play_type, formation_id, personnel_name, side in cur.fetchall():
+    for pid, name, play_type, formation_id, personnel_id, side in cur.fetchall():
         cur.execute("SELECT tag FROM def_play_tags WHERE play_id = ?", (pid,))
         tags = [row[0] for row in cur.fetchall()]
 
@@ -254,7 +258,7 @@ def load_plays_for_team(
                 name=name,
                 play_type=PlayTypeEnum.DEFENSIVE_PLAY,
                 formation=def_formations[formation_id],
-                personnel_package=personnel[personnel_name],
+                personnel_package=def_personnel[personnel_id],
                 side=PlaySideEnum.DEFENSE,
                 tags=tags,
                 uid=str(pid),
@@ -266,7 +270,7 @@ def load_plays_for_team(
 
 def load_team_plays(conn: sqlite3.Connection, team_espn_id: int) -> List[PlayCall]:
     off_formations, def_formations = load_formations(conn)
-    personnel = load_personnel_packages(conn)
+    off_personnel, def_personnel = load_personnel_packages(conn)
     return load_plays_for_team(
-        conn, team_espn_id, off_formations, def_formations, personnel
+        conn, team_espn_id, off_formations, def_formations, off_personnel, def_personnel
     )

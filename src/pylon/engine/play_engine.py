@@ -1,3 +1,5 @@
+"""Play-level orchestrator: selects calls, assigns personnel, and records outcomes."""
+
 import logging
 from typing import Dict, List
 
@@ -282,7 +284,9 @@ class PlayEngine:
         # Kickoffs don't have pre-play clock runoff
         play_data.set_preplay_clock_runoff(0)
 
-        KickoffPlayEngine(self.game_state, self.models, self.rng, play_data, self.rules).run()
+        KickoffPlayEngine(
+            self.game_state, self.models, self.rng, play_data, self.rules
+        ).run()
 
         # Set time elapsed for the kickoff play
         self.set_play_time_elapsed(play_data)

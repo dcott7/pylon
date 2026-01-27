@@ -1,3 +1,5 @@
+"""Field goal engine: simulates FG attempts, distance, and make/miss outcomes."""
+
 import logging
 
 from ..state.game_state import GameState
