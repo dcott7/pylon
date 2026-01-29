@@ -18,8 +18,14 @@ from ..domain.rules.base import LeagueRules
 from ..domain.rules.nfl import NFLRules
 from ..models.registry import TypedModel
 from ..rng import RNG
+from ..state.game_state import GameState
 from ..db.database import DatabaseManager
-from ..db.repositories import DimensionRepository, ExperimentRepository, GameRepository
+from ..db.repositories import (
+    DimensionRepository,
+    FactRepository,
+    ExperimentRepository,
+    GameRepository,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -214,7 +220,8 @@ class SimulationRunner:
 
         # Persist game result to database
         if self.db_manager:
-            self._persist_game_result(game_result)
+            game_id = self._persist_game_result(game_result)
+            self._persist_game_facts(game_id, game_state)
 
         logger.info(
             f"Rep {rep_number} complete [{status}]: {home_score}-{away_score} "
@@ -231,13 +238,15 @@ class SimulationRunner:
     def _persist_dimension_data(self) -> None:
         """Persist teams, rosters, and playbooks to database."""
         logger.info("Persisting dimension data (teams, rosters, playbooks)...")
-        dim_repo = DimensionRepository(self.db_manager)  # type: ignore
+        assert self.db_manager is not None
+        dim_repo = DimensionRepository(self.db_manager)
         dim_repo.persist_game_dimensions(self.home_team, self.away_team)
 
     def _persist_experiment_metadata(self) -> None:
         """Persist experiment metadata to database."""
         logger.info("Persisting experiment metadata...")
-        exp_repo = ExperimentRepository(self.db_manager)  # type: ignore
+        assert self.db_manager is not None
+        exp_repo = ExperimentRepository(self.db_manager)
         exp_repo.create(
             name=self.experiment_name,
             num_reps=self.num_reps,
@@ -246,10 +255,16 @@ class SimulationRunner:
             experiment_id=self.experiment_id,
         )
 
-    def _persist_game_result(self, game_result: Dict[str, Any]) -> None:
-        """Persist individual game result to database."""
-        game_repo = GameRepository(self.db_manager)  # type: ignore
-        game_repo.create(
+    def _persist_game_result(self, game_result: Dict[str, Any]) -> str:
+        """
+        Persist individual game result to database.
+
+        Returns:
+            The game ID that was persisted.
+        """
+        assert self.db_manager is not None
+        game_repo = GameRepository(self.db_manager)
+        orm_game = game_repo.create(
             seed=game_result["seed"],
             home_team_id=self.home_team.uid,
             away_team_id=self.away_team.uid,
@@ -264,6 +279,19 @@ class SimulationRunner:
             duration_seconds=game_result["duration_seconds"],
             status=game_result["status"],
         )
+        return orm_game.id
+
+    def _persist_game_facts(self, game_id: str, game_state: GameState) -> None:
+        """
+        Persist all game facts (drives, plays, personnel assignments, participants).
+
+        Args:
+            game_id: The game fact ID to associate with all fact data.
+            game_state: The GameState object containing all play/drive execution data.
+        """
+        assert self.db_manager is not None
+        fact_repo = FactRepository(self.db_manager)
+        fact_repo.persist_game_facts(game_id, game_state)
 
     def _compute_aggregate_stats(self) -> Dict[str, Any]:
         """Compute aggregate statistics across all replications."""

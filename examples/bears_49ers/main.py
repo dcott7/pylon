@@ -77,14 +77,16 @@ def main() -> None:
     runner = SimulationRunner(
         home_team=home,
         away_team=away,
-        num_reps=50,
+        # num_reps=50,
+        num_reps=2,
         base_seed=42,
         rules=NFLRules(),
         db_manager=db_manager,
         experiment_name="Bears vs 49ers - 10 Rep Test",
         experiment_description="Test run of multi-rep simulation with database persistence",
         log_dir=EXAMPLE_DIR / "log",
-        log_level=logging.DEBUG,  # Log all details for debugging
+        # log_level=logging.DEBUG,  # Log all details for debugging
+        log_level=logging.INFO,
         max_drives=100,  # Uncomment to limit drives per game for debugging infinate loops
     )
     results = runner.run()

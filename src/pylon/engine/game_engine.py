@@ -2,7 +2,7 @@ import logging
 from typing import Any, List, Optional
 
 from .drive_engine import DriveEngine
-from ..state.game_state import GameState, GameExecutionData
+from ..state.game_state import GameState
 from ..models.registry import ModelRegistry, TypedModel
 from ..rng import RNG
 from ..domain.rules.base import LeagueRules
@@ -80,7 +80,6 @@ class GameEngine:
             max_timeouts=self.rules.TIMEOUTS_PER_HALF,
         )
         self.user_models = user_models or []
-        self.game_data: GameExecutionData = GameExecutionData()
         self._register_default_models()
         self._override_default_models(self.user_models)
 
@@ -88,7 +87,7 @@ class GameEngine:
         self._game_loop()
 
     def _game_loop(self):
-        self.game_data.start_game()
+        self.game_state.game_data.start_game()
         # Apply the league-specific rules for starting the game. This is
         # typically where the opening kickoff is set up.
         self.rules.start_game(self.game_state, self.models, self.rng)
@@ -108,9 +107,9 @@ class GameEngine:
                 # possible scheduling of post halftime kickoff, etc.
                 self.rules.start_half(self.game_state, self.models, self.rng)
 
-            self.game_data.add_drive(drive_record)
+            self.game_state.game_data.add_drive(drive_record)
 
-        self.game_data.end_game()
+        self.game_state.game_data.end_game()
 
         # Log final game stats
         logger.info(

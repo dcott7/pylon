@@ -8,6 +8,7 @@ game data to SQL databases.
 from .database import DatabaseManager
 from .repositories import (
     DimensionRepository,
+    FactRepository,
     TeamRepository,
     AthleteRepository,
     FormationRepository,
@@ -15,6 +16,9 @@ from .repositories import (
     PlayRepository,
     ExperimentRepository,
     GameRepository,
+    DriveRepository,
+    PlayPersonnelAssignmentRepository,
+    PlayParticipantRepository,
 )
 from .schema import (
     Base,
@@ -35,11 +39,15 @@ from ..domain.playbook import PlaySideEnum, PlayTypeEnum
 __all__ = [
     "DatabaseManager",
     "DimensionRepository",
+    "FactRepository",
     "TeamRepository",
     "AthleteRepository",
     "FormationRepository",
     "PersonnelRepository",
     "PlayRepository",
+    "DriveRepository",
+    "PlayPersonnelAssignmentRepository",
+    "PlayParticipantRepository",
     "ExperimentRepository",
     "GameRepository",
     "Base",

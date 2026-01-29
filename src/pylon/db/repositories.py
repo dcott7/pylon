@@ -9,6 +9,8 @@ import logging
 from typing import Dict, List, Optional
 import uuid
 
+from sqlalchemy import insert
+
 from ..domain.athlete import Athlete as DomainAthlete
 from ..domain.athlete import AthletePositionEnum
 from ..domain.team import Team as DomainTeam
@@ -30,6 +32,7 @@ from .schema import Drive as OrmDrive
 from .schema import Play as OrmPlay
 from .schema import PlayPersonnelAssignment as OrmPlayPersonnelAssignment
 from .schema import PlayParticipant as OrmPlayParticipant
+from .schema import team_roster
 
 logger = logging.getLogger(__name__)
 
@@ -608,12 +611,33 @@ class DimensionRepository:
         logger.info("Persisting game dimension data...")
 
         # Persist teams
-        self.teams.save_batch([home_team, away_team])
+        orm_teams = self.teams.save_batch([home_team, away_team])
 
-        # Persist all athletes from both rosters
+        # Persist all athletes from both rosters and associate with their teams
         all_athletes = home_team.roster + away_team.roster
         if all_athletes:
             self.athletes.save_batch(all_athletes)
+
+            # Build athlete-to-team mapping and populate team_roster association
+            team_roster_rows: List[Dict[str, str]] = []
+            for team in [home_team, away_team]:
+                orm_team = next(t for t in orm_teams if t.id == team.uid)
+                for athlete in team.roster:
+                    team_roster_rows.append(
+                        {"team_id": orm_team.id, "athlete_id": athlete.uid}
+                    )
+
+            # Insert team_roster associations
+            if team_roster_rows:
+                session = self.db.get_session()
+                try:
+                    session.execute(insert(team_roster).values(team_roster_rows))
+                    session.commit()
+                    logger.info(
+                        f"Persisted {len(team_roster_rows)} team-athlete associations."
+                    )
+                finally:
+                    session.close()
 
         # Collect all formations and personnel from both teams' playbooks
         # (deduped globally by UID since both teams share standard NFL formations/personnel)
@@ -1073,13 +1097,18 @@ class FactRepository:
             game_state: GameState object with completed drives.
         """
         logger.info(f"Persisting game {game_id} fact data...")
+        logger.info(f"Game has {len(game_state.drives)} drive(s)")
 
         # Persist drives
         if game_state.drives:
             self.drives.save_batch(game_state.drives, game_id)
 
             # Persist plays, personnel assignments, and participants for each drive
-            for drive in game_state.drives:
+            for drive_idx, drive in enumerate(game_state.drives):
+                logger.info(
+                    f"Processing drive {drive_idx + 1}/{len(game_state.drives)} with {len(drive.plays)} play(s)"
+                )
+
                 # Get the offensive team for this drive
                 assert drive.start.pos_team is not None
                 assert drive.start.def_team is not None
