@@ -10,18 +10,26 @@ from typing import Dict, List, Optional
 import uuid
 
 from ..domain.athlete import Athlete as DomainAthlete
+from ..domain.athlete import AthletePositionEnum
 from ..domain.team import Team as DomainTeam
 from ..domain.playbook import Formation as DomainFormation
 from ..domain.playbook import PersonnelPackage as DomainPersonnel
 from ..domain.playbook import PlayCall as DomainPlayCall
+from ..state.drive_record import DriveRecord
+from ..state.game_state import GameState
+from ..state.play_record import PlayRecord, PlayParticipantType
 from .database import DatabaseManager
 from .schema import Athlete as OrmAthlete
 from .schema import Team as OrmTeam
 from .schema import Formation as OrmFormation
 from .schema import Personnel as OrmPersonnel
-from .schema import Play as OrmPlay
+from .schema import PlayCall as OrmPlayCall
 from .schema import Experiment as OrmExperiment
 from .schema import Game as OrmGame
+from .schema import Drive as OrmDrive
+from .schema import Play as OrmPlay
+from .schema import PlayPersonnelAssignment as OrmPlayPersonnelAssignment
+from .schema import PlayParticipant as OrmPlayParticipant
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +182,7 @@ class FormationRepository:
         self.db = db_manager
 
     def to_orm(
-        self, domain_formation: DomainFormation, parent_id: str | None = None
+        self, domain_formation: DomainFormation, parent_id: Optional[str] = None
     ) -> OrmFormation:
         """
         Convert a domain Formation to an ORM Formation.
@@ -194,7 +202,7 @@ class FormationRepository:
         return orm_formation
 
     def save(
-        self, domain_formation: DomainFormation, parent_id: str | None = None
+        self, domain_formation: DomainFormation, parent_id: Optional[str] = None
     ) -> OrmFormation:
         """
         Convert and persist a domain Formation.
@@ -305,7 +313,7 @@ class PersonnelRepository:
         return orm_personnels
 
 
-class PlayRepository:
+class PlayCallRepository:
     """
     Repository for Play dimension data.
 
@@ -326,11 +334,11 @@ class PlayRepository:
         self,
         domain_play: DomainPlayCall,
         team_id: str,
-        formation_id: str | None = None,
-        personnel_id: str | None = None,
-    ) -> OrmPlay:
+        formation_id: Optional[str] = None,
+        personnel_id: Optional[str] = None,
+    ) -> OrmPlayCall:
         """
-        Convert a domain PlayCall to an ORM Play.
+        Convert a domain PlayCall to an ORM PlayCall.
 
         Args:
             domain_play: Domain PlayCall object.
@@ -339,9 +347,9 @@ class PlayRepository:
             personnel_id: Optional Personnel ID reference.
 
         Returns:
-            ORM Play object (not yet persisted).
+            ORM PlayCall object (not yet persisted).
         """
-        orm_play = OrmPlay(
+        orm_play_call = OrmPlayCall(
             id=domain_play.uid,
             name=domain_play.name,
             play_type=domain_play.play_type,
@@ -351,15 +359,15 @@ class PlayRepository:
             personnel_id=personnel_id,
             description=domain_play.description,
         )
-        return orm_play
+        return orm_play_call
 
     def save(
         self,
         domain_play: DomainPlayCall,
         team_id: str,
-        formation_id: str | None = None,
-        personnel_id: str | None = None,
-    ) -> OrmPlay:
+        formation_id: Optional[str] = None,
+        personnel_id: Optional[str] = None,
+    ) -> OrmPlayCall:
         """
         Convert and persist a domain PlayCall.
 
@@ -370,20 +378,22 @@ class PlayRepository:
             personnel_id: Optional Personnel ID reference.
 
         Returns:
-            Persisted ORM Play object.
+            Persisted ORM PlayCall object.
         """
-        orm_play = self.to_orm(domain_play, team_id, formation_id, personnel_id)
-        self.db.insert_dimension_data(orm_play)
-        logger.info(f"Persisted play: {orm_play.name} (id={orm_play.id})")
-        return orm_play
+        orm_play_call = self.to_orm(domain_play, team_id, formation_id, personnel_id)
+        self.db.insert_dimension_data(orm_play_call)
+        logger.info(
+            f"Persisted play call: {orm_play_call.name} (id={orm_play_call.id})"
+        )
+        return orm_play_call
 
     def save_batch(
         self,
         domain_plays: List[DomainPlayCall],
         team_id: str,
-        formation_ids: dict[str, str] | None = None,
-        personnel_ids: dict[str, str] | None = None,
-    ) -> List[OrmPlay]:
+        formation_ids: Optional[Dict[str, str]] = None,
+        personnel_ids: Optional[Dict[str, str]] = None,
+    ) -> List[OrmPlayCall]:
         """
         Convert and persist multiple domain PlayCalls.
 
@@ -574,7 +584,7 @@ class DimensionRepository:
         self.athletes = AthleteRepository(db_manager)
         self.formations = FormationRepository(db_manager)
         self.personnel = PersonnelRepository(db_manager)
-        self.plays = PlayRepository(db_manager)
+        self.play_calls = PlayCallRepository(db_manager)
 
     def persist_game_dimensions(
         self,
@@ -662,6 +672,449 @@ class DimensionRepository:
             if all_plays:
                 formation_map = team_play_maps.get(team.uid, {})
                 personnel_map = team_personnel_maps.get(team.uid, {})
-                self.plays.save_batch(all_plays, team.uid, formation_map, personnel_map)
+                self.play_calls.save_batch(
+                    all_plays, team.uid, formation_map, personnel_map
+                )
 
         logger.info("Game dimension data persisted successfully.")
+
+
+class DriveRepository:
+    """
+    Repository for Drive fact data.
+
+    Handles conversion between DriveRecord (execution state) and ORM Drive objects
+    and manages persistence of drive execution records.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the DriveRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def to_orm(self, drive_record: DriveRecord, game_id: str) -> OrmDrive:
+        """
+        Convert a DriveRecord to an ORM Drive.
+
+        Args:
+            drive_record: DriveRecord object from simulation.
+            game_id: Parent game ID.
+
+        Returns:
+            ORM Drive object (not yet persisted).
+        """
+        execution_data = drive_record.execution_data
+        start = drive_record.start
+        end = drive_record.end
+
+        orm_drive = OrmDrive(
+            id=drive_record.uid,
+            game_id=game_id,
+            drive_number=getattr(start.possession_snapshot, "drive_number", 1),
+            offense_team_id=start.pos_team.uid if start.pos_team else None,
+            defense_team_id=start.def_team.uid if start.def_team else None,
+            # Start snapshot
+            start_quarter=start.clock_snapshot.quarter,
+            start_time_remaining=start.clock_snapshot.time_remaining,
+            start_down=start.possession_snapshot.down,
+            start_distance=start.possession_snapshot.distance,
+            start_yardline=start.possession_snapshot.yardline,
+            # End snapshot
+            end_quarter=end.clock_snapshot.quarter,
+            end_time_remaining=end.clock_snapshot.time_remaining,
+            end_down=end.possession_snapshot.down,
+            end_distance=end.possession_snapshot.distance,
+            end_yardline=end.possession_snapshot.yardline,
+            # Aggregates
+            plays_run=len(drive_record.plays),
+            yards_gained=execution_data.yards_gained,
+            time_elapsed=execution_data.time_elapsed,
+            # Results
+            result=execution_data.result.value if execution_data.result else "unknown",
+            scoring_type=execution_data.scoring_type.value
+            if execution_data.scoring_type
+            else None,
+            scoring_team_id=execution_data.scoring_team.uid
+            if execution_data.scoring_team
+            else None,
+        )
+        return orm_drive
+
+    def save(self, drive_record: DriveRecord, game_id: str) -> OrmDrive:
+        """
+        Convert and persist a single DriveRecord.
+
+        Args:
+            drive_record: DriveRecord object.
+            game_id: Parent game ID.
+
+        Returns:
+            Persisted ORM Drive object.
+        """
+        orm_drive = self.to_orm(drive_record, game_id)
+        self.db.insert_fact_data(orm_drive)
+        logger.info(
+            f"Persisted drive: {orm_drive.id} (plays={orm_drive.plays_run}, yards={orm_drive.yards_gained})"
+        )
+        return orm_drive
+
+    def save_batch(
+        self, drive_records: List[DriveRecord], game_id: str
+    ) -> List[OrmDrive]:
+        """
+        Convert and persist multiple DriveRecords.
+
+        Args:
+            drive_records: List of DriveRecord objects.
+            game_id: Parent game ID.
+
+        Returns:
+            List of persisted ORM Drive objects.
+        """
+        orm_drives = [self.to_orm(dr, game_id) for dr in drive_records]
+        self.db.insert_fact_data(*orm_drives)
+        logger.info(f"Persisted {len(orm_drives)} drive(s).")
+        return orm_drives
+
+
+class PlayRepository:
+    """
+    Repository for Play fact data.
+
+    Handles conversion between PlayRecord (execution state) and ORM Play objects
+    and manages persistence of play execution records.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the PlayRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def to_orm(
+        self, play_record: PlayRecord, game_id: str, drive_id: str, play_number: int
+    ) -> OrmPlay:
+        """
+        Convert a PlayRecord to an ORM Play.
+
+        Args:
+            play_record: PlayRecord object from simulation.
+            game_id: Parent game ID.
+            drive_id: Parent drive ID.
+            play_number: 1-based play number within drive.
+
+        Returns:
+            ORM Play object (not yet persisted).
+        """
+        execution_data = play_record.execution_data
+        start = play_record.start
+        end = play_record.end
+
+        orm_play = OrmPlay(
+            id=play_record.uid,
+            game_id=game_id,
+            drive_id=drive_id,
+            play_number=play_number,
+            # Call metadata
+            play_call_id=execution_data.off_play_call.uid
+            if execution_data.off_play_call
+            else None,
+            play_type=execution_data.off_play_call.play_type
+            if execution_data.off_play_call
+            else None,
+            side=execution_data.off_play_call.side
+            if execution_data.off_play_call
+            else None,
+            formation_id=None,  # Can be enhanced if formation tracking is added
+            personnel_id=None,  # Can be enhanced if personnel tracking is added
+            # Teams
+            offense_team_id=start.pos_team.uid if start.pos_team else None,
+            defense_team_id=start.def_team.uid if start.def_team else None,
+            # Start snapshot
+            quarter=start.clock_snapshot.quarter,
+            time_remaining=start.clock_snapshot.time_remaining,
+            down=start.possession_snapshot.down,
+            distance=start.possession_snapshot.distance,
+            yardline_start=start.possession_snapshot.yardline,
+            # Outcomes
+            yardline_end=end.possession_snapshot.yardline,
+            yards_gained=execution_data.yards_gained or 0,
+            possession_changed=int(execution_data.is_possession_change or False),
+            turnover=int(execution_data.is_turnover or False),
+            scoring_type=None,  # Can be populated if scoring data is tracked
+            scoring_team_id=None,  # Can be populated if scoring data is tracked
+        )
+        return orm_play
+
+    def save(
+        self, play_record: PlayRecord, game_id: str, drive_id: str, play_number: int
+    ) -> OrmPlay:
+        """
+        Convert and persist a single PlayRecord.
+
+        Args:
+            play_record: PlayRecord object.
+            game_id: Parent game ID.
+            drive_id: Parent drive ID.
+            play_number: 1-based play number within drive.
+
+        Returns:
+            Persisted ORM Play object.
+        """
+        orm_play = self.to_orm(play_record, game_id, drive_id, play_number)
+        self.db.insert_fact_data(orm_play)
+        logger.info(f"Persisted play: {orm_play.id} (yards={orm_play.yards_gained})")
+        return orm_play
+
+    def save_batch(
+        self, play_records: List[PlayRecord], game_id: str, drive_id: str
+    ) -> List[OrmPlay]:
+        """
+        Convert and persist multiple PlayRecords from a drive.
+
+        Args:
+            play_records: List of PlayRecord objects.
+            game_id: Parent game ID.
+            drive_id: Parent drive ID.
+
+        Returns:
+            List of persisted ORM Play objects.
+        """
+        orm_plays = [
+            self.to_orm(pr, game_id, drive_id, i + 1)
+            for i, pr in enumerate(play_records)
+        ]
+        self.db.insert_fact_data(*orm_plays)
+        logger.info(f"Persisted {len(orm_plays)} play(s).")
+        return orm_plays
+
+
+class PlayPersonnelAssignmentRepository:
+    """
+    Repository for PlayPersonnelAssignment fact data.
+
+    Tracks which athletes were assigned to which positions for each play.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the PlayPersonnelAssignmentRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def to_orm(
+        self, play_id: str, team_id: str, athlete_id: str, position: AthletePositionEnum
+    ) -> OrmPlayPersonnelAssignment:
+        """
+        Create an ORM PlayPersonnelAssignment.
+
+        Args:
+            play_id: Play fact ID.
+            team_id: Team ID.
+            athlete_id: Athlete ID.
+            position: AthletePositionEnum.
+
+        Returns:
+            ORM PlayPersonnelAssignment object (not yet persisted).
+        """
+        orm_assignment = OrmPlayPersonnelAssignment(
+            id=str(uuid.uuid4()),
+            play_id=play_id,
+            team_id=team_id,
+            athlete_id=athlete_id,
+            position=position,
+        )
+        return orm_assignment
+
+    def save_batch(
+        self,
+        play_id: str,
+        assignments: Dict[AthletePositionEnum, List[DomainAthlete]],
+        team_id: str,
+    ) -> List[OrmPlayPersonnelAssignment]:
+        """
+        Persist personnel assignments for a play.
+
+        Args:
+            play_id: Play fact ID.
+            assignments: Dict of position -> List[Athlete] from play execution.
+            team_id: Team ID.
+
+        Returns:
+            List of persisted ORM PlayPersonnelAssignment objects.
+        """
+        orm_assignments: List[OrmPlayPersonnelAssignment] = []
+        for position, athletes in assignments.items():
+            for athlete in athletes:
+                orm_assignment = self.to_orm(play_id, team_id, athlete.uid, position)
+                orm_assignments.append(orm_assignment)
+
+        if orm_assignments:
+            self.db.insert_fact_data(*orm_assignments)
+            logger.info(f"Persisted {len(orm_assignments)} personnel assignment(s).")
+
+        return orm_assignments
+
+
+class PlayParticipantRepository:
+    """
+    Repository for PlayParticipant fact data.
+
+    Tracks participant roles (passer, rusher, receiver, etc.) for each play.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize the PlayParticipantRepository.
+
+        Args:
+            db_manager: DatabaseManager instance for persistence.
+        """
+        self.db = db_manager
+
+    def to_orm(
+        self,
+        play_id: str,
+        athlete_id: str,
+        team_id: str,
+        participant_type: PlayParticipantType,
+    ) -> OrmPlayParticipant:
+        """
+        Create an ORM PlayParticipant.
+
+        Args:
+            play_id: Play fact ID.
+            athlete_id: Athlete ID.
+            team_id: Team ID.
+            participant_type: PlayParticipantType enum.
+
+        Returns:
+            ORM PlayParticipant object (not yet persisted).
+        """
+        orm_participant = OrmPlayParticipant(
+            id=str(uuid.uuid4()),
+            play_id=play_id,
+            athlete_id=athlete_id,
+            team_id=team_id,
+            participant_type=participant_type,
+        )
+        return orm_participant
+
+    def save_batch(
+        self, play_id: str, participants: Dict[str, PlayParticipantType], team_id: str
+    ) -> List[OrmPlayParticipant]:
+        """
+        Persist participant roles for a play.
+
+        Args:
+            play_id: Play fact ID.
+            participants: Dict of athlete_id -> PlayParticipantType from play execution.
+            team_id: Team ID.
+
+        Returns:
+            List of persisted ORM PlayParticipant objects.
+        """
+        orm_participants: List[OrmPlayParticipant] = []
+        for athlete_id, participant_type in participants.items():
+            orm_participant = self.to_orm(
+                play_id, athlete_id, team_id, participant_type
+            )
+            orm_participants.append(orm_participant)
+
+        if orm_participants:
+            self.db.insert_fact_data(*orm_participants)
+            logger.info(f"Persisted {len(orm_participants)} participant(s).")
+
+        return orm_participants
+
+
+class FactRepository:
+    """
+    Facade for all fact repositories.
+
+    Provides a unified interface for persisting fact data from game simulations.
+    """
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        """
+        Initialize FactRepository with all sub-repositories.
+
+        Args:
+            db_manager: DatabaseManager instance.
+        """
+        self.db = db_manager
+        self.drives = DriveRepository(db_manager)
+        self.plays = PlayRepository(db_manager)
+        self.play_personnel_assignments = PlayPersonnelAssignmentRepository(db_manager)
+        self.play_participants = PlayParticipantRepository(db_manager)
+
+    def persist_game_facts(self, game_id: str, game_state: GameState) -> None:
+        """
+        Persist all fact data from a completed game.
+
+        This includes:
+        - Drives (aggregated play data per drive)
+        - Plays (individual play execution records)
+        - Play personnel assignments (who was on the field)
+        - Play participants (who participated in each play)
+
+        Args:
+            game_id: Game fact ID.
+            game_state: GameState object with completed drives.
+        """
+        logger.info(f"Persisting game {game_id} fact data...")
+
+        # Persist drives
+        if game_state.drives:
+            self.drives.save_batch(game_state.drives, game_id)
+
+            # Persist plays, personnel assignments, and participants for each drive
+            for drive in game_state.drives:
+                # Get the offensive team for this drive
+                assert drive.start.pos_team is not None
+                assert drive.start.def_team is not None
+                drive_offense_team_id = drive.start.pos_team.uid
+                drive_defense_team_id = drive.start.def_team.uid
+
+                for play_number, play_record in enumerate(drive.plays, start=1):
+                    # Persist the play
+                    orm_play = self.plays.to_orm(
+                        play_record, game_id, drive.uid, play_number
+                    )
+                    self.db.insert_fact_data(orm_play)
+
+                    # Persist offensive personnel assignments
+                    if play_record.off_personnel_assignments:
+                        self.play_personnel_assignments.save_batch(
+                            orm_play.id,
+                            play_record.off_personnel_assignments,
+                            drive_offense_team_id,
+                        )
+
+                    # Persist defensive personnel assignments
+                    if play_record.def_personnel_assignments:
+                        self.play_personnel_assignments.save_batch(
+                            orm_play.id,
+                            play_record.def_personnel_assignments,
+                            drive_defense_team_id,
+                        )
+
+                    # Persist participants
+                    if play_record.participants:
+                        self.play_participants.save_batch(
+                            orm_play.id,
+                            play_record.participants,
+                            drive_offense_team_id,
+                        )
+
+        logger.info(f"Game {game_id} fact data persisted successfully.")

@@ -229,6 +229,10 @@ class PlayExecutionData:
     def def_personnel_assignments(self) -> Dict[AthletePositionEnum, List[Athlete]]:
         return self._def_personnel_assignments
 
+    @property
+    def participants(self) -> Dict[str, PlayParticipantType]:
+        return self._participants
+
     # ==============================
     # Validators
     # ==============================
@@ -333,6 +337,15 @@ class PlayRecord:
         self._start_snapshot = PlaySnapshot(start_game_state)
         # this will be filled in later during finalization
         self._end_snapshot = PlaySnapshot(None)
+        # Execution data (play calls, personnel, outcomes, participants)
+        self._execution_data: PlayExecutionData = PlayExecutionData()
+
+    # ==============================
+    # Setters
+    # ==============================
+    def set_execution_data(self, execution_data: PlayExecutionData) -> None:
+        self._execution_data = execution_data
+        logger.debug(f"Set execution data for PlayRecord {self.uid}")
 
     # ==============================
     # Getters
@@ -344,6 +357,64 @@ class PlayRecord:
     @property
     def end(self) -> PlaySnapshot:
         return self._end_snapshot
+
+    @property
+    def execution_data(self) -> PlayExecutionData:
+        """Access execution data directly."""
+        return self._execution_data
+
+    @property
+    def off_play_call(self) -> Optional[PlayCall]:
+        return self._execution_data.off_play_call
+
+    @property
+    def def_play_call(self) -> Optional[PlayCall]:
+        return self._execution_data.def_play_call
+
+    @property
+    def yards_gained(self) -> Optional[int]:
+        return self._execution_data.yards_gained
+
+    @property
+    def time_elapsed(self) -> Optional[int]:
+        return self._execution_data.time_elapsed
+
+    @property
+    def preplay_clock_runoff(self) -> Optional[int]:
+        return self._execution_data.preplay_clock_runoff
+
+    @property
+    def is_fg_attempt(self) -> Optional[bool]:
+        return self._execution_data.is_fg_attempt
+
+    @property
+    def fg_good(self) -> Optional[bool]:
+        return self._execution_data.fg_good
+
+    @property
+    def is_clock_running(self) -> Optional[bool]:
+        return self._execution_data.is_clock_running
+
+    @property
+    def is_possession_change(self) -> Optional[bool]:
+        return self._execution_data.is_possession_change
+
+    @property
+    def is_turnover(self) -> Optional[bool]:
+        return self._execution_data.is_turnover
+
+    @property
+    def off_personnel_assignments(self) -> Dict[AthletePositionEnum, List[Athlete]]:
+        return self._execution_data.off_personnel_assignments
+
+    @property
+    def def_personnel_assignments(self) -> Dict[AthletePositionEnum, List[Athlete]]:
+        return self._execution_data.def_personnel_assignments
+
+    @property
+    def participants(self) -> Dict[str, PlayParticipantType]:
+        """Return participant roles (passer, rusher, receiver, etc.)."""
+        return self._execution_data.participants
 
     # ==============================
     # Validators

@@ -70,9 +70,9 @@ class Team(Base):
         secondary=team_roster,
         back_populates="teams",
     )
-    plays: Mapped[List["Play"]] = relationship(
-        "Play",
-        foreign_keys="Play.team_id",
+    plays: Mapped[List["PlayCall"]] = relationship(
+        "PlayCall",
+        foreign_keys="PlayCall.team_id",
         back_populates="team",
     )
 
@@ -183,8 +183,8 @@ class Personnel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
-    plays: Mapped[List["Play"]] = relationship(
-        "Play",
+    plays: Mapped[List["PlayCall"]] = relationship(
+        "PlayCall",
         back_populates="personnel",
     )
 
@@ -192,7 +192,7 @@ class Personnel(Base):
         return f"Personnel(id={self.id}, name={self.name})"
 
 
-class Play(Base):
+class PlayCall(Base):
     """
     Dimension: Play/Play Call information.
 
@@ -201,7 +201,7 @@ class Play(Base):
     Linked to offensive and defensive teams.
     """
 
-    __tablename__ = "play"
+    __tablename__ = "play_call"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Play UID
     name: Mapped[str] = mapped_column(String, nullable=False)
@@ -236,7 +236,7 @@ class Play(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Play(id={self.id}, name={self.name}, type={self.play_type})"
+        return f"PlayCall(id={self.id}, name={self.name}, type={self.play_type})"
 
 
 class Playbook(Base):
@@ -493,7 +493,7 @@ class Drive(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 
-class PlayFact(Base):
+class Play(Base):
     """
     Fact: Play-level execution record.
 
@@ -501,7 +501,7 @@ class PlayFact(Base):
     for each executed play. Designed for analytics and replay.
     """
 
-    __tablename__ = "play_fact"
+    __tablename__ = "play"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Play execution UID
     game_id: Mapped[str] = mapped_column(String, ForeignKey("game.id"), nullable=False)
@@ -514,7 +514,7 @@ class PlayFact(Base):
 
     # Call metadata
     play_call_id: Mapped[Optional[str]] = mapped_column(
-        String, ForeignKey("play.id"), nullable=True
+        String, ForeignKey("play_call.id"), nullable=True
     )
     play_type: Mapped[Optional[PlayTypeEnum]] = mapped_column(
         SQLEnum(PlayTypeEnum), nullable=True
@@ -561,10 +561,10 @@ class PlayFact(Base):
 
     # Relationships
     assignments: Mapped[List["PlayPersonnelAssignment"]] = relationship(
-        "PlayPersonnelAssignment", back_populates="play_fact"
+        "PlayPersonnelAssignment", back_populates="play"
     )
     participants_rel: Mapped[List["PlayParticipant"]] = relationship(
-        "PlayParticipant", back_populates="play_fact"
+        "PlayParticipant", back_populates="play"
     )
 
 
@@ -579,9 +579,7 @@ class PlayPersonnelAssignment(Base):
     __tablename__ = "play_personnel_assignment"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    play_fact_id: Mapped[str] = mapped_column(
-        String, ForeignKey("play_fact.id"), nullable=False
-    )
+    play_id: Mapped[str] = mapped_column(String, ForeignKey("play.id"), nullable=False)
     team_id: Mapped[str] = mapped_column(String, ForeignKey("team.id"), nullable=False)
     athlete_id: Mapped[str] = mapped_column(
         String, ForeignKey("athlete.id"), nullable=False
@@ -592,16 +590,14 @@ class PlayPersonnelAssignment(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
-    play_fact: Mapped["PlayFact"] = relationship(
-        "PlayFact", back_populates="assignments"
-    )
+    play: Mapped["Play"] = relationship("Play", back_populates="assignments")
     team: Mapped["Team"] = relationship("Team")
     athlete: Mapped["Athlete"] = relationship("Athlete")
 
     def __repr__(self) -> str:
         return (
             "PlayPersonnelAssignment("
-            f"play_fact_id={self.play_fact_id}, team_id={self.team_id}, "
+            f"play_id={self.play_id}, team_id={self.team_id}, "
             f"athlete_id={self.athlete_id}, position={self.position}"
             ")"
         )
@@ -615,9 +611,7 @@ class PlayParticipant(Base):
     __tablename__ = "play_participant"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    play_fact_id: Mapped[str] = mapped_column(
-        String, ForeignKey("play_fact.id"), nullable=False
-    )
+    play_id: Mapped[str] = mapped_column(String, ForeignKey("play.id"), nullable=False)
     athlete_id: Mapped[Optional[str]] = mapped_column(
         String, ForeignKey("athlete.id"), nullable=True
     )
@@ -630,16 +624,14 @@ class PlayParticipant(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
-    play_fact: Mapped["PlayFact"] = relationship(
-        "PlayFact", back_populates="participants_rel"
-    )
+    play: Mapped["Play"] = relationship("Play", back_populates="participants_rel")
     athlete: Mapped[Optional["Athlete"]] = relationship("Athlete")
     team: Mapped[Optional["Team"]] = relationship("Team")
 
     def __repr__(self) -> str:
         return (
             "PlayParticipant("
-            f"play_fact_id={self.play_fact_id}, athlete_id={self.athlete_id}, "
+            f"play_id={self.play_id}, athlete_id={self.athlete_id}, "
             f"participant_type={self.participant_type}"
             ")"
         )

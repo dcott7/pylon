@@ -9,7 +9,7 @@ from pylon.domain.rules.nfl import NFLRules
 from pylon.engine import SimulationRunner
 from pylon.db import DatabaseManager
 
-from .teams import load_team
+from .utils.teams import load_team
 
 
 TEAM_NAMES = ["Bears", "49ers"]
@@ -84,7 +84,7 @@ def main() -> None:
         experiment_name="Bears vs 49ers - 10 Rep Test",
         experiment_description="Test run of multi-rep simulation with database persistence",
         log_dir=EXAMPLE_DIR / "log",
-        log_level=logging.INFO,  # Log all details for debugging
+        log_level=logging.DEBUG,  # Log all details for debugging
         max_drives=100,  # Uncomment to limit drives per game for debugging infinate loops
     )
     results = runner.run()

@@ -95,6 +95,33 @@ class DatabaseManager:
         """
         return self.SessionLocal()
 
+    def insert_objects(self, *objects: Any, label: str = "object") -> None:
+        """
+        Generic insert for any ORM objects (dimension, fact, model invocation, etc.).
+
+        Args:
+            *objects: ORM objects to insert.
+            label: Description for logging (e.g., "dimension", "fact", "model invocation").
+
+        Raises:
+            Exception: If insertion fails.
+        """
+        if not objects:
+            logger.debug(f"No {label}(s) to insert.")
+            return
+
+        session = self.get_session()
+        try:
+            session.add_all(objects)
+            session.commit()
+            logger.info(f"Inserted {len(objects)} {label}(s).")
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to insert {label}(s): {e}")
+            raise
+        finally:
+            session.close()
+
     def insert_dimension_data(
         self,
         *objects: Any,
@@ -108,27 +135,49 @@ class DatabaseManager:
         Raises:
             Exception: If insertion fails.
         """
-        session = self.get_session()
-        try:
-            for obj in objects:
-                session.add(obj)
-            session.commit()
-            logger.debug(f"Inserted {len(objects)} dimension object(s).")
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Failed to insert dimension data: {e}")
-            raise
-        finally:
-            session.close()
+        self.insert_objects(*objects, label="dimension")
+
+    def insert_fact_data(
+        self,
+        *objects: Any,
+    ) -> None:
+        """
+        Insert fact data (games, drives, plays, etc.).
+
+        Args:
+            *objects: ORM fact objects to insert (Game, Drive, Play, etc.)
+
+        Raises:
+            Exception: If insertion fails.
+        """
+        self.insert_objects(*objects, label="fact")
+
+    def insert_model_invocations(
+        self,
+        *invocations: Any,
+    ) -> None:
+        """
+        Insert model invocation records.
+
+        Useful for post-game persistence of all model calls from a simulation.
+
+        Args:
+            *invocations: ModelInvocation objects to insert.
+
+        Raises:
+            Exception: If insertion fails.
+        """
+        self.insert_objects(*invocations, label="model invocation")
 
     def insert_dimension_data_or_ignore(
         self,
         *objects: Any,
     ) -> None:
         """
-        Insert dimension data, ignoring duplicates (based on primary key or unique constraints).
+        Insert dimension data, ignoring/skipping duplicates (based on primary key or unique constraints).
 
         Useful for idempotent dimension data insertion where duplicates may exist.
+        Uses merge() to handle both inserts and updates gracefully.
 
         Args:
             *objects: ORM objects to insert (Team, Athlete, Formation, etc.)
@@ -136,7 +185,7 @@ class DatabaseManager:
         session = self.get_session()
         try:
             for obj in objects:
-                # Merge handles both inserts and updates, ignoring errors for duplicates
+                # Merge handles both inserts and updates, skipping errors for duplicates
                 try:
                     session.merge(obj)
                 except Exception as obj_err:
@@ -148,37 +197,6 @@ class DatabaseManager:
         except Exception as e:
             session.rollback()
             logger.error(f"Failed to insert dimension data: {e}")
-            raise
-        finally:
-            session.close()
-
-    def insert_model_invocations(
-        self,
-        invocations: list[Any],
-    ) -> None:
-        """
-        Batch insert model invocation records.
-
-        Useful for post-game persistence of all model calls from a simulation.
-
-        Args:
-            invocations: List of ModelInvocation objects to insert.
-
-        Raises:
-            Exception: If insertion fails.
-        """
-        if not invocations:
-            logger.debug("No model invocations to insert.")
-            return
-
-        session = self.get_session()
-        try:
-            session.add_all(invocations)
-            session.commit()
-            logger.info(f"Inserted {len(invocations)} model invocation(s).")
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Failed to insert model invocations: {e}")
             raise
         finally:
             session.close()

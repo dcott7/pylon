@@ -159,7 +159,7 @@ class SimulationRunner:
             Dictionary with game result metadata.
         """
         # Attach per-rep log file to capture all module logs for this game
-        rep_log_path = self.log_dir / f"pylon.log.{rep_number}"
+        rep_log_path = self.log_dir / f"pylon.{rep_number}.log"
         rep_handler = logging.FileHandler(rep_log_path, mode="w")
         rep_handler.setLevel(self.log_level)
         rep_handler.setFormatter(
@@ -208,9 +208,8 @@ class SimulationRunner:
             "final_quarter": game_state.clock.current_quarter,
             "duration_seconds": game_duration,
             "status": status,
-            # TODO: Add total_plays and total_drives once GameExecutionData is accessible
-            "total_plays": 0,
-            "total_drives": 0,
+            "total_plays": game_state.total_plays(),
+            "total_drives": game_state.total_drives(),
         }
 
         # Persist game result to database

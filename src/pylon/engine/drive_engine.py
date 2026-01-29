@@ -51,9 +51,13 @@ class DriveEngine:
 
             self.run_pre_play_hooks()
 
+            # Assign execution data to the play record before updating game state
+            play_record.set_execution_data(play_data)
+
             GameStateUpdater.apply_play_data(self.game_state, play_data, self.rules)
 
             play_record.set_end_state(self.game_state)
+            self.drive_record.add_play(play_record)
             last_play = play_record
 
             self.run_post_play_hooks()

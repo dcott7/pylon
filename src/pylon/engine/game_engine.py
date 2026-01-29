@@ -80,6 +80,7 @@ class GameEngine:
             max_timeouts=self.rules.TIMEOUTS_PER_HALF,
         )
         self.user_models = user_models or []
+        self.game_data: GameExecutionData = GameExecutionData()
         self._register_default_models()
         self._override_default_models(self.user_models)
 
@@ -87,9 +88,7 @@ class GameEngine:
         self._game_loop()
 
     def _game_loop(self):
-        game_data = GameExecutionData()
-        # implementation is tbd...
-        game_data.start_game()  # Initialize game state
+        self.game_data.start_game()
         # Apply the league-specific rules for starting the game. This is
         # typically where the opening kickoff is set up.
         self.rules.start_game(self.game_state, self.models, self.rng)
@@ -109,10 +108,19 @@ class GameEngine:
                 # possible scheduling of post halftime kickoff, etc.
                 self.rules.start_half(self.game_state, self.models, self.rng)
 
-            game_data.add_drive(drive_record)
+            self.game_data.add_drive(drive_record)
 
-        # implementation is tbd...
-        game_data.end_game()
+        self.game_data.end_game()
+
+        # Log final game stats
+        logger.info(
+            f"Game complete: {self.game_state.home_team.name} "
+            f"{self.game_state.scoreboard.current_score(self.game_state.home_team)} - "
+            f"{self.game_state.away_team.name} "
+            f"{self.game_state.scoreboard.current_score(self.game_state.away_team)}. "
+            f"Total drives: {len(self.game_state.drives)}, "
+            f"Total plays: {self.game_state.total_plays()}"
+        )
 
     def _register_default_models(self) -> None:
         self.models.register_model(DefaultOffensivePlayCallModel())

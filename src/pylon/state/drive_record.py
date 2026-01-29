@@ -175,6 +175,12 @@ class DriveExecutionData:
             return None
         return self._plays[-1]
 
+    def total_plays(self) -> int:
+        return len(self._plays)
+
+    def total_yards(self) -> int:
+        return sum(p.yards_gained for p in self._plays if p.yards_gained is not None)
+
     # ==============================
     # Validators
     # ==============================
@@ -193,6 +199,8 @@ class DriveRecord:
         self._start_snapshot = DriveSnapshot(start_game_state)
         # this will be filled in later during finalization
         self._end_snapshot = DriveSnapshot(None)
+        # Execution data (plays, stats, results)
+        self._execution_data: DriveExecutionData = DriveExecutionData()
 
     # ==============================
     # Getters
@@ -204,6 +212,32 @@ class DriveRecord:
     @property
     def end(self) -> DriveSnapshot:
         return self._end_snapshot
+
+    @property
+    def execution_data(self) -> DriveExecutionData:
+        return self._execution_data
+
+    @property
+    def plays(self) -> List[PlayRecord]:
+        """Access plays through execution data."""
+        return self._execution_data.plays
+
+    @property
+    def last_play(self) -> Optional[PlayRecord]:
+        """Access last play through execution data."""
+        return self._execution_data.last_play
+
+    def add_play(self, play: PlayRecord) -> None:
+        """Add a finalized play to this drive."""
+        self._execution_data.add_play(play)
+
+    def total_plays(self) -> int:
+        """Return number of plays in this drive."""
+        return self._execution_data.total_plays()
+
+    def total_yards(self) -> int:
+        """Return total yards gained on all plays in this drive."""
+        return self._execution_data.total_yards()
 
     # ==============================
     # Validators

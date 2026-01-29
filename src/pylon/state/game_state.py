@@ -23,7 +23,7 @@ from .play_record import ScoringTypeEnum
 
 if TYPE_CHECKING:
     from .drive_record import DriveRecord
-    from .play_record import PlayExecutionData
+    from .play_record import PlayRecord, PlayExecutionData
     from ..domain.rules.base import LeagueRules
 
 
@@ -288,6 +288,8 @@ class GameState:
         # Coin toss info
         self._coin_toss_winner: Optional[Team] = None
         self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
+        # Execution data (set by GameEngine)
+        self._game_data: GameExecutionData = GameExecutionData()
 
     # ===============================
     # Getters
@@ -343,6 +345,37 @@ class GameState:
     @property
     def coin_toss_winner_choice(self) -> Optional[CoinTossChoice]:
         return self._coin_toss_winner_choice
+
+    @property
+    def game_data(self) -> GameExecutionData:
+        """Access to execution data (drives, game status, etc.)."""
+        # Note: game_data is set externally by GameEngine after instantiation
+        return self._game_data  # type: ignore
+
+    @property
+    def drives(self) -> List["DriveRecord"]:
+        return self.game_data.drives
+
+    def total_drives(self) -> int:
+        return len(self.drives)
+
+    def total_plays(self) -> int:
+        return sum(len(drive.plays) for drive in self.drives)
+
+    def total_yards(self) -> int:
+        """Return total yards gained across all drives (offensive perspective)."""
+        return sum(drive.total_yards() for drive in self.drives)
+
+    def drives_by_team(self, team: Team) -> List["DriveRecord"]:
+        """Return all drives where the given team was on offense."""
+        return [d for d in self.drives if d.start.pos_team == team]
+
+    def all_plays(self) -> List["PlayRecord"]:
+        """Return a flattened list of all plays from all drives."""
+        plays: List["PlayRecord"] = []
+        for drive in self.drives:
+            plays.extend(drive.plays)
+        return plays
 
     # ===============================
     # Setters
