@@ -446,7 +446,7 @@ class Drive(Base):
 
     __tablename__ = "drive"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True)  # Drive UID
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     game_id: Mapped[str] = mapped_column(String, ForeignKey("game.id"), nullable=False)
     drive_number: Mapped[int] = mapped_column(
         Integer, nullable=False
@@ -503,10 +503,10 @@ class Play(Base):
 
     __tablename__ = "play"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True)  # Play execution UID
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     game_id: Mapped[str] = mapped_column(String, ForeignKey("game.id"), nullable=False)
-    drive_id: Mapped[str] = mapped_column(
-        String, ForeignKey("drive.id"), nullable=False
+    drive_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("drive.id"), nullable=False
     )
     play_number: Mapped[int] = mapped_column(
         Integer, nullable=False
@@ -579,7 +579,7 @@ class PlayPersonnelAssignment(Base):
     __tablename__ = "play_personnel_assignment"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    play_id: Mapped[str] = mapped_column(String, ForeignKey("play.id"), nullable=False)
+    play_id: Mapped[int] = mapped_column(Integer, ForeignKey("play.id"), nullable=False)
     team_id: Mapped[str] = mapped_column(String, ForeignKey("team.id"), nullable=False)
     athlete_id: Mapped[str] = mapped_column(
         String, ForeignKey("athlete.id"), nullable=False
@@ -611,7 +611,7 @@ class PlayParticipant(Base):
     __tablename__ = "play_participant"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    play_id: Mapped[str] = mapped_column(String, ForeignKey("play.id"), nullable=False)
+    play_id: Mapped[int] = mapped_column(Integer, ForeignKey("play.id"), nullable=False)
     athlete_id: Mapped[Optional[str]] = mapped_column(
         String, ForeignKey("athlete.id"), nullable=True
     )

@@ -59,6 +59,7 @@ class GameEngine:
         self,
         home_team: Team,
         away_team: Team,
+        game_id: str,
         user_models: Optional[List[TypedModel[Any, Any]]] = None,
         rng: RNG = RNG(),
         rules: LeagueRules = NFLRules(),  # type: ignore
@@ -78,6 +79,7 @@ class GameEngine:
             minutes_per_quarter=self.rules.MINUTES_PER_QUARTER,
             quarters_per_half=self.rules.QUARTERS_PER_HALF,
             max_timeouts=self.rules.TIMEOUTS_PER_HALF,
+            game_id=game_id,
         )
         self.user_models = user_models or []
         self._register_default_models()

@@ -8,7 +8,6 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 import logging
-import uuid
 
 from ..domain.team import Team
 from .snapshot import ClockSnapshot, PossessionSnapshot, ScoreSnapshot
@@ -194,7 +193,7 @@ class DriveExecutionData:
 
 class DriveRecord:
     def __init__(self, start_game_state: GameState) -> None:
-        self.uid: str = str(uuid.uuid4())
+        self.uid: str = str(start_game_state.total_drives() + 1)
         # initialize start snapshot from provided game state
         self._start_snapshot = DriveSnapshot(start_game_state)
         # this will be filled in later during finalization

@@ -45,7 +45,11 @@ class DriveEngine:
 
         while not self.is_drive_over(play_count) and play_count < max_plays:
             # create snapshots of the current game state before the play
-            play_record = PlayRecord(self.game_state)
+            # Calculate total play number: completed drives + current drive's plays so far + 1
+            current_play_number: int = (
+                self.game_state.total_plays() + len(self.drive_record.plays) + 1
+            )
+            play_record = PlayRecord(self.game_state, current_play_number)
             # execute the play
             play_data = self.play_engine.run()
 

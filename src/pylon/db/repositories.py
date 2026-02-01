@@ -736,9 +736,8 @@ class DriveRepository:
         end = drive_record.end
 
         orm_drive = OrmDrive(
-            id=drive_record.uid,
             game_id=game_id,
-            drive_number=getattr(start.possession_snapshot, "drive_number", 1),
+            drive_number=int(drive_record.uid),  # Sequential drive number within game
             offense_team_id=start.pos_team.uid if start.pos_team else None,
             defense_team_id=start.def_team.uid if start.def_team else None,
             # Start snapshot
@@ -823,7 +822,7 @@ class PlayRepository:
         self.db = db_manager
 
     def to_orm(
-        self, play_record: PlayRecord, game_id: str, drive_id: str, play_number: int
+        self, play_record: PlayRecord, game_id: str, drive_id: int, play_number: int
     ) -> OrmPlay:
         """
         Convert a PlayRecord to an ORM Play.
@@ -842,7 +841,6 @@ class PlayRepository:
         end = play_record.end
 
         orm_play = OrmPlay(
-            id=play_record.uid,
             game_id=game_id,
             drive_id=drive_id,
             play_number=play_number,
@@ -878,7 +876,7 @@ class PlayRepository:
         return orm_play
 
     def save(
-        self, play_record: PlayRecord, game_id: str, drive_id: str, play_number: int
+        self, play_record: PlayRecord, game_id: str, drive_id: int, play_number: int
     ) -> OrmPlay:
         """
         Convert and persist a single PlayRecord.
@@ -898,7 +896,7 @@ class PlayRepository:
         return orm_play
 
     def save_batch(
-        self, play_records: List[PlayRecord], game_id: str, drive_id: str
+        self, play_records: List[PlayRecord], game_id: str, drive_id: int
     ) -> List[OrmPlay]:
         """
         Convert and persist multiple PlayRecords from a drive.
@@ -937,7 +935,7 @@ class PlayPersonnelAssignmentRepository:
         self.db = db_manager
 
     def to_orm(
-        self, play_id: str, team_id: str, athlete_id: str, position: AthletePositionEnum
+        self, play_id: int, team_id: str, athlete_id: str, position: AthletePositionEnum
     ) -> OrmPlayPersonnelAssignment:
         """
         Create an ORM PlayPersonnelAssignment.
@@ -962,7 +960,7 @@ class PlayPersonnelAssignmentRepository:
 
     def save_batch(
         self,
-        play_id: str,
+        play_id: int,
         assignments: Dict[AthletePositionEnum, List[DomainAthlete]],
         team_id: str,
     ) -> List[OrmPlayPersonnelAssignment]:
@@ -1008,7 +1006,7 @@ class PlayParticipantRepository:
 
     def to_orm(
         self,
-        play_id: str,
+        play_id: int,
         athlete_id: str,
         team_id: str,
         participant_type: PlayParticipantType,
@@ -1035,7 +1033,7 @@ class PlayParticipantRepository:
         return orm_participant
 
     def save_batch(
-        self, play_id: str, participants: Dict[str, PlayParticipantType], team_id: str
+        self, play_id: int, participants: Dict[str, PlayParticipantType], team_id: str
     ) -> List[OrmPlayParticipant]:
         """
         Persist participant roles for a play.
@@ -1101,10 +1099,12 @@ class FactRepository:
 
         # Persist drives
         if game_state.drives:
-            self.drives.save_batch(game_state.drives, game_id)
+            orm_drives = self.drives.save_batch(game_state.drives, game_id)
 
             # Persist plays, personnel assignments, and participants for each drive
-            for drive_idx, drive in enumerate(game_state.drives):
+            for drive_idx, (drive, orm_drive) in enumerate(
+                zip(game_state.drives, orm_drives)
+            ):
                 logger.info(
                     f"Processing drive {drive_idx + 1}/{len(game_state.drives)} with {len(drive.plays)} play(s)"
                 )
@@ -1116,9 +1116,9 @@ class FactRepository:
                 drive_defense_team_id = drive.start.def_team.uid
 
                 for play_number, play_record in enumerate(drive.plays, start=1):
-                    # Persist the play
+                    # Persist the play - use orm_drive.id which has the composite ID
                     orm_play = self.plays.to_orm(
-                        play_record, game_id, drive.uid, play_number
+                        play_record, game_id, orm_drive.id, play_number
                     )
                     self.db.insert_fact_data(orm_play)
 

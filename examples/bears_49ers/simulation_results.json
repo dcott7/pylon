@@ -1,10 +1,10 @@
 {
   "experiment": {
-    "id": "5632effd-79a5-4b08-8c1b-bdb057f5f226",
+    "id": "d6db1d30-9952-4dc3-9f69-95f602dbce0d",
     "name": "Bears vs 49ers - 10 Rep Test",
     "num_reps": 2,
     "base_seed": 42,
-    "elapsed_time": 9.07316517829895
+    "elapsed_time": 12.231255054473877
   },
   "aggregate": {
     "home_wins": 0,
@@ -14,7 +14,7 @@
     "away_win_pct": 0.5,
     "avg_home_score": 18.0,
     "avg_away_score": 24.0,
-    "avg_duration_seconds": 0.14635586738586426,
+    "avg_duration_seconds": 0.19718050956726074,
     "failed_reps": 0
   }
 }

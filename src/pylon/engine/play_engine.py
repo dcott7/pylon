@@ -73,7 +73,7 @@ class PlayEngine:
             return play_data
 
         if self.game_state.clock.clock_is_running:
-            # how much time does the team run off before the play starts?
+            # How much time does the team run off before the snap?
             self.set_preplay_clock_runoff(play_data)
         else:
             play_data.set_preplay_clock_runoff(0)

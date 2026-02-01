@@ -179,10 +179,14 @@ class SimulationRunner:
         rng = RNG(seed)
         game_start = time.time()
 
+        # Determine the next game ID
+        game_id = self._get_next_game_id() if self.db_manager else str(rep_number)
+
         # Create and run game engine
         engine = GameEngine(
             home_team=self.home_team,
             away_team=self.away_team,
+            game_id=game_id,
             user_models=self.user_models,
             rng=rng,
             rules=self.rules,
@@ -220,7 +224,8 @@ class SimulationRunner:
 
         # Persist game result to database
         if self.db_manager:
-            game_id = self._persist_game_result(game_result)
+            game_id = game_state.game_data.game_id
+            self._persist_game_result(game_result, game_id)
             self._persist_game_facts(game_id, game_state)
 
         logger.info(
@@ -255,16 +260,17 @@ class SimulationRunner:
             experiment_id=self.experiment_id,
         )
 
-    def _persist_game_result(self, game_result: Dict[str, Any]) -> str:
+    def _persist_game_result(self, game_result: Dict[str, Any], game_id: str) -> None:
         """
         Persist individual game result to database.
 
-        Returns:
-            The game ID that was persisted.
+        Args:
+            game_result: Game result metadata.
+            game_id: The game ID to use (already determined).
         """
         assert self.db_manager is not None
         game_repo = GameRepository(self.db_manager)
-        orm_game = game_repo.create(
+        game_repo.create(
             seed=game_result["seed"],
             home_team_id=self.home_team.uid,
             away_team_id=self.away_team.uid,
@@ -278,8 +284,8 @@ class SimulationRunner:
             rep_number=game_result["rep_number"],
             duration_seconds=game_result["duration_seconds"],
             status=game_result["status"],
+            game_id=game_id,
         )
-        return orm_game.id
 
     def _persist_game_facts(self, game_id: str, game_state: GameState) -> None:
         """
@@ -292,6 +298,27 @@ class SimulationRunner:
         assert self.db_manager is not None
         fact_repo = FactRepository(self.db_manager)
         fact_repo.persist_game_facts(game_id, game_state)
+
+    def _get_next_game_id(self) -> str:
+        """
+        Get the next sequential game ID by querying the database.
+
+        Returns:
+            Sequential game ID as a string (e.g., "1", "2", "3"...)
+        """
+        assert self.db_manager is not None
+        from ..db.schema import Game as OrmGame
+
+        session = self.db_manager.get_session()
+        try:
+            games = session.query(OrmGame.id).all()
+            if not games:
+                return "1"
+            # Convert IDs to integers and find max
+            max_id = max(int(game.id) for game in games)
+            return str(max_id + 1)
+        finally:
+            session.close()
 
     def _compute_aggregate_stats(self) -> Dict[str, Any]:
         """Compute aggregate statistics across all replications."""

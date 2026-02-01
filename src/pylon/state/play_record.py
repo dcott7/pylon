@@ -7,7 +7,6 @@ game state before/after a play for downstream analysis and consistency checks.
 from __future__ import annotations
 from enum import Enum
 import logging
-import uuid
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from ..domain.team import Team
@@ -332,8 +331,12 @@ class PlayRecord:
     of what happened during the play for later application to the game state.
     """
 
-    def __init__(self, start_game_state: GameState) -> None:
-        self.uid: str = str(uuid.uuid4())
+    def __init__(self, start_game_state: GameState, play_number: int) -> None:
+        # Use the provided play_number which accounts for:
+        # - All plays from completed drives (game_state.total_plays())
+        # - Plus plays from the current in-progress drive
+        # - Plus 1 for this new play being created
+        self.uid: str = str(play_number)
         self._start_snapshot = PlaySnapshot(start_game_state)
         # this will be filled in later during finalization
         self._end_snapshot = PlaySnapshot(None)

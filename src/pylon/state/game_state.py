@@ -99,7 +99,8 @@ class GameSnapshot:
 
 
 class GameExecutionData:
-    def __init__(self) -> None:
+    def __init__(self, game_id: str) -> None:
+        self.game_id: str = game_id
         self._status: GameStatus = GameStatus.NOT_STARTED
         self._coin_toss_winner: Optional[Team] = None
         self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
@@ -264,6 +265,7 @@ class GameState:
         minutes_per_quarter: int,
         quarters_per_half: int,
         max_timeouts: int,
+        game_id: str,
     ) -> None:
         self._home_team: Team = home_team
         self._away_team: Team = away_team
@@ -289,7 +291,7 @@ class GameState:
         self._coin_toss_winner: Optional[Team] = None
         self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
         # Execution data (set by GameEngine)
-        self._game_data: GameExecutionData = GameExecutionData()
+        self._game_data: GameExecutionData = GameExecutionData(game_id)
 
     # ===============================
     # Getters
