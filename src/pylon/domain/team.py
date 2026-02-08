@@ -28,7 +28,7 @@ import logging
 import uuid
 from typing import List, Optional
 
-from .athlete import Athlete
+from .athlete import Athlete, AthletePositionEnum
 from .playbook import Playbook, PlayCall, PlaySideEnum
 
 
@@ -62,7 +62,7 @@ class Team:
     # ==============================
     # Setters
     # ==============================
-    def add_player(self, athlete: Athlete) -> None:
+    def add_athlete(self, athlete: Athlete) -> None:
         logger.debug(f"Adding {athlete} to {self.name} roster")
         self._roster.append(athlete)
 
@@ -97,3 +97,20 @@ class Team:
     @property
     def uid(self) -> str:
         return self._uid
+
+    def get_athlete_by_uid(self, athlete_uid: str) -> Optional[Athlete]:
+        for athlete in self._roster:
+            if athlete.uid == athlete_uid:
+                return athlete
+        logger.warning(f"Athlete with UID {athlete_uid} not found in team {self.name}")
+        return None
+
+    def get_athletes_by_position(self, position: AthletePositionEnum) -> List[Athlete]:
+        athletes_at_position = [
+            athlete for athlete in self._roster if athlete.position == position
+        ]
+        if not athletes_at_position:
+            logger.warning(
+                f"No athletes found at position {position} in team {self.name}"
+            )
+        return athletes_at_position

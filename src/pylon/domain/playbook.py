@@ -123,7 +123,7 @@ class Formation:
         position_counts: Dict[
             AthletePositionEnum, int
         ],  # e.g. {AthletePositionEnum.QB: 1, AthletePositionEnum.WR: 3}
-        tags: List[str],
+        tags: Optional[List[str]] = None,
         parent: Optional["Formation"] = None,
         subformations: Optional[Set["Formation"]] = None,
         uid: Optional[str] = None,
@@ -131,7 +131,7 @@ class Formation:
         self._uid = uid if uid else str(uuid.uuid4())
         self.name = name
         self._position_counts = position_counts
-        self._tags = tags or []
+        self._tags = tags if tags is not None else []
         self.parent = parent
         self._subformations = subformations or set()
         if self.parent and self not in self.parent.subformations:

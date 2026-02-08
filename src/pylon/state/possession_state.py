@@ -13,6 +13,12 @@ from ..domain.team import Team
 logger = logging.getLogger(__name__)
 
 
+class PossessionStateError(Exception):
+    """Custom exception for possession state errors."""
+
+    pass
+
+
 class PossessionState:
     """
     Mutable, authoritative possession state.
@@ -53,6 +59,13 @@ class PossessionState:
 
     def set_distance(self, distance: int) -> None:
         self._distance = distance
+
+    def advance_down(self) -> None:
+        if self._down is None:
+            logger.error("Cannot advance down: current down is not set.")
+            raise PossessionStateError("Current down is not set.")
+        self._down += 1
+        logger.debug(f"Down advanced to {self._down}.")
 
     # ===============================
     # Getters
