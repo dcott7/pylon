@@ -12,15 +12,15 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .game_engine import GameEngine
-from ..domain.team import Team
-from ..domain.rules.base import LeagueRules
-from ..domain.rules.nfl import NFLRules
-from ..models.registry import TypedModel
-from ..rng import RNG
-from ..state.game_state import GameState
-from ..db.database import DatabaseManager
-from ..db.repositories import (
+from .engine.game_engine import GameEngine
+from .domain.team import Team
+from .domain.rules.base import LeagueRules
+from .domain.rules.nfl import NFLRules
+from .models.registry import TypedModel
+from .engine.rng import RNG
+from .state.game_state import GameState
+from .db.database import DatabaseManager
+from .db.repositories import (
     DimensionRepository,
     FactRepository,
     ExperimentRepository,
@@ -307,7 +307,7 @@ class SimulationRunner:
             Sequential game ID as a string (e.g., "1", "2", "3"...)
         """
         assert self.db_manager is not None
-        from ..db.schema import Game as OrmGame
+        from .db.schema import Game as OrmGame
 
         session = self.db_manager.get_session()
         try:

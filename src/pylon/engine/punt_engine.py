@@ -7,12 +7,15 @@ from ..models.registry import ModelRegistry
 from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
-from ..rng import RNG
+from .rng import RNG
 from ..models.personnel import (
     PunterSelectionContext,
     PunterSelectionModel,
     PuntReturnerSelectionContext,
     PuntReturnerSelectionModel,
+    OffensivePlayerAssignmentModel,
+    DefensivePlayerAssignmentModel,
+    PlayerAssignmentContext,
 )
 from ..models.specialteams import (
     PuntDistanceContext,
@@ -39,8 +42,11 @@ class PuntPlayEngine:
         self.play_data = play_data
 
     def run(self) -> None:
-        assert self.play_data.off_play_call is not None
-        assert self.play_data.off_play_call.play_type == PlayTypeEnum.PUNT
+        assert self.play_data.play_type == PlayTypeEnum.PUNT
+
+        # Assign personnel for this punt play
+        self.assign_personnel()
+
         punter = self.get_punter()
         punt_distance = self.get_punt_distance()
         returner = self.get_returner()
@@ -51,6 +57,36 @@ class PuntPlayEngine:
         self.play_data.add_participant(returner.uid, PlayParticipantType.RETURNER)
         self.play_data.set_yards_gained(punt_distance - return_distance)
         self.play_data.set_is_possession_change(True)
+
+    def assign_personnel(self) -> None:
+        """Assign offensive (punting team) and defensive (return team) personnel."""
+        off_personnel_model = self.models.get_typed(
+            "offensive_play_personnel_assignment",
+            OffensivePlayerAssignmentModel,  # type: ignore
+        )
+        off_personnel = off_personnel_model.execute(
+            PlayerAssignmentContext(
+                self.game_state,
+                self.rng,
+                self.play_data.off_play_call,
+                play_type=self.play_data.play_type,
+            )
+        )
+        self.play_data.set_off_personnel_assignments(off_personnel)
+
+        def_personnel_model = self.models.get_typed(
+            "defensive_play_personnel_assignment",
+            DefensivePlayerAssignmentModel,  # type: ignore
+        )
+        def_personnel = def_personnel_model.execute(
+            PlayerAssignmentContext(
+                self.game_state,
+                self.rng,
+                self.play_data.def_play_call,
+                play_type=self.play_data.play_type,
+            )
+        )
+        self.play_data.set_def_personnel_assignments(def_personnel)
 
     def get_punter(self) -> Athlete:
         punter_select_model = self.models.get_typed(

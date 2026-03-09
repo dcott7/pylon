@@ -15,3 +15,7 @@ drop_plays_tables.sh
 # Logs
 *.log
 *.log.*
+
+# Database files
+*.db
+!data/football.db

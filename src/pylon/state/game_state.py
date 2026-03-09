@@ -467,12 +467,10 @@ class GameStateUpdater:
         """Apply the results of a play execution to the game state."""
         # For kickoffs and punts, down/distance may not be set yet (they're special teams plays)
         # They'll be set after possession change via reset_down_and_distance()
-        has_play_call = play_data.off_play_call is not None
-        if has_play_call:
-            assert play_data.off_play_call is not None
-            is_special_teams = play_data.off_play_call.play_type.is_kick()
-            if not is_special_teams:
-                game_state.possession.assert_down_and_distance_set()
+        assert play_data.play_type is not None
+        is_special_teams = play_data.play_type.is_kick()
+        if not is_special_teams:
+            game_state.possession.assert_down_and_distance_set()
         play_data.assert_is_finalized()
 
         GameStateUpdater._update_clock(game_state, play_data)
@@ -483,7 +481,7 @@ class GameStateUpdater:
 
         # Skip scoring for kickoffs/punts - they don't result in scores by themselves
         # (fumbles/returns to endzone would be handled differently)
-        is_special_play = play_data.off_play_call is None
+        is_special_play = play_data.play_type.is_kick()
         if not is_special_play:
             # Update score if scoring occurred (only for regular plays)
             GameStateUpdater._update_scoring(game_state, play_data, league_rules)
@@ -578,11 +576,8 @@ class GameStateUpdater:
         start_spot = possession.ball_position
         end_spot = start_spot + play_data.yards_gained
 
-        # For kickoffs, off_play_call is None
-        is_kick = (
-            play_data.off_play_call is not None
-            and play_data.off_play_call.play_type.is_kick()
-        )
+        assert play_data.play_type is not None
+        is_kick = play_data.play_type.is_kick()
 
         # Check for touchback on kick plays
         if league_rules.is_touchback(end_spot, play_data.is_possession_change, is_kick):

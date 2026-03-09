@@ -4,7 +4,7 @@ import sqlite3
 
 from pylon.domain.team import Team
 from pylon.domain.athlete import Athlete
-from pylon.domain.playbook import Playbook, PlayCall, PlaySideEnum
+from pylon.domain.playbook import Playbook, PlaySideEnum
 
 from .athletes import load_team_athletes
 from .plays import load_team_plays
@@ -13,7 +13,9 @@ from .plays import load_team_plays
 logger = logging.getLogger(__name__)
 
 
-def load_team(conn: sqlite3.Connection, team_name: str) -> Optional[Team]:
+def load_team(
+    conn: sqlite3.Connection, team_name: str, include_plays: bool = True
+) -> Optional[Team]:
     """
     Load a full Team domain object from the database, including:
     - roster (Athlete objects)
@@ -38,18 +40,18 @@ def load_team(conn: sqlite3.Connection, team_name: str) -> Optional[Team]:
     name: str = row[1]
 
     roster: list[Athlete] = load_team_athletes(conn, team_id)
-    plays: list[PlayCall] = load_team_plays(conn, team_id)
 
     off_pb = Playbook()
     def_pb = Playbook()
 
-    for play in plays:
-        if play.side == PlaySideEnum.OFFENSE:
-            off_pb.add_play(play)
-        else:
-            # since there are no defensive plays in the DB, this block won't run
-            # we will manually add defensive play(s) later
-            def_pb.add_play(play)
+    if include_plays:
+        for play in load_team_plays(conn, team_id):
+            if play.side == PlaySideEnum.OFFENSE:
+                off_pb.add_play(play)
+            else:
+                # since there are no defensive plays in the DB, this block won't run
+                # we will manually add defensive play(s) later
+                def_pb.add_play(play)
 
     team = Team(
         name=name,

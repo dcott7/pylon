@@ -7,7 +7,7 @@ from ..models.registry import ModelRegistry
 from ..state.play_record import PlayParticipantType, PlayExecutionData
 from ..domain.athlete import Athlete
 from ..domain.rules.base import LeagueRules
-from ..rng import RNG
+from .rng import RNG
 from ..models.personnel import (
     PlaceKickerSelectionModel,
     PlaceKickerSelectionContext,
@@ -43,8 +43,7 @@ class KickoffPlayEngine:
         self.rules = rules
 
     def run(self) -> None:
-        # we should not have any play call for a kickoff
-        assert self.play_data.off_play_call is None
+        # Kickoff play call may be None in playbook-optional mode.
 
         kicker = self.get_kicker()
         returner = self.get_returner()

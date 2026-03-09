@@ -4,9 +4,9 @@ from enum import Enum
 import logging
 from typing import TYPE_CHECKING
 
-from .model import TypedModel
+from .model import TypedModel, ModelContext
 from ..domain.team import Team
-from ..rng import RNG
+from ..engine.rng import RNG
 
 if TYPE_CHECKING:
     from ..state.game_state import GameState
@@ -20,32 +20,37 @@ class CoinTossChoice(Enum):
     RECEIVE = "receive"
 
 
-class CoinTossContext:
-    def __init__(self, game_state: GameState, rng: RNG) -> None:
-        self.game_state = game_state
-        self.rng = rng
+# ==============================
+# Miscellaneous Model Contexts
+# ==============================
 
 
-class KickReceiveContext:
+class CoinTossContext(ModelContext):
+    pass
+
+
+class PlayTimeElapsedContext(ModelContext):
+    pass
+
+
+class PrePlayClockRunoffContext(ModelContext):
+    pass
+
+
+class KickReceiveContext(ModelContext):
     def __init__(self, game_state: GameState, rng: RNG) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.coin_tosswinner = game_state.coin_toss_winner
 
 
-class PlayTimeElapsedContext:
-    def __init__(self, game_state: GameState, rng: RNG) -> None:
-        self.game_state = game_state
-        self.rng = rng
-
-
-class PrePlayClockRunoffContext:
-    def __init__(self, game_state: GameState, rng: RNG) -> None:
-        self.game_state = game_state
-        self.rng = rng
+# ==============================
+# Miscellaneous Models
+# ==============================
 
 
 class PlayTimeElapsedModel(TypedModel[PlayTimeElapsedContext, int]):
+    """Determines the amount of time elapsed on a play."""
+
     def __init__(self) -> None:
         super().__init__(name="play_time_elapsed")
 
@@ -54,6 +59,8 @@ class PlayTimeElapsedModel(TypedModel[PlayTimeElapsedContext, int]):
 
 
 class DefaultPlayTimeElapsedModel(PlayTimeElapsedModel):
+    """Baseline play time model using a simple random range."""
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -62,6 +69,8 @@ class DefaultPlayTimeElapsedModel(PlayTimeElapsedModel):
 
 
 class PrePlayClockRunoffModel(TypedModel[PrePlayClockRunoffContext, int]):
+    """Determines pre-snap clock runoff in seconds."""
+
     def __init__(self) -> None:
         super().__init__(name="preplay_clock_runoff")
 
@@ -70,6 +79,8 @@ class PrePlayClockRunoffModel(TypedModel[PrePlayClockRunoffContext, int]):
 
 
 class DefaultPrePlayClockRunoffModel(PrePlayClockRunoffModel):
+    """Baseline pre-play runoff model using a simple random range."""
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -78,6 +89,8 @@ class DefaultPrePlayClockRunoffModel(PrePlayClockRunoffModel):
 
 
 class CoinTossWinnerModel(TypedModel[CoinTossContext, Team]):
+    """Determines the coin toss winner."""
+
     def __init__(self) -> None:
         super().__init__(name="coin_toss_winner")
 
@@ -86,6 +99,8 @@ class CoinTossWinnerModel(TypedModel[CoinTossContext, Team]):
 
 
 class DefaultCoinTossWinnerModel(CoinTossWinnerModel):
+    """Baseline coin toss model using a random choice between teams."""
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -96,6 +111,8 @@ class DefaultCoinTossWinnerModel(CoinTossWinnerModel):
 
 
 class KickReceiveChoiceModel(TypedModel[KickReceiveContext, CoinTossChoice]):
+    """Determines whether the coin toss winner kicks or receives."""
+
     def __init__(self) -> None:
         super().__init__(name="kick_receive_choice")
 
@@ -104,6 +121,8 @@ class KickReceiveChoiceModel(TypedModel[KickReceiveContext, CoinTossChoice]):
 
 
 class DefaultKickReceiveChoiceModel(KickReceiveChoiceModel):
+    """Baseline kick/receive choice model using a random selection."""
+
     def __init__(self) -> None:
         super().__init__()
 

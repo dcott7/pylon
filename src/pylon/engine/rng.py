@@ -40,5 +40,7 @@ class RNG:
     def randint(self, a: int, b: int) -> int:
         return self._rng.randint(a, b)
 
-    def choice(self, seq: Sequence[T]) -> T:
+    def choice(self, seq: Sequence[T], weights: Optional[Sequence[float]] = None) -> T:
+        if weights is not None:
+            return self._rng.choices(seq, weights=weights, k=1)[0]
         return self._rng.choice(seq)

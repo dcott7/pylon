@@ -11,7 +11,7 @@ from pylon.domain.playbook import (
 )
 from pylon.domain.rules.nfl import NFLRules
 from pylon.engine.game_engine import GameEngine
-from pylon.rng import RNG
+from pylon.engine.rng import RNG
 from pylon.state.game_state import GameStatus
 
 
@@ -270,9 +270,27 @@ def create_minimal_team(uid: str, name: str) -> Team:
         personnel_package=def_personnel,
         side=PlaySideEnum.DEFENSE,
     )
+    kickoff_play = PlayCall(
+        uid=f"{uid}-kickoff-1",
+        name="Basic Kickoff",
+        play_type=PlayTypeEnum.KICKOFF,
+        formation=subformation,
+        personnel_package=personnel,
+        side=PlaySideEnum.OFFENSE,
+    )
+    kickoff_return_play = PlayCall(
+        uid=f"{uid}-kickoff-return-1",
+        name="Basic Kickoff Return",
+        play_type=PlayTypeEnum.KICKOFF_RETURN,
+        formation=def_subformation,
+        personnel_package=def_personnel,
+        side=PlaySideEnum.DEFENSE,
+    )
     team.add_play_template(pass_play)
     team.add_play_template(run_play)
     team.add_play_template(def_play)
+    team.add_play_template(kickoff_play)
+    team.add_play_template(kickoff_return_play)
 
     return team
 

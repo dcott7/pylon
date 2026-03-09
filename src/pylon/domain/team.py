@@ -29,7 +29,11 @@ import uuid
 from typing import List, Optional
 
 from .athlete import Athlete, AthletePositionEnum
-from .playbook import Playbook, PlayCall, PlaySideEnum
+from .playbook import (
+    Playbook,
+    PlayCall,
+    PlaySideEnum,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -55,8 +59,8 @@ class Team:
         # Keep uid stable across reloads (use provided UID when available)
         self._uid = uid or str(uuid.uuid4())
         self.name = name
-        self._off_playbook = off_playbook or Playbook()
-        self._def_playbook = def_playbook or Playbook()
+        self._off_playbook = off_playbook
+        self._def_playbook = def_playbook
         self._roster: List[Athlete] = roster or []
 
     # ==============================
@@ -69,9 +73,13 @@ class Team:
     def add_play_template(self, play: PlayCall) -> None:
         logger.debug(f"Adding {play} to {self.name} playbook")
         if play.side == PlaySideEnum.OFFENSE:
+            if self._off_playbook is None:
+                self._off_playbook = Playbook()
             self._off_playbook.add_play(play)
             return
         elif play.side == PlaySideEnum.DEFENSE:
+            if self._def_playbook is None:
+                self._def_playbook = Playbook()
             self._def_playbook.add_play(play)
             return
 
@@ -87,16 +95,22 @@ class Team:
         return self._roster
 
     @property
-    def off_playbook(self) -> Playbook:
+    def off_playbook(self) -> Optional[Playbook]:
         return self._off_playbook
 
     @property
-    def def_playbook(self) -> Playbook:
+    def def_playbook(self) -> Optional[Playbook]:
         return self._def_playbook
 
     @property
     def uid(self) -> str:
         return self._uid
+
+    def has_offensive_playbook(self) -> bool:
+        return self._off_playbook is not None
+
+    def has_defensive_playbook(self) -> bool:
+        return self._def_playbook is not None
 
     def get_athlete_by_uid(self, athlete_uid: str) -> Optional[Athlete]:
         for athlete in self._roster:
@@ -114,3 +128,4 @@ class Team:
                 f"No athletes found at position {position} in team {self.name}"
             )
         return athletes_at_position
+

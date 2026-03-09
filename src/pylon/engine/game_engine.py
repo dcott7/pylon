@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 from .drive_engine import DriveEngine
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry, TypedModel
-from ..rng import RNG
+from .rng import RNG
 from ..domain.rules.base import LeagueRules
 from ..domain.rules.nfl import NFLRules
 from ..domain.team import Team
@@ -19,15 +19,24 @@ from ..models.personnel import (
     DefaultKickoffReturnerSelectionModel,
     DefaultKickerSelectionModel,
     DefaultPlaceKickerSelectionModel,
+    DefaultSackerSelectionModel,
+    DefaultInterceptorSelectionModel,
 )
 from ..models.offense import (
+    DefaultPlayTypeModel,
     DefaultOffensivePlayCallModel,
     DefaultAirYardsModel,
     DefaultCompletionModel,
     DefaultRushYardsGainedModel,
     DefaultYardsAfterCatchModel,
 )
-from ..models.defense import DefaultDefensivePlayCallModel
+from ..models.defense import (
+    DefaultDefensivePlayCallModel,
+    DefaultSackModel,
+    DefaultSackYardsModel,
+    DefaultInterceptionModel,
+    DefaultInterceptionReturnYardsModel,
+)
 from ..models.specialteams import (
     DefaultPuntDistanceModel,
     DefaultPuntReturnDistanceModel,
@@ -40,6 +49,10 @@ from ..models.misc import (
     DefaultPrePlayClockRunoffModel,
     DefaultCoinTossWinnerModel,
     DefaultKickReceiveChoiceModel,
+)
+from ..models.possession import (
+    DefaultFumbleModel,
+    DefaultFumbleRecoveryModel,
 )
 
 
@@ -124,6 +137,7 @@ class GameEngine:
         )
 
     def _register_default_models(self) -> None:
+        self.models.register_model(DefaultPlayTypeModel())
         self.models.register_model(DefaultOffensivePlayCallModel())
         self.models.register_model(DefaultAirYardsModel())
         self.models.register_model(DefaultCompletionModel())
@@ -149,6 +163,14 @@ class GameEngine:
         self.models.register_model(DefaultKickoffDistanceModel())
         self.models.register_model(DefaultKickoffTouchbackDecisionModel())
         self.models.register_model(DefaultDefensivePlayCallModel())
+        self.models.register_model(DefaultSackModel())
+        self.models.register_model(DefaultSackYardsModel())
+        self.models.register_model(DefaultInterceptionModel())
+        self.models.register_model(DefaultInterceptionReturnYardsModel())
+        self.models.register_model(DefaultSackerSelectionModel())
+        self.models.register_model(DefaultInterceptorSelectionModel())
+        self.models.register_model(DefaultFumbleModel())
+        self.models.register_model(DefaultFumbleRecoveryModel())
 
     def _override_default_models(self, models: List[TypedModel[Any, Any]]) -> None:
         for model in models:

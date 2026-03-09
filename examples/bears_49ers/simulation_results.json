@@ -1,20 +1,722 @@
 {
   "experiment": {
-    "id": "d6db1d30-9952-4dc3-9f69-95f602dbce0d",
-    "name": "Bears vs 49ers - 10 Rep Test",
-    "num_reps": 2,
+    "id": "f4867675-347b-4484-a164-54aa9d577374",
+    "name": "49ers at Bears - 50 Rep Test",
+    "num_reps": 50,
     "base_seed": 42,
-    "elapsed_time": 12.231255054473877
+    "elapsed_time": 313.87893986701965
   },
   "aggregate": {
-    "home_wins": 0,
-    "away_wins": 1,
-    "ties": 1,
-    "home_win_pct": 0.0,
-    "away_win_pct": 0.5,
-    "avg_home_score": 18.0,
-    "avg_away_score": 24.0,
-    "avg_duration_seconds": 0.19718050956726074,
+    "home_wins": 17,
+    "away_wins": 21,
+    "ties": 12,
+    "home_win_pct": 0.34,
+    "away_win_pct": 0.42,
+    "avg_home_score": 19.8,
+    "avg_away_score": 21.16,
+    "avg_duration_seconds": 2.0428500747680665,
     "failed_reps": 0
-  }
+  },
+  "reps": [
+    {
+      "rep_number": 1,
+      "seed": 43,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 12
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 2.078922986984253,
+      "total_plays": 117,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 2,
+      "seed": 44,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.2483320236206055,
+      "total_plays": 121,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 3,
+      "seed": 45,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 3.025601863861084,
+      "total_plays": 121,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 4,
+      "seed": 46,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.4363529682159424,
+      "total_plays": 121,
+      "total_drives": 23
+    },
+    {
+      "rep_number": 5,
+      "seed": 47,
+      "status": "completed",
+      "score": {
+        "Bears": 30,
+        "49ers": 18
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.5572509765625,
+      "total_plays": 120,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 6,
+      "seed": 48,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 26
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.8748416900634766,
+      "total_plays": 121,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 7,
+      "seed": 49,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 2.0402109622955322,
+      "total_plays": 118,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 8,
+      "seed": 50,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 18
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.7779591083526611,
+      "total_plays": 116,
+      "total_drives": 17
+    },
+    {
+      "rep_number": 9,
+      "seed": 51,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 36
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.008882999420166,
+      "total_plays": 118,
+      "total_drives": 23
+    },
+    {
+      "rep_number": 10,
+      "seed": 52,
+      "status": "completed",
+      "score": {
+        "Bears": 6,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.8072702884674072,
+      "total_plays": 120,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 11,
+      "seed": 53,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.1335947513580322,
+      "total_plays": 125,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 12,
+      "seed": 54,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 18
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.0138638019561768,
+      "total_plays": 118,
+      "total_drives": 16
+    },
+    {
+      "rep_number": 13,
+      "seed": 55,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 24
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.7597057819366455,
+      "total_plays": 122,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 14,
+      "seed": 56,
+      "status": "completed",
+      "score": {
+        "Bears": 30,
+        "49ers": 24
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.9560790061950684,
+      "total_plays": 121,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 15,
+      "seed": 57,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 2.555248260498047,
+      "total_plays": 124,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 16,
+      "seed": 58,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.9395718574523926,
+      "total_plays": 119,
+      "total_drives": 17
+    },
+    {
+      "rep_number": 17,
+      "seed": 59,
+      "status": "completed",
+      "score": {
+        "Bears": 30,
+        "49ers": 30
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.8465521335601807,
+      "total_plays": 123,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 18,
+      "seed": 60,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.9298651218414307,
+      "total_plays": 117,
+      "total_drives": 14
+    },
+    {
+      "rep_number": 19,
+      "seed": 61,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.301893949508667,
+      "total_plays": 122,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 20,
+      "seed": 62,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 24
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.4175639152526855,
+      "total_plays": 119,
+      "total_drives": 17
+    },
+    {
+      "rep_number": 21,
+      "seed": 63,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.8284051418304443,
+      "total_plays": 119,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 22,
+      "seed": 64,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.0020267963409424,
+      "total_plays": 117,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 23,
+      "seed": 65,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 18
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.9859898090362549,
+      "total_plays": 119,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 24,
+      "seed": 66,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.8355250358581543,
+      "total_plays": 117,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 25,
+      "seed": 67,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.9249060153961182,
+      "total_plays": 118,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 26,
+      "seed": 68,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.9154589176177979,
+      "total_plays": 121,
+      "total_drives": 16
+    },
+    {
+      "rep_number": 27,
+      "seed": 69,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.033144950866699,
+      "total_plays": 120,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 28,
+      "seed": 70,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.9237849712371826,
+      "total_plays": 123,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 29,
+      "seed": 71,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 36
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.807447910308838,
+      "total_plays": 117,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 30,
+      "seed": 72,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 1.854090929031372,
+      "total_plays": 120,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 31,
+      "seed": 73,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.3587870597839355,
+      "total_plays": 122,
+      "total_drives": 16
+    },
+    {
+      "rep_number": 32,
+      "seed": 74,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.6365277767181396,
+      "total_plays": 123,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 33,
+      "seed": 75,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.458845853805542,
+      "total_plays": 124,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 34,
+      "seed": 76,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 24
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.5475151538848877,
+      "total_plays": 116,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 35,
+      "seed": 77,
+      "status": "completed",
+      "score": {
+        "Bears": 6,
+        "49ers": 12
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.037642002105713,
+      "total_plays": 118,
+      "total_drives": 14
+    },
+    {
+      "rep_number": 36,
+      "seed": 78,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.125836133956909,
+      "total_plays": 122,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 37,
+      "seed": 79,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 30
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.7840619087219238,
+      "total_plays": 119,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 38,
+      "seed": 80,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.7750020027160645,
+      "total_plays": 119,
+      "total_drives": 17
+    },
+    {
+      "rep_number": 39,
+      "seed": 81,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 36
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.4853630065917969,
+      "total_plays": 123,
+      "total_drives": 23
+    },
+    {
+      "rep_number": 40,
+      "seed": 82,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 18
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.19543194770813,
+      "total_plays": 116,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 41,
+      "seed": 83,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 1.9190080165863037,
+      "total_plays": 119,
+      "total_drives": 19
+    },
+    {
+      "rep_number": 42,
+      "seed": 84,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 1.8874711990356445,
+      "total_plays": 122,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 43,
+      "seed": 85,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.511566162109375,
+      "total_plays": 121,
+      "total_drives": 18
+    },
+    {
+      "rep_number": 44,
+      "seed": 86,
+      "status": "completed",
+      "score": {
+        "Bears": 18,
+        "49ers": 18
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 2.015362024307251,
+      "total_plays": 123,
+      "total_drives": 22
+    },
+    {
+      "rep_number": 45,
+      "seed": 87,
+      "status": "completed",
+      "score": {
+        "Bears": 30,
+        "49ers": 24
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.2760839462280273,
+      "total_plays": 120,
+      "total_drives": 24
+    },
+    {
+      "rep_number": 46,
+      "seed": 88,
+      "status": "completed",
+      "score": {
+        "Bears": 12,
+        "49ers": 24
+      },
+      "winner_id": "25",
+      "final_quarter": 5,
+      "duration_seconds": 2.3629019260406494,
+      "total_plays": 121,
+      "total_drives": 20
+    },
+    {
+      "rep_number": 47,
+      "seed": 89,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 24
+      },
+      "winner_id": null,
+      "final_quarter": 5,
+      "duration_seconds": 2.8151957988739014,
+      "total_plays": 121,
+      "total_drives": 21
+    },
+    {
+      "rep_number": 48,
+      "seed": 90,
+      "status": "completed",
+      "score": {
+        "Bears": 36,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.234448194503784,
+      "total_plays": 118,
+      "total_drives": 22
+    },
+    {
+      "rep_number": 49,
+      "seed": 91,
+      "status": "completed",
+      "score": {
+        "Bears": 24,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.3745107650756836,
+      "total_plays": 117,
+      "total_drives": 17
+    },
+    {
+      "rep_number": 50,
+      "seed": 92,
+      "status": "completed",
+      "score": {
+        "Bears": 30,
+        "49ers": 12
+      },
+      "winner_id": "3",
+      "final_quarter": 5,
+      "duration_seconds": 2.5205979347229004,
+      "total_plays": 120,
+      "total_drives": 19
+    }
+  ]
 }

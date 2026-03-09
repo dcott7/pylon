@@ -13,7 +13,7 @@ from pylon.domain.playbook import (
     PersonnelPackage,
 )
 from pylon.domain.rules.nfl import NFLRules
-from pylon.engine.simulation_runner import SimulationRunner
+from pylon.simulation_runner import SimulationRunner
 from pylon.db.database import DatabaseManager
 from pylon.db.schema import Game as OrmGame, Drive as OrmDrive, Play as OrmPlay
 
@@ -160,7 +160,25 @@ def create_test_team(uid: str, name: str) -> Team:
         side=PlaySideEnum.DEFENSE,
         uid=f"{uid}-def-1",
     )
+    kickoff_play = PlayCall(
+        name="Basic Kickoff",
+        play_type=PlayTypeEnum.KICKOFF,
+        formation=subformation,
+        personnel_package=personnel,
+        side=PlaySideEnum.OFFENSE,
+        uid=f"{uid}-kickoff-1",
+    )
+    kickoff_return_play = PlayCall(
+        name="Basic Kickoff Return",
+        play_type=PlayTypeEnum.KICKOFF_RETURN,
+        formation=def_subformation,
+        personnel_package=def_personnel,
+        side=PlaySideEnum.DEFENSE,
+        uid=f"{uid}-kickoff-return-1",
+    )
     team.add_play_template(def_play)
+    team.add_play_template(kickoff_play)
+    team.add_play_template(kickoff_return_play)
 
     return team
 

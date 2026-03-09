@@ -10,6 +10,11 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=TypedModel[Any, Any])
 
 
+# ==============================
+# Model Registry Errors
+# ==============================
+
+
 class ModelRegistryError(Exception):
     pass
 
@@ -20,6 +25,11 @@ class DuplicateModelError(ModelRegistryError):
 
 class ModelNotFoundError(ModelRegistryError):
     pass
+
+
+# ==============================
+# Model Registry
+# ==============================
 
 
 class ModelRegistry:

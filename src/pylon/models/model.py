@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Generic, TypeVar, Optional, Type
+from typing import Generic, TypeVar, Optional, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..state.game_state import GameState
+    from ..engine.rng import RNG
 
 
 logger = logging.getLogger(__name__)
@@ -16,6 +20,18 @@ class InvalidModelReturnType(Exception):
 
 class ModelExecutionError(Exception):
     pass
+
+
+class ModelContext:
+    """Base context carrying common simulation inputs.
+
+    Most model contexts require a `GameState` and `RNG`. Subclasses can add
+    additional fields while inheriting these common attributes.
+    """
+
+    def __init__(self, game_state: "GameState", rng: "RNG") -> None:
+        self.game_state = game_state
+        self.rng = rng
 
 
 class TypedModel(ABC, Generic[C, R]):
@@ -56,23 +72,3 @@ class TypedModel(ABC, Generic[C, R]):
 
     @abstractmethod
     def execute(self, context: C) -> R: ...
-
-
-class IntegerModel(TypedModel[C, int]):
-    def __init__(self, name: Optional[str] = None) -> None:
-        super().__init__(name=name, return_type=int)
-
-
-class FloatModel(TypedModel[C, float]):
-    def __init__(self, name: Optional[str] = None) -> None:
-        super().__init__(name=name, return_type=float)
-
-
-class BooleanModel(TypedModel[C, bool]):
-    def __init__(self, name: Optional[str] = None) -> None:
-        super().__init__(name=name, return_type=bool)
-
-
-class StringModel(TypedModel[C, str]):
-    def __init__(self, name: Optional[str] = None) -> None:
-        super().__init__(name=name, return_type=str)

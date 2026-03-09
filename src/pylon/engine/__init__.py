@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .game_engine import GameEngine
-    from .simulation_runner import SimulationRunner
+    from ..simulation_runner import SimulationRunner
     from .drive_engine import DriveEngine
     from .play_engine import PlayEngine
     from .pass_engine import PassPlayEngine
@@ -31,7 +31,7 @@ def __getattr__(name: str):
 
         return GameEngine
     elif name == "SimulationRunner":
-        from .simulation_runner import SimulationRunner
+        from ..simulation_runner import SimulationRunner
 
         return SimulationRunner
     elif name == "DriveEngine":

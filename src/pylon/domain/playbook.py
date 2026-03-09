@@ -76,8 +76,11 @@ class PlayTypeEnum(Enum):
     QB_SPIKE = "QB_SPIKE"
     # Special Teams
     PUNT = "PUNT"
+    PUNT_RETURN = "PUNT_RETURN"
     FIELD_GOAL = "FIELD_GOAL"
+    FIELD_GOAL_BLOCK = "FIELD_GOAL_BLOCK"
     KICKOFF = "KICKOFF"
+    KICKOFF_RETURN = "KICKOFF_RETURN"
     EXTRA_POINT = "EXTRA_POINT"
     TWO_POINT_CONVERSION = "TWO_POINT_CONVERSION"
     # Defense # TODO: Implement defensive play types
@@ -89,7 +92,13 @@ class PlayTypeEnum(Enum):
             PlayTypeEnum.FIELD_GOAL,
             PlayTypeEnum.KICKOFF,
             PlayTypeEnum.EXTRA_POINT,
-            PlayTypeEnum.TWO_POINT_CONVERSION,
+        }
+
+    def is_kick_return(self) -> bool:
+        return self in {
+            PlayTypeEnum.PUNT_RETURN,
+            PlayTypeEnum.FIELD_GOAL_BLOCK,
+            PlayTypeEnum.KICKOFF_RETURN,
         }
 
     def is_pass(self) -> bool:
@@ -101,8 +110,18 @@ class PlayTypeEnum(Enum):
     def is_rpo(self) -> bool:
         return self == PlayTypeEnum.RPO
 
+    def is_punt(self) -> bool:
+        return self == PlayTypeEnum.PUNT
+
+    def is_field_goal(self) -> bool:
+        return self == PlayTypeEnum.FIELD_GOAL
+
     def is_special_teams(self) -> bool:
-        return self.is_kick()  # same as is_kick for now
+        return (
+            self.is_kick()
+            or self.is_kick_return()
+            or self == PlayTypeEnum.TWO_POINT_CONVERSION
+        )
 
 
 class Formation:
@@ -317,12 +336,20 @@ class PlayCall:
 
     def _validate_personnel(self) -> None:
         """Ensure that the formation and personnel package are compatible."""
+        if self.play_type.is_special_teams():
+            # personnel does not matter. Defenseive players can be assigned to
+            # "offensive" special teams plays and vice versa
+            return
         if self.side == PlaySideEnum.OFFENSE:
             valid_tree = POSITION_TREE.children[AthletePositionEnum.OFFENSE]
             side_label = "offensive"
-        else:
+        elif self.side == PlaySideEnum.DEFENSE:
             valid_tree = POSITION_TREE.children[AthletePositionEnum.DEFENSE]
             side_label = "defensive"
+        else:
+            raise PlayCallInitializationError(
+                f"Invalid play side {self.side} for play '{self.name}'"
+            )
 
         # Validate each position in the formation
         for position in self.formation.positions:
@@ -385,3 +412,251 @@ class Playbook:
 
     def __len__(self) -> int:
         return len(self._plays)
+
+
+# ==============================
+# System Play Definitions
+# ==============================
+# These are default play calls for required game mechanics that every team needs.
+# Teams can optionally define their own versions, but these serve as fallbacks.
+
+# System formations - minimal parent formations
+_SYSTEM_OFFENSE_PARENT = Formation(name="System Offense", position_counts={})
+_SYSTEM_DEFENSE_PARENT = Formation(name="System Defense", position_counts={})
+
+# System offensive formation (11 players)
+_FORMATION_KNEEL_SPIKE = Formation(
+    name="Kneel/Spike",
+    position_counts={
+        AthletePositionEnum.QB: 1,
+        AthletePositionEnum.RB: 1,
+        AthletePositionEnum.WR: 3,
+        AthletePositionEnum.TE: 1,
+        AthletePositionEnum.T: 2,
+        AthletePositionEnum.G: 2,
+        AthletePositionEnum.C: 1,
+    },
+    parent=_SYSTEM_OFFENSE_PARENT,
+)
+
+_FORMATION_PUNT = Formation(
+    name="Punt",
+    position_counts={
+        AthletePositionEnum.LS: 1,
+        AthletePositionEnum.P: 1,
+        AthletePositionEnum.TE: 7,  # punter blockers
+        AthletePositionEnum.DB: 2,  # gunners
+    },
+    parent=_SYSTEM_OFFENSE_PARENT,
+)
+
+_FORMATION_FG = Formation(
+    name="Field Goal",
+    position_counts={
+        AthletePositionEnum.LS: 1,
+        AthletePositionEnum.K: 1,
+        AthletePositionEnum.QB: 1,  # holder
+        AthletePositionEnum.G: 4,
+        AthletePositionEnum.T: 4,
+    },
+    parent=_SYSTEM_OFFENSE_PARENT,
+)
+
+_FORMATION_KICKOFF = Formation(
+    name="Kickoff",
+    position_counts={
+        AthletePositionEnum.K: 1,
+        AthletePositionEnum.LB: 5,
+        AthletePositionEnum.DB: 5,
+    },
+    parent=_SYSTEM_OFFENSE_PARENT,
+)
+
+# System defensive formations (11 players each)
+_FORMATION_KICKOFF_RETURN = Formation(
+    name="Kickoff Return",
+    position_counts={
+        AthletePositionEnum.KR: 1,  # deep returner
+        AthletePositionEnum.WR: 6,  # return blockers/wedge
+        AthletePositionEnum.LB: 2,  # front line
+        AthletePositionEnum.S: 2,  # back line
+    },
+    parent=_SYSTEM_DEFENSE_PARENT,
+)
+
+_FORMATION_PUNT_RETURN = Formation(
+    name="Punt Return",
+    position_counts={
+        AthletePositionEnum.KR: 1,  # punt returner
+        AthletePositionEnum.WR: 4,  # return blockers
+        AthletePositionEnum.LB: 4,  # rush/contain
+        AthletePositionEnum.S: 2,  # vice/contain
+    },
+    parent=_SYSTEM_DEFENSE_PARENT,
+)
+
+_FORMATION_FG_BLOCK = Formation(
+    name="Field Goal Block",
+    position_counts={
+        AthletePositionEnum.DT: 4,  # interior rush
+        AthletePositionEnum.EDGE: 2,  # edge rush
+        AthletePositionEnum.LB: 3,  # middle rush
+        AthletePositionEnum.S: 2,  # back line (block/return)
+    },
+    parent=_SYSTEM_DEFENSE_PARENT,
+)
+
+# System personnel packages
+_SYSTEM_OFFENSE_PERSONNEL = PersonnelPackage(
+    name="System 11 Personnel",
+    counts={
+        AthletePositionEnum.RB: 1,
+        AthletePositionEnum.TE: 1,
+        AthletePositionEnum.WR: 3,
+    },
+    uid="system-offense-personnel",
+)
+
+_PERSONNEL_FG = PersonnelPackage(
+    name="Field Goal",
+    counts={
+        AthletePositionEnum.LS: 1,
+        AthletePositionEnum.K: 1,
+        AthletePositionEnum.QB: 1,  # holder
+    },
+    uid="system-fg-personnel",
+)
+
+_PERSONNEL_KICKOFF_RETURN = PersonnelPackage(
+    name="Kickoff Return",
+    counts={
+        AthletePositionEnum.KR: 1,
+        AthletePositionEnum.WR: 6,
+        AthletePositionEnum.LB: 2,
+    },
+    uid="system-kickoff-return-personnel",
+)
+
+_PERSONNEL_PUNT_RETURN = PersonnelPackage(
+    name="Punt Return",
+    counts={
+        AthletePositionEnum.KR: 1,
+        AthletePositionEnum.WR: 4,
+        AthletePositionEnum.LB: 4,
+    },
+    uid="system-punt-return-personnel",
+)
+
+_PERSONNEL_FG_BLOCK = PersonnelPackage(
+    name="Field Goal Block",
+    counts={
+        AthletePositionEnum.DT: 4,
+        AthletePositionEnum.EDGE: 2,
+        AthletePositionEnum.LB: 3,
+    },
+    uid="system-fg-block-personnel",
+)
+
+# Default system play calls
+DEFAULT_QB_KNEEL = PlayCall(
+    uid="system-qb-kneel",
+    name="QB Kneel",
+    play_type=PlayTypeEnum.QB_KNEEL,
+    formation=_FORMATION_KNEEL_SPIKE,
+    personnel_package=_SYSTEM_OFFENSE_PERSONNEL,
+    side=PlaySideEnum.OFFENSE,
+    description="System QB kneel play",
+)
+
+DEFAULT_QB_SPIKE = PlayCall(
+    uid="system-qb-spike",
+    name="QB Spike",
+    play_type=PlayTypeEnum.QB_SPIKE,
+    formation=_FORMATION_KNEEL_SPIKE,
+    personnel_package=_SYSTEM_OFFENSE_PERSONNEL,
+    side=PlaySideEnum.OFFENSE,
+    description="System QB spike play",
+)
+
+DEFAULT_KICKOFF = PlayCall(
+    uid="system-kickoff",
+    name="Kickoff",
+    play_type=PlayTypeEnum.KICKOFF,
+    formation=_FORMATION_KICKOFF,
+    personnel_package=_SYSTEM_OFFENSE_PERSONNEL,
+    side=PlaySideEnum.OFFENSE,
+    description="System kickoff play",
+)
+
+DEFAULT_PUNT = PlayCall(
+    uid="system-punt",
+    name="Punt",
+    play_type=PlayTypeEnum.PUNT,
+    formation=_FORMATION_PUNT,
+    personnel_package=_SYSTEM_OFFENSE_PERSONNEL,
+    side=PlaySideEnum.OFFENSE,
+    description="System punt play",
+)
+
+DEFAULT_FIELD_GOAL = PlayCall(
+    uid="system-field-goal",
+    name="Field Goal",
+    play_type=PlayTypeEnum.FIELD_GOAL,
+    formation=_FORMATION_FG,
+    personnel_package=_PERSONNEL_FG,
+    side=PlaySideEnum.OFFENSE,
+    description="System field goal play",
+)
+
+DEFAULT_EXTRA_POINT = PlayCall(
+    uid="system-extra-point",
+    name="Extra Point",
+    play_type=PlayTypeEnum.EXTRA_POINT,
+    formation=_FORMATION_FG,
+    personnel_package=_PERSONNEL_FG,
+    side=PlaySideEnum.OFFENSE,
+    description="System extra point play",
+)
+
+DEFAULT_KICKOFF_RETURN = PlayCall(
+    uid="system-kickoff-return",
+    name="Kickoff Return",
+    play_type=PlayTypeEnum.KICKOFF_RETURN,
+    formation=_FORMATION_KICKOFF_RETURN,
+    personnel_package=_PERSONNEL_KICKOFF_RETURN,
+    side=PlaySideEnum.DEFENSE,
+    description="System kickoff return play",
+)
+
+DEFAULT_PUNT_RETURN = PlayCall(
+    uid="system-punt-return",
+    name="Punt Return",
+    play_type=PlayTypeEnum.PUNT_RETURN,
+    formation=_FORMATION_PUNT_RETURN,
+    personnel_package=_PERSONNEL_PUNT_RETURN,
+    side=PlaySideEnum.DEFENSE,
+    description="System punt return play",
+)
+
+DEFAULT_FIELD_GOAL_BLOCK = PlayCall(
+    uid="system-field-goal-block",
+    name="Field Goal Block",
+    play_type=PlayTypeEnum.FIELD_GOAL_BLOCK,
+    formation=_FORMATION_FG_BLOCK,
+    personnel_package=_PERSONNEL_FG_BLOCK,
+    side=PlaySideEnum.DEFENSE,
+    description="System field goal block play",
+)
+
+# Map of play types to their default system plays
+SYSTEM_PLAY_DEFAULTS = {
+    PlayTypeEnum.QB_KNEEL: DEFAULT_QB_KNEEL,
+    PlayTypeEnum.QB_SPIKE: DEFAULT_QB_SPIKE,
+    PlayTypeEnum.KICKOFF: DEFAULT_KICKOFF,
+    PlayTypeEnum.PUNT: DEFAULT_PUNT,
+    PlayTypeEnum.FIELD_GOAL: DEFAULT_FIELD_GOAL,
+    PlayTypeEnum.EXTRA_POINT: DEFAULT_EXTRA_POINT,
+    PlayTypeEnum.KICKOFF_RETURN: DEFAULT_KICKOFF_RETURN,
+    PlayTypeEnum.PUNT_RETURN: DEFAULT_PUNT_RETURN,
+    PlayTypeEnum.FIELD_GOAL_BLOCK: DEFAULT_FIELD_GOAL_BLOCK,
+}

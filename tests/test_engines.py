@@ -16,12 +16,20 @@ from pylon.engine.drive_engine import DriveEngine
 from pylon.engine.play_engine import PlayEngine
 from pylon.engine.game_engine import GameEngine
 from pylon.models.registry import ModelRegistry
+from pylon.models.offense import (
+    PlayTypeModel,
+    PlayTypeContext,
+    OffensivePlayCallModel,
+    OffPlayCallContext,
+)
+from pylon.models.defense import DefensivePlayCallModel, DefPlayCallContext
 from pylon.domain.rules.nfl import NFLRules
-from pylon.rng import RNG
+from pylon.engine.rng import RNG
+from pylon.state.play_record import PlayExecutionData
 
 
-def create_test_team(uid: str, name: str) -> Team:
-    """Helper to create a team with valid roster and plays."""
+def create_test_team(uid: str, name: str, include_plays: bool = True) -> Team:
+    """Helper to create a team with valid roster and possibly plays."""
     team = Team(uid=uid, name=name)
 
     # Add minimal roster
@@ -97,7 +105,9 @@ def create_test_team(uid: str, name: str) -> Team:
         side=PlaySideEnum.OFFENSE,
     )
 
-    team.add_play_template(play)
+    if include_plays:
+        team.add_play_template(play)
+
     return team
 
 
@@ -199,6 +209,63 @@ class TestPlayEngine:
         # RNG should be available for play execution
         random_value = engine.rng.randint(1, 100)
         assert 1 <= random_value <= 100
+
+    def test_no_playbook_skips_playcall_models(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """When playbooks are missing, playcall models are skipped and calls are None."""
+
+        class CountingPlayTypeModel(PlayTypeModel):
+            def __init__(self) -> None:
+                super().__init__()
+                self.calls = 0
+
+            def execute(self, context: PlayTypeContext) -> PlayTypeEnum:
+                self.calls += 1
+                return PlayTypeEnum.RUN
+
+        class FailingOffPlayCallModel(OffensivePlayCallModel):
+            def execute(self, context: OffPlayCallContext) -> PlayCall:
+                raise AssertionError("offensive playcall model should not be called")
+
+        class FailingDefPlayCallModel(DefensivePlayCallModel):
+            def execute(self, context: DefPlayCallContext) -> PlayCall:
+                raise AssertionError("defensive playcall model should not be called")
+
+        home = create_test_team("home-no-pb", "Home No Playbook", False)
+        away = create_test_team("away-no-pb", "Away No Playbook", False)
+
+        play_type_model = CountingPlayTypeModel()
+        game_engine = GameEngine(
+            home_team=home,
+            away_team=away,
+            game_id="no-playbook-test",
+            rng=RNG(seed=7),
+            rules=NFLRules(),
+            user_models=[
+                play_type_model,
+                FailingOffPlayCallModel(),
+                FailingDefPlayCallModel(),
+            ],
+        )
+
+        play_engine = PlayEngine(
+            game_engine.game_state,
+            game_engine.models,
+            RNG(seed=11),
+            NFLRules(),
+        )
+        play_data = PlayExecutionData()
+        play_engine.set_play_calls(play_data)
+
+        assert play_data.off_play_call is None
+        assert play_data.def_play_call is None
+        assert play_data.play_type == PlayTypeEnum.RUN
+        assert play_type_model.calls == 1
+        assert (
+            "Skipping offensive play-call model because offense has no playbook or no plays."
+            in caplog.text
+        )
 
 
 class TestNFLRulesConstants:

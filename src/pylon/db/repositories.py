@@ -848,9 +848,7 @@ class PlayRepository:
             play_call_id=execution_data.off_play_call.uid
             if execution_data.off_play_call
             else None,
-            play_type=execution_data.off_play_call.play_type
-            if execution_data.off_play_call
-            else None,
+            play_type=execution_data.play_type,
             side=execution_data.off_play_call.side
             if execution_data.off_play_call
             else None,

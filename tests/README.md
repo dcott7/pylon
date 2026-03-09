@@ -10,7 +10,7 @@ The test suite is organized into layers matching the codebase architecture:
 - **test_state.py** - State layer: GameState, GameClock, Scoreboard, PossessionState (16 tests)
 - **test_engine.py** - Engine layer: GameEngine, RNG, specialized engines (9 tests)
 - **test_engines.py** - Drive and Play engines: DriveEngine, PlayEngine (18 tests)
-- **test_domain_rules.py** - Domain rules: Formation, Personnel, PlayCall validation (30 tests)
+- **test_domain_rules.py** - Domain rules: Formation, Personnel, PlayCall validation, method testing (35 tests)
 - **test_database.py** - Database layer: Schema, repositories, persistence (11 tests)
 - **test_integration.py** - Integration tests: Full simulation workflow (8 tests)
 - **test_typed_model.py** - Model framework: TypedModel validation (5 tests)
@@ -44,10 +44,35 @@ uv run pytest tests/ --cov=src/pylon --cov-report=html
 
 ## Test Status
 
-Currently **103 tests passing** across all layers. All tests are passing and API requirements are properly implemented:
+Currently **114 tests passing** across all layers. All tests are passing and API requirements are properly implemented:
 
 ✅ PlayCall requires formation and personnel_package parameters
 ✅ Database uses sqlite:// URL format  
+### Method Coverage
+
+The test suite comprehensively tests domain methods:
+
+**Formation methods:**
+- `position_count()` - Get count for specific position
+- `has_position()` - Check if position exists in formation
+- `has_tag()` - Check if tag exists, plus `add_tag()` functionality
+- `is_subformation_of()` - Check parent hierarchy relationships
+
+**Team methods:**
+- `get_athlete_by_uid()` - Find athlete by unique identifier
+- `add_play_template()` - Add plays to correct playbook (offense/defense)
+- `get_athletes_by_position()` - Filter roster by position
+
+**Playbook methods:**
+- `get_by_name()` - Retrieve plays by name (including duplicates)
+- `get_by_uid()` - Find play by unique identifier
+- `get_by_tag()` - Filter plays by tag
+- `get_by_type()` - Filter plays by type (RUN, PASS, etc.)
+- `__len__()` - Get playbook size
+
+**PlayCall methods:**
+- `add_tag()` - Add tags dynamically (prevents duplicates)
+
 ✅ All state methods working correctly
 ✅ GameClock.time_remaining returns total game time remaining
 ✅ Engine integration tests validate drive and play execution

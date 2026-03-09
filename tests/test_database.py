@@ -37,6 +37,53 @@ def db_manager() -> Generator[DatabaseManager, Any, None]:
     db.close()
 
 
+@pytest.fixture
+def parent_formation() -> Formation:
+    """Fixture for a parent formation used in database tests."""
+    return Formation(
+        name="Singleback",
+        position_counts={
+            AthletePositionEnum.QB: 1,
+            AthletePositionEnum.RB: 1,
+            AthletePositionEnum.WR: 2,
+            AthletePositionEnum.TE: 1,
+        },
+    )
+
+
+@pytest.fixture
+def offensive_formation(parent_formation: Formation) -> Formation:
+    """Fixture for an offensive formation with parent for database tests."""
+    return Formation(
+        name="Singleback Tight",
+        position_counts={
+            AthletePositionEnum.QB: 1,
+            AthletePositionEnum.RB: 1,
+            AthletePositionEnum.WR: 3,
+            AthletePositionEnum.TE: 1,
+            AthletePositionEnum.LT: 1,
+            AthletePositionEnum.LG: 1,
+            AthletePositionEnum.C: 1,
+            AthletePositionEnum.RG: 1,
+            AthletePositionEnum.RT: 1,
+        },
+        parent=parent_formation,
+    )
+
+
+@pytest.fixture
+def personnel_package() -> PersonnelPackage:
+    """Fixture for personnel package used in database tests."""
+    return PersonnelPackage(
+        name="11 Personnel",
+        counts={
+            AthletePositionEnum.RB: 1,
+            AthletePositionEnum.WR: 3,
+            AthletePositionEnum.TE: 1,
+        },
+    )
+
+
 class TestDatabaseSetup:
     """Tests for database setup and configuration."""
 
@@ -143,52 +190,24 @@ class TestAthleteRepository:
 class TestPlayCallRepository:
     """Tests for PlayCallRepository."""
 
-    def test_save_play_call(self, db_manager: DatabaseManager) -> None:
+    def test_save_play_call(
+        self,
+        db_manager: DatabaseManager,
+        offensive_formation: Formation,
+        personnel_package: PersonnelPackage,
+    ) -> None:
         """Test saving a play call to database."""
         # First save a team (required foreign key)
         team = Team(uid="team-1", name="Test Team")
         team_repo = TeamRepository(db_manager)
         team_repo.save(team)
 
-        parent_formation = Formation(
-            name="Singleback",
-            position_counts={
-                AthletePositionEnum.QB: 1,
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 2,
-                AthletePositionEnum.TE: 1,
-            },
-        )
-        formation = Formation(
-            name="Singleback Tight",
-            position_counts={
-                AthletePositionEnum.QB: 1,
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 3,
-                AthletePositionEnum.TE: 1,
-                AthletePositionEnum.LT: 1,
-                AthletePositionEnum.LG: 1,
-                AthletePositionEnum.C: 1,
-                AthletePositionEnum.RG: 1,
-                AthletePositionEnum.RT: 1,
-            },
-            parent=parent_formation,
-        )
-        personnel = PersonnelPackage(
-            name="11 Personnel",
-            counts={
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 3,
-                AthletePositionEnum.TE: 1,
-            },
-        )
-
         play = PlayCall(
             uid="play-1",
             name="Deep Pass",
             play_type=PlayTypeEnum.PASS,
-            formation=formation,
-            personnel_package=personnel,
+            formation=offensive_formation,
+            personnel_package=personnel_package,
             side=PlaySideEnum.OFFENSE,
         )
         repo = PlayCallRepository(db_manager)
@@ -279,7 +298,12 @@ class TestGameRepository:
 class TestDimensionRepository:
     """Tests for DimensionRepository facade."""
 
-    def test_persist_game_dimensions(self, db_manager: DatabaseManager) -> None:
+    def test_persist_game_dimensions(
+        self,
+        db_manager: DatabaseManager,
+        offensive_formation: Formation,
+        personnel_package: PersonnelPackage,
+    ) -> None:
         """Test persisting all game dimensions at once."""
         # Create teams with rosters
         home = Team(uid="home", name="Home Team")
@@ -303,50 +327,14 @@ class TestDimensionRepository:
                 )
             )
 
-        # Create shared formations
-        parent_formation = Formation(
-            name="Singleback",
-            position_counts={
-                AthletePositionEnum.QB: 1,
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 2,
-                AthletePositionEnum.TE: 1,
-            },
-        )
-
-        formation = Formation(
-            name="Singleback Tight",
-            position_counts={
-                AthletePositionEnum.QB: 1,
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 3,
-                AthletePositionEnum.TE: 1,
-                AthletePositionEnum.LT: 1,
-                AthletePositionEnum.LG: 1,
-                AthletePositionEnum.C: 1,
-                AthletePositionEnum.RG: 1,
-                AthletePositionEnum.RT: 1,
-            },
-            parent=parent_formation,
-        )
-
-        personnel = PersonnelPackage(
-            name="11 Personnel",
-            counts={
-                AthletePositionEnum.RB: 1,
-                AthletePositionEnum.WR: 3,
-                AthletePositionEnum.TE: 1,
-            },
-        )
-
         # Add plays to playbooks using shared formations
         home.add_play_template(
             PlayCall(
                 uid="home-pass",
                 name="Pass Play",
                 play_type=PlayTypeEnum.PASS,
-                formation=formation,
-                personnel_package=personnel,
+                formation=offensive_formation,
+                personnel_package=personnel_package,
                 side=PlaySideEnum.OFFENSE,
             )
         )
@@ -356,8 +344,8 @@ class TestDimensionRepository:
                 uid="away-pass",
                 name="Pass Play",
                 play_type=PlayTypeEnum.PASS,
-                formation=formation,
-                personnel_package=personnel,
+                formation=offensive_formation,
+                personnel_package=personnel_package,
                 side=PlaySideEnum.OFFENSE,
             )
         )

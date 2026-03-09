@@ -2,16 +2,21 @@ from abc import abstractmethod
 import logging
 from typing import Dict, List
 
-from .model import TypedModel
+from .model import TypedModel, ModelContext
 from ..state.game_state import GameState
 from ..domain.athlete import Athlete, AthletePositionEnum
-from ..rng import RNG
+from ..engine.rng import RNG
 
 
 logger = logging.getLogger(__name__)
 
 
-class FieldGoalContext:
+# ==============================
+# Special Teams Model Contexts
+# ==============================
+
+
+class FieldGoalContext(ModelContext):
     def __init__(
         self,
         game_state: GameState,
@@ -19,25 +24,23 @@ class FieldGoalContext:
         personnel_assignments: Dict[AthletePositionEnum, List[Athlete]],
         kicker: Athlete,
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.personnel_assignments = personnel_assignments
         self.kicker = kicker
 
 
-class PuntDistanceContext:
+class PuntDistanceContext(ModelContext):
     def __init__(
         self,
         game_state: GameState,
         rng: RNG,
         personnel_assignments: Dict[AthletePositionEnum, List[Athlete]],
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.personnel_assignments = personnel_assignments
 
 
-class PuntReturnDistanceContext:
+class PuntReturnDistanceContext(ModelContext):
     def __init__(
         self,
         game_state: GameState,
@@ -45,25 +48,23 @@ class PuntReturnDistanceContext:
         personnel_assignments: Dict[AthletePositionEnum, List[Athlete]],
         returner: Athlete,
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.personnel_assignments = personnel_assignments
         self.returner = returner
 
 
-class KickoffReturnDistanceContext:
+class KickoffReturnDistanceContext(ModelContext):
     def __init__(
         self,
         game_state: GameState,
         rng: RNG,
         returner: Athlete,
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.returner = returner
 
 
-class KickoffDistanceContext:
+class KickoffDistanceContext(ModelContext):
     """Context for determining how far a kickoff travels."""
 
     def __init__(
@@ -72,12 +73,11 @@ class KickoffDistanceContext:
         rng: RNG,
         kicker: Athlete,
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.kicker = kicker
 
 
-class KickoffTouchbackDecisionContext:
+class KickoffTouchbackDecisionContext(ModelContext):
     """Context for deciding whether to take a touchback or return."""
 
     def __init__(
@@ -87,13 +87,19 @@ class KickoffTouchbackDecisionContext:
         returner: Athlete,
         landing_spot: int,  # Where the ball lands (from receiving team's goal line)
     ) -> None:
-        self.game_state = game_state
-        self.rng = rng
+        super().__init__(game_state, rng)
         self.returner = returner
         self.landing_spot = landing_spot
 
 
+# ==============================
+# Special Teams Models
+# ==============================
+
+
 class PuntDistanceModel(TypedModel[PuntDistanceContext, int]):
+    """Determines punt distance in yards."""
+
     def __init__(self) -> None:
         super().__init__(name="punt_distance")
 
@@ -102,11 +108,15 @@ class PuntDistanceModel(TypedModel[PuntDistanceContext, int]):
 
 
 class DefaultPuntDistanceModel(PuntDistanceModel):
+    """Baseline punt distance model using a simple random distribution."""
+
     def execute(self, context: PuntDistanceContext) -> int:
         return context.rng.randint(0, 70)  # TODO: make this more realistic
 
 
 class PuntReturnDistanceModel(TypedModel[PuntReturnDistanceContext, int]):
+    """Determines punt return yards."""
+
     def __init__(self) -> None:
         super().__init__(name="punt_return_distance")
 
@@ -115,11 +125,15 @@ class PuntReturnDistanceModel(TypedModel[PuntReturnDistanceContext, int]):
 
 
 class DefaultPuntReturnDistanceModel(PuntReturnDistanceModel):
+    """Baseline punt return distance model using a simple random distribution."""
+
     def execute(self, context: PuntReturnDistanceContext) -> int:
         return context.rng.randint(0, 30)  # TODO: make this more realistic
 
 
 class FieldGoalModel(TypedModel[FieldGoalContext, bool]):
+    """Determines whether a field goal/extra point attempt is good."""
+
     def __init__(self) -> None:
         super().__init__(name="field_goal_success")
 
@@ -128,6 +142,8 @@ class FieldGoalModel(TypedModel[FieldGoalContext, bool]):
 
 
 class DefaultFieldGoalModel(FieldGoalModel):
+    """Baseline field goal model based on distance and a random roll."""
+
     def execute(self, context: FieldGoalContext) -> bool:
         distance = context.game_state.possession.ball_position
         kick_distance = 100 - distance + 17  # 17 yards added for end zone and snap
@@ -161,6 +177,8 @@ class DefaultFieldGoalModel(FieldGoalModel):
 
 
 class KickoffReturnDistanceModel(TypedModel[KickoffReturnDistanceContext, int]):
+    """Determines kickoff return yards."""
+
     def __init__(self) -> None:
         super().__init__(name="kickoff_return_distance")
 
@@ -169,12 +187,14 @@ class KickoffReturnDistanceModel(TypedModel[KickoffReturnDistanceContext, int]):
 
 
 class DefaultKickoffReturnDistanceModel(KickoffReturnDistanceModel):
+    """Baseline kickoff return distance model using a simple random distribution."""
+
     def execute(self, context: KickoffReturnDistanceContext) -> int:
         return context.rng.randint(0, 40)  # TODO: make this more realistic
 
 
 class KickoffDistanceModel(TypedModel[KickoffDistanceContext, int]):
-    """Model to determine how far the kickoff travels."""
+    """Determines kickoff distance in yards."""
 
     def __init__(self) -> None:
         super().__init__(name="kickoff_distance")
@@ -184,7 +204,7 @@ class KickoffDistanceModel(TypedModel[KickoffDistanceContext, int]):
 
 
 class DefaultKickoffDistanceModel(KickoffDistanceModel):
-    """Default implementation: kickoffs travel 55-75 yards."""
+    """Baseline kickoff distance model: kickoffs travel 55-75 yards."""
 
     def execute(self, context: KickoffDistanceContext) -> int:
         # In NFL, kickoffs from 35 typically travel 60-70 yards
@@ -193,7 +213,7 @@ class DefaultKickoffDistanceModel(KickoffDistanceModel):
 
 
 class KickoffTouchbackDecisionModel(TypedModel[KickoffTouchbackDecisionContext, bool]):
-    """Model to decide if returner takes touchback or attempts return."""
+    """Determines whether a returner takes a touchback on a kickoff."""
 
     def __init__(self) -> None:
         super().__init__(name="kickoff_touchback_decision")
@@ -203,7 +223,7 @@ class KickoffTouchbackDecisionModel(TypedModel[KickoffTouchbackDecisionContext, 
 
 
 class DefaultKickoffTouchbackDecisionModel(KickoffTouchbackDecisionModel):
-    """Default: take touchback if deep in endzone, return if near goal line."""
+    """Baseline touchback decision: take deep touchbacks, return near goal line."""
 
     def execute(self, context: KickoffTouchbackDecisionContext) -> bool:
         # If ball lands more than 5 yards deep in endzone, usually take touchback

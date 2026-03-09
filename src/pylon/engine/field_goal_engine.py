@@ -7,8 +7,14 @@ from ..models.registry import ModelRegistry
 from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
-from ..rng import RNG
-from ..models.personnel import KickerSelectionContext, KickerSelectionModel
+from .rng import RNG
+from ..models.personnel import (
+    KickerSelectionContext,
+    KickerSelectionModel,
+    OffensivePlayerAssignmentModel,
+    DefensivePlayerAssignmentModel,
+    PlayerAssignmentContext,
+)
 from ..models.specialteams import FieldGoalContext, FieldGoalModel
 
 
@@ -29,8 +35,10 @@ class FieldGoalPlayEngine:
         self.play_data = play_data
 
     def run(self) -> None:
-        assert self.play_data.off_play_call is not None
-        assert self.play_data.off_play_call.play_type == PlayTypeEnum.FIELD_GOAL
+        assert self.play_data.play_type == PlayTypeEnum.FIELD_GOAL
+
+        # Assign personnel for this field goal play
+        self.assign_personnel()
 
         kicker = self.get_kicker()
         is_fg_good = self.is_fg_good(kicker)
@@ -48,6 +56,36 @@ class FieldGoalPlayEngine:
         self.play_data.set_yards_gained(yards_gained)
         logger.debug(f"Field Goal Play Yards Gained: {yards_gained}")
         self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
+
+    def assign_personnel(self) -> None:
+        """Assign offensive (FG unit) and defensive (FG block) personnel."""
+        off_personnel_model = self.models.get_typed(
+            "offensive_play_personnel_assignment",
+            OffensivePlayerAssignmentModel,  # type: ignore
+        )
+        off_personnel = off_personnel_model.execute(
+            PlayerAssignmentContext(
+                self.game_state,
+                self.rng,
+                self.play_data.off_play_call,
+                play_type=self.play_data.play_type,
+            )
+        )
+        self.play_data.set_off_personnel_assignments(off_personnel)
+
+        def_personnel_model = self.models.get_typed(
+            "defensive_play_personnel_assignment",
+            DefensivePlayerAssignmentModel,  # type: ignore
+        )
+        def_personnel = def_personnel_model.execute(
+            PlayerAssignmentContext(
+                self.game_state,
+                self.rng,
+                self.play_data.def_play_call,
+                play_type=self.play_data.play_type,
+            )
+        )
+        self.play_data.set_def_personnel_assignments(def_personnel)
 
     def get_kicker(self) -> Athlete:
         kicker_select_model = self.models.get_typed(

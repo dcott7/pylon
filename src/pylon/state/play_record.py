@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 
 from ..domain.team import Team
 from ..domain.athlete import Athlete, AthletePositionEnum
-from ..domain.playbook import PlayCall
+from ..domain.playbook import PlayCall, PlayTypeEnum
 from .snapshot import ClockSnapshot, PossessionSnapshot, ScoreSnapshot
 
 if TYPE_CHECKING:
@@ -47,6 +47,8 @@ class PlayParticipantType(Enum):
     KICKER = "kicker"
     PUNTER = "punter"
     RETURNER = "returner"
+    TACKLER = "tackler"
+    INTERCEPTOR = "interceptor"
     # ... add more participant types as needed ...
 
 
@@ -102,6 +104,7 @@ class PlayExecutionData:
     """
 
     def __init__(self) -> None:
+        self._play_type: Optional[PlayTypeEnum] = None
         self._off_play_call: Optional[PlayCall] = None
         self._def_play_call: Optional[PlayCall] = None
         self._time_elapsed: Optional[int] = None
@@ -116,14 +119,36 @@ class PlayExecutionData:
         self._def_personnel_assignments: Dict[AthletePositionEnum, List[Athlete]] = {}
         self._participants: Dict[str, PlayParticipantType] = {}
 
+        # Pass-specific metrics
+        self._air_yards: Optional[int] = None
+        self._yards_after_catch: Optional[int] = None
+        self._is_complete: Optional[bool] = None
+        self._is_interception: Optional[bool] = None
+        self._is_sack: Optional[bool] = None
+
+        # Run-specific metrics
+        self._run_gap: Optional[str] = None  # "A", "B", "C", etc.
+        self._is_fumble: Optional[bool] = None
+        self._fumble_recovered_by_team: Optional[Team] = None
+
+        # Penalty information
+        self._penalty_occurred: Optional[bool] = None
+        self._penalty_yards: Optional[int] = None
+        self._penalty_team: Optional[Team] = None
+        self._penalty_type: Optional[str] = None
+
     # ==============================
     # Setters
     # ==============================
-    def set_off_play_call(self, play_call: PlayCall) -> None:
+    def set_play_type(self, play_type: PlayTypeEnum) -> None:
+        self._play_type = play_type
+        logger.debug(f"Set play_type to {play_type}")
+
+    def set_off_play_call(self, play_call: Optional[PlayCall]) -> None:
         self._off_play_call = play_call
         logger.debug(f"Set off_play_call to {play_call}")
 
-    def set_def_play_call(self, play_call: PlayCall) -> None:
+    def set_def_play_call(self, play_call: Optional[PlayCall]) -> None:
         self._def_play_call = play_call
         logger.debug(f"Set def_play_call to {play_call}")
 
@@ -177,9 +202,61 @@ class PlayExecutionData:
         self._participants[player_id] = participant_type
         logger.debug(f"Added participant {player_id} as {participant_type}")
 
+    def set_air_yards(self, air_yards: int) -> None:
+        self._air_yards = air_yards
+        logger.debug(f"Set air_yards to {air_yards}")
+
+    def set_yards_after_catch(self, yac: int) -> None:
+        self._yards_after_catch = yac
+        logger.debug(f"Set yards_after_catch to {yac}")
+
+    def set_is_complete(self, is_complete: bool) -> None:
+        self._is_complete = is_complete
+        logger.debug(f"Set is_complete to {is_complete}")
+
+    def set_is_interception(self, is_interception: bool) -> None:
+        self._is_interception = is_interception
+        logger.debug(f"Set is_interception to {is_interception}")
+
+    def set_is_sack(self, is_sack: bool) -> None:
+        self._is_sack = is_sack
+        logger.debug(f"Set is_sack to {is_sack}")
+
+    def set_run_gap(self, run_gap: str) -> None:
+        self._run_gap = run_gap
+        logger.debug(f"Set run_gap to {run_gap}")
+
+    def set_is_fumble(self, is_fumble: bool) -> None:
+        self._is_fumble = is_fumble
+        logger.debug(f"Set is_fumble to {is_fumble}")
+
+    def set_fumble_recovered_by_team(self, team: Team) -> None:
+        self._fumble_recovered_by_team = team
+        logger.debug(f"Set fumble_recovered_by_team to {team}")
+
+    def set_penalty_occurred(self, penalty_occurred: bool) -> None:
+        self._penalty_occurred = penalty_occurred
+        logger.debug(f"Set penalty_occurred to {penalty_occurred}")
+
+    def set_penalty_yards(self, penalty_yards: int) -> None:
+        self._penalty_yards = penalty_yards
+        logger.debug(f"Set penalty_yards to {penalty_yards}")
+
+    def set_penalty_team(self, team: Team) -> None:
+        self._penalty_team = team
+        logger.debug(f"Set penalty_team to {team}")
+
+    def set_penalty_type(self, penalty_type: str) -> None:
+        self._penalty_type = penalty_type
+        logger.debug(f"Set penalty_type to {penalty_type}")
+
     # ==============================
     # Getters
     # ==============================
+    @property
+    def play_type(self) -> Optional[PlayTypeEnum]:
+        return self._play_type
+
     @property
     def off_play_call(self) -> Optional[PlayCall]:
         return self._off_play_call
@@ -232,40 +309,96 @@ class PlayExecutionData:
     def participants(self) -> Dict[str, PlayParticipantType]:
         return self._participants
 
+    @property
+    def air_yards(self) -> Optional[int]:
+        return self._air_yards
+
+    @property
+    def yards_after_catch(self) -> Optional[int]:
+        return self._yards_after_catch
+
+    @property
+    def is_complete(self) -> Optional[bool]:
+        return self._is_complete
+
+    @property
+    def is_interception(self) -> Optional[bool]:
+        return self._is_interception
+
+    @property
+    def is_sack(self) -> Optional[bool]:
+        return self._is_sack
+
+    @property
+    def run_gap(self) -> Optional[str]:
+        return self._run_gap
+
+    @property
+    def is_fumble(self) -> Optional[bool]:
+        return self._is_fumble
+
+    @property
+    def fumble_recovered_by_team(self) -> Optional[Team]:
+        return self._fumble_recovered_by_team
+
+    @property
+    def penalty_occurred(self) -> Optional[bool]:
+        return self._penalty_occurred
+
+    @property
+    def penalty_yards(self) -> Optional[int]:
+        return self._penalty_yards
+
+    @property
+    def penalty_team(self) -> Optional[Team]:
+        return self._penalty_team
+
+    @property
+    def penalty_type(self) -> Optional[str]:
+        return self._penalty_type
+
     # ==============================
     # Validators
     # ==============================
     def is_finalized(self) -> bool:
-        # For special teams plays like kickoffs, play calls may be None
-        # Check if this looks like a kickoff (no play calls but has possession change)
-        is_special_play = (
-            self.off_play_call is None
-            and self.def_play_call is None
-            and self.is_possession_change is True
-        )
+        if self.play_type is None:
+            return False
 
-        if is_special_play:
-            # For special plays, we just need the basic fields
-            return (
-                self.time_elapsed is not None
-                and self.preplay_clock_runoff is not None
-                and self.yards_gained is not None
-                and self.is_clock_running is not None
-                and self.is_possession_change is not None
-                and self.is_turnover is not None
-            )
+        is_o_special_play = self.play_type.is_special_teams()
 
-        # For regular plays, we need play calls too
-        return (
-            self.off_play_call is not None
-            and self.def_play_call is not None
-            and self.time_elapsed is not None
+        # Base required fields for all plays
+        base_complete = (
+            self.time_elapsed is not None
             and self.preplay_clock_runoff is not None
             and self.yards_gained is not None
             and self.is_clock_running is not None
             and self.is_possession_change is not None
             and self.is_turnover is not None
         )
+
+        if not base_complete:
+            return False
+
+        # Special plays just need the basic fields
+        if is_o_special_play:
+            return True
+
+        # Pass plays must have pass-specific analytics
+        if self.play_type.is_pass():
+            return (
+                self.air_yards is not None
+                and self.yards_after_catch is not None
+                and self.is_complete is not None
+                and self.is_interception is not None
+                and self.is_sack is not None
+            )
+
+        # Run plays must have run-specific analytics (fumble status at minimum)
+        if self.play_type.is_run():
+            return self.is_fumble is not None and self.run_gap is not None
+
+        # Other play types just need base fields
+        return True
 
     def assert_is_finalized(self) -> None:
         """Check that all necessary components are set to finalize the play."""
@@ -274,10 +407,8 @@ class PlayExecutionData:
 
         # Debug output to show which fields are missing
         missing: List[str] = []
-        if self.off_play_call is None:
-            missing.append("off_play_call")
-        if self.def_play_call is None:
-            missing.append("def_play_call")
+        if self.play_type is None:
+            missing.append("play_type")
         if self.time_elapsed is None:
             missing.append("time_elapsed")
         if self.preplay_clock_runoff is None:
@@ -290,6 +421,25 @@ class PlayExecutionData:
             missing.append("is_possession_change")
         if self.is_turnover is None:
             missing.append("is_turnover")
+
+        # Check play-type specific fields if we have a play call
+        if self.play_type is not None:
+            if self.play_type.is_pass():
+                if self.air_yards is None:
+                    missing.append("air_yards")
+                if self.yards_after_catch is None:
+                    missing.append("yards_after_catch")
+                if self.is_complete is None:
+                    missing.append("is_complete")
+                if self.is_interception is None:
+                    missing.append("is_interception")
+                if self.is_sack is None:
+                    missing.append("is_sack")
+            elif self.play_type.is_run():
+                if self.is_fumble is None:
+                    missing.append("is_fumble")
+                if self.run_gap is None:
+                    missing.append("run_gap")
 
         msg = f"PlayExecutionData is not finalized. Missing required fields: {', '.join(missing)}"
         logger.error(msg)
@@ -305,12 +455,8 @@ class PlayExecutionData:
 
     def assert_is_ready_to_execute(self) -> None:
         """Check that all necessary components are set to execute the play."""
-        if self.off_play_call is None:
-            msg = "Offensive play call must be set before executing play."
-            raise PlayRecordError(msg)
-
-        if self.def_play_call is None:
-            msg = "Defensive play call must be set before executing play."
+        if self.play_type is None:
+            msg = "Play type must be set before executing play."
             raise PlayRecordError(msg)
 
         if not self.off_personnel_assignments:
@@ -418,6 +564,54 @@ class PlayRecord:
     def participants(self) -> Dict[str, PlayParticipantType]:
         """Return participant roles (passer, rusher, receiver, etc.)."""
         return self._execution_data.participants
+
+    @property
+    def air_yards(self) -> Optional[int]:
+        return self._execution_data.air_yards
+
+    @property
+    def yards_after_catch(self) -> Optional[int]:
+        return self._execution_data.yards_after_catch
+
+    @property
+    def is_complete(self) -> Optional[bool]:
+        return self._execution_data.is_complete
+
+    @property
+    def is_interception(self) -> Optional[bool]:
+        return self._execution_data.is_interception
+
+    @property
+    def is_sack(self) -> Optional[bool]:
+        return self._execution_data.is_sack
+
+    @property
+    def run_gap(self) -> Optional[str]:
+        return self._execution_data.run_gap
+
+    @property
+    def is_fumble(self) -> Optional[bool]:
+        return self._execution_data.is_fumble
+
+    @property
+    def fumble_recovered_by_team(self) -> Optional[Team]:
+        return self._execution_data.fumble_recovered_by_team
+
+    @property
+    def penalty_occurred(self) -> Optional[bool]:
+        return self._execution_data.penalty_occurred
+
+    @property
+    def penalty_yards(self) -> Optional[int]:
+        return self._execution_data.penalty_yards
+
+    @property
+    def penalty_team(self) -> Optional[Team]:
+        return self._execution_data.penalty_team
+
+    @property
+    def penalty_type(self) -> Optional[str]:
+        return self._execution_data.penalty_type
 
     # ==============================
     # Validators

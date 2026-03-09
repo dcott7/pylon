@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from ..domain.team import Team
 from ..domain.rules.base import LeagueRules
-from ..rng import RNG
+from .rng import RNG
 from .run_engine import RunPlayEngine
 from .pass_engine import PassPlayEngine
 from .punt_engine import PuntPlayEngine
@@ -14,7 +14,11 @@ from .field_goal_engine import FieldGoalPlayEngine
 from ..state.game_state import GameState
 from ..state.play_record import PlayExecutionData
 from ..models.registry import ModelRegistry
-from ..domain.playbook import PlayTypeEnum, PlayCall, PlaySideEnum
+from ..domain.playbook import (
+    PlayTypeEnum,
+    PlayCall,
+    PlaySideEnum,
+)
 from ..domain.athlete import Athlete, AthletePositionEnum
 from ..models.misc import (
     PlayTimeElapsedModel,
@@ -22,7 +26,12 @@ from ..models.misc import (
     PrePlayClockRunoffModel,
     PrePlayClockRunoffContext,
 )
-from ..models.offense import OffensivePlayCallModel, OffPlayCallContext
+from ..models.offense import (
+    PlayTypeModel,
+    PlayTypeContext,
+    OffensivePlayCallModel,
+    OffPlayCallContext,
+)
 from ..models.defense import DefensivePlayCallModel, DefPlayCallContext
 from ..models.personnel import (
     OffensivePlayerAssignmentModel,
@@ -72,14 +81,14 @@ class PlayEngine:
             self._run_kickoff(play_data)
             return play_data
 
+        # How much time does the team run off before the snap?
         if self.game_state.clock.clock_is_running:
-            # How much time does the team run off before the snap?
             self.set_preplay_clock_runoff(play_data)
         else:
             play_data.set_preplay_clock_runoff(0)
 
+        # Get offensive and defensive play calls
         self.set_play_calls(play_data)
-        self.set_personnel_assignments(play_data)
         self.execute_play_based_on_type(play_data)
         self.set_play_time_elapsed(play_data)
 
@@ -97,33 +106,19 @@ class PlayEngine:
 
     def execute_play_based_on_type(self, play_data: PlayExecutionData) -> None:
         """Execute the play based on its type."""
+        assert play_data.play_type is not None
 
-        play_data.assert_is_ready_to_execute()
+        if play_data.play_type.is_run():
+            RunPlayEngine(self.game_state, self.models, self.rng, play_data).run()
 
-        assert play_data.off_play_call is not None
-        assert play_data.def_play_call is not None
-        assert play_data.off_personnel_assignments
-        assert play_data.def_personnel_assignments
+        elif play_data.play_type.is_pass():
+            PassPlayEngine(self.game_state, self.models, self.rng, play_data).run()
 
-        if play_data.off_play_call.play_type == PlayTypeEnum.RUN:
-            RunPlayEngine(  # TODO: remove GameState parameter from RunPlayEngine
-                self.game_state, self.models, self.rng, play_data
-            ).run()
+        elif play_data.play_type.is_punt():
+            PuntPlayEngine(self.game_state, self.models, self.rng, play_data).run()
 
-        elif play_data.off_play_call.play_type == PlayTypeEnum.PASS:
-            PassPlayEngine(  # TODO: remove GameState parameter from PassPlayEngine
-                self.game_state, self.models, self.rng, play_data
-            ).run()
-
-        elif play_data.off_play_call.play_type == PlayTypeEnum.PUNT:
-            PuntPlayEngine(  # TODO: remove GameState parameter from PuntPlayEngine
-                self.game_state, self.models, self.rng, play_data
-            ).run()
-
-        elif play_data.off_play_call.play_type == PlayTypeEnum.FIELD_GOAL:
-            FieldGoalPlayEngine(  # TODO: remove GameState parameter from PuntPlayEngine
-                self.game_state, self.models, self.rng, play_data
-            ).run()
+        elif play_data.play_type.is_field_goal():
+            FieldGoalPlayEngine(self.game_state, self.models, self.rng, play_data).run()
 
     # ==============================
     # Setters
@@ -139,10 +134,27 @@ class PlayEngine:
         play_data.set_preplay_clock_runoff(preplay_runoff)
 
     def set_play_calls(self, play_data: PlayExecutionData) -> None:
-        off_play_call = self.get_off_playcall(play_data)
+        play_type = self.get_play_type()
+        play_data.set_play_type(play_type)
+
+        off_playbook = self.game_state.pos_team.off_playbook
+        if off_playbook is None or len(off_playbook) == 0:
+            logger.warning(
+                "Skipping offensive play-call model because offense has no playbook or no plays."
+            )
+            off_play_call = None
+        else:
+            off_play_call = self.get_off_playcall(play_type)
         play_data.set_off_play_call(off_play_call)
 
-        def_play_call = self.get_def_playcall(play_data)
+        def_playbook = self.game_state.def_team.def_playbook
+        if def_playbook is None or len(def_playbook) == 0:
+            logger.warning(
+                "Skipping defensive play-call model because defense has no playbook or no plays."
+            )
+            def_play_call = None
+        else:
+            def_play_call = self.get_def_playcall(play_data)
         play_data.set_def_play_call(def_play_call)
 
     def set_play_time_elapsed(self, play_data: PlayExecutionData) -> None:
@@ -157,35 +169,43 @@ class PlayEngine:
         )
         play_data.set_time_elapsed(time_elapsed)
 
-    def set_personnel_assignments(self, play_data: PlayExecutionData) -> None:
-        off_personnel_assignments = self.get_off_play_personnel(play_data)
-        play_data.set_off_personnel_assignments(off_personnel_assignments)
-
-        def_personnel_assignments = self.get_def_play_personnel(play_data)
-        play_data.set_def_personnel_assignments(def_personnel_assignments)
-
     # ==============================
     # Getters (mainly models)
     # ==============================
-    def get_off_playcall(self, play_data: PlayExecutionData) -> PlayCall:
+    def get_play_type(self) -> PlayTypeEnum:
+        play_type_model = self.models.get_typed(
+            "play_type",
+            PlayTypeModel,  # type: ignore
+        )
+        return play_type_model.execute(PlayTypeContext(self.game_state, self.rng))
+
+    def get_off_playcall(self, play_type: PlayTypeEnum) -> PlayCall:
         off_play_call_model = self.models.get_typed(
             "off_play_call",
             OffensivePlayCallModel,  # type: ignore
         )
         off_play_call = off_play_call_model.execute(
-            OffPlayCallContext(self.game_state, self.rng)
+            OffPlayCallContext(self.game_state, self.rng, play_type)
         )
 
         self._validate_playcall(off_play_call, PlaySideEnum.OFFENSE)
         return off_play_call
 
     def get_def_playcall(self, play_data: PlayExecutionData) -> PlayCall:
+        assert play_data.play_type is not None
+
         def_play_call_model = self.models.get_typed(
             "def_play_call",
             DefensivePlayCallModel,  # type: ignore
         )
+        # We pass the offensive play type to the defensive play call model so it
+        # can condition its call on the offense's call. This is mainly done to
+        # prevent the defense from calling a punt return (or something similarly
+        # unrealistic) if the offense calls a run or pass. In the future, we may
+        # want to pass more information about the offensive call. For now, just the
+        # play type is sufficient.
         def_play_call = def_play_call_model.execute(
-            DefPlayCallContext(self.game_state, self.rng)
+            DefPlayCallContext(self.game_state, self.rng, play_data.play_type)
         )
 
         self._validate_playcall(def_play_call, PlaySideEnum.DEFENSE)
@@ -278,7 +298,55 @@ class PlayEngine:
             logger.error(msg)
             raise PlayExecutionError(msg)
 
+    def _set_kickoff_playcalls(self, play_data: PlayExecutionData) -> None:
+        play_data.set_play_type(PlayTypeEnum.KICKOFF)
+        off_playbook = self.game_state.pos_team.off_playbook
+        if off_playbook is None or len(off_playbook) == 0:
+            logger.warning(
+                "Cannot set kickoff offensive play call: offense has no playbook or no plays."
+            )
+            play_data.set_off_play_call(None)
+        else:
+            off_kickoff_plays = off_playbook.get_by_type(PlayTypeEnum.KICKOFF)
+            if not off_kickoff_plays:
+                logger.warning(
+                    "No KICKOFF plays found in offensive playbook; kickoff will run without offensive play call."
+                )
+                play_data.set_off_play_call(None)
+            else:
+                if len(off_kickoff_plays) > 1:
+                    logger.warning(
+                        "Multiple kickoff plays found in offensive playbook; using the first one."
+                    )
+                # TODO: we should really have the kickoff play call model select from the
+                # available kickoff plays rather than just taking the first one.
+                play_data.set_off_play_call(off_kickoff_plays[0])
+
+        def_playbook = self.game_state.def_team.def_playbook
+        if def_playbook is None or len(def_playbook) == 0:
+            logger.warning(
+                "Cannot set kickoff defensive play call: defense has no playbook or no plays."
+            )
+            play_data.set_def_play_call(None)
+        else:
+            def_kickoff_plays = def_playbook.get_by_type(PlayTypeEnum.KICKOFF_RETURN)
+            if not def_kickoff_plays:
+                logger.warning(
+                    "No KICKOFF_RETURN plays found in defensive playbook; kickoff will run without defensive play call."
+                )
+                play_data.set_def_play_call(None)
+            else:
+                if len(def_kickoff_plays) > 1:
+                    logger.warning(
+                        "Multiple kickoff plays found in defensive playbook; using the first one."
+                    )
+                # TODO: we should really have the kickoff play call model select from the
+                # available kickoff plays rather than just taking the first one.
+                play_data.set_def_play_call(def_kickoff_plays[0])
+
     def _run_kickoff(self, play_data: PlayExecutionData) -> None:
+        self._set_kickoff_playcalls(play_data)
+
         self.game_state.consume_pending_kickoff()
 
         # Kickoffs don't have pre-play clock runoff
