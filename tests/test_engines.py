@@ -358,6 +358,23 @@ class TestGameEngine:
         assert game_engine.game_state.clock.current_quarter == 1
         assert game_engine.game_state.clock.time_remaining == 3600  # 60 minutes
 
+    def test_game_engine_with_max_drives_limit(self) -> None:
+        """Test that max drives is persisted on the game engine."""
+        home = create_test_team("home-md", "Home")
+        away = create_test_team("away-md", "Away")
+
+        engine = GameEngine(
+            home_team=home,
+            away_team=away,
+            game_id="max-drives-test",
+            rng=RNG(seed=42),
+            rules=NFLRules(),
+            max_drives=5,
+        )
+
+        assert engine.max_drives == 5
+        assert engine.max_drives_reached is False
+
 
 class TestEngineIntegration:
     """Integration tests for engines working together."""

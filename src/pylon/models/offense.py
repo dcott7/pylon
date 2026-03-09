@@ -2,7 +2,7 @@ from abc import abstractmethod
 import logging
 from typing import Dict, List, Optional
 
-from .model import TypedModel, ModelContext
+from .model import TypedModel, ModelContext, ModelExecutionError
 from ..state.game_state import GameState
 from ..domain.playbook import PlayCall, PlayTypeEnum
 from ..domain.athlete import Athlete, AthletePositionEnum
@@ -10,17 +10,6 @@ from ..engine.rng import RNG
 
 
 logger = logging.getLogger(__name__)
-
-
-# ==============================
-# Model Exceptions
-# ==============================
-
-
-class ModelExecutionError(Exception):
-    """Custom exception for errors during model execution."""
-
-    pass
 
 
 # ==============================

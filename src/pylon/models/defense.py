@@ -2,7 +2,7 @@ from abc import abstractmethod
 import logging
 from typing import Dict, List, Optional
 
-from .model import TypedModel, ModelContext
+from .model import TypedModel, ModelContext, ModelExecutionError
 from ..state.game_state import GameState
 from ..domain.playbook import PlayCall, PlayTypeEnum
 from ..domain.athlete import Athlete, AthletePositionEnum
@@ -105,6 +105,15 @@ class DefaultDefensivePlayCallModel(DefensivePlayCallModel):
 
     def execute(self, context: DefPlayCallContext) -> PlayCall:
         playbook = context.game_state.def_team.def_playbook
+
+        if playbook is None:
+            logger.error(
+                f"Defensive playbook is None for team {context.game_state.def_team.name}."
+                f"The PlayCall Model should not be called if the defense has no playbook."
+            )
+            raise ModelExecutionError(
+                "Defensive playbook is None, cannot select play call."
+            )
 
         off_type = context.offensive_play_type
         assert off_type is not None
