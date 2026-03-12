@@ -18,14 +18,23 @@ from .domain.rules.base import LeagueRules
 from .domain.rules.nfl import NFLRules
 from .models.registry import TypedModel
 from .engine.rng import RNG
-from .state.game_state import GameState
 from .db.database import DatabaseManager
-from .db.repositories import (
-    DimensionRepository,
-    FactRepository,
-    ExperimentRepository,
-    GameRepository,
+from .state.game_state import GameState
+from .output import (
+    DBOutputWriter,
+    ExperimentOutputPayload,
+    JsonOutputWriter,
+    OUTPUT_SCHEMA_VERSION,
+    OutputMode,
+    SimulationOutputPayload,
+    TeamOutputPayload,
+    serialize_team,
+    validate_output_config,
+    wants_db_output,
+    wants_json_output,
 )
+from .output.serializers import serialize_game_state
+from .output.types import GameStateOutputPayload, SimulationResultsPayload
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +46,7 @@ class SimulationRunner:
     Manages:
     - Running multiple GameEngine instances with varied seeds
     - Tracking experiment metadata and results
-    - Persisting dimension and fact data to database
+    - Writing simulation output to JSON, DB, or both
     - Collecting aggregate statistics across reps
 
     Usage:
@@ -47,6 +56,7 @@ class SimulationRunner:
             num_reps=100,
             base_seed=42,
             db_manager=db,
+            output_mode=OutputMode.BOTH,
         )
         results = runner.run()
     """
@@ -61,6 +71,8 @@ class SimulationRunner:
         rules: LeagueRules = NFLRules(),  # type: ignore
         max_drives: Optional[int] = None,
         db_manager: Optional[DatabaseManager] = None,
+        output_mode: OutputMode = OutputMode.JSON,
+        json_output_path: Optional[Path | str] = None,
         experiment_name: Optional[str] = None,
         experiment_description: Optional[str] = None,
         log_dir: Optional[Path | str] = None,
@@ -78,6 +90,8 @@ class SimulationRunner:
             rules: League rules (defaults to NFLRules).
             max_drives: Optional drive limit per game.
             db_manager: Optional database manager for persistence.
+            output_mode: Output destination: "json", "db", or "both".
+            json_output_path: Optional output path for JSON results.
             experiment_name: Optional human-readable experiment name.
             experiment_description: Optional detailed description.
         """
@@ -89,7 +103,14 @@ class SimulationRunner:
         self.rules = rules
         self.max_drives = max_drives
         self.db_manager = db_manager
+        self.output_mode = output_mode
         self.log_dir = Path(log_dir) if log_dir is not None else Path("./log")
+        self.json_output_path = (
+            Path(json_output_path)
+            if json_output_path is not None
+            else self.log_dir / "simulation_results.json"
+        )
+        self.json_writer = JsonOutputWriter(self.json_output_path)
         self.log_level = log_level
 
         # Experiment metadata
@@ -99,10 +120,19 @@ class SimulationRunner:
         )
         self.experiment_description = experiment_description
 
+        self.db_writer = (
+            DBOutputWriter(db_manager=self.db_manager)
+            if self.db_manager is not None
+            else None
+        )
+
         # Result tracking
         self.game_results: List[Dict[str, Any]] = []
+        self.game_details: List[GameStateOutputPayload] = []
+        self._pending_db_games: List[tuple[str, Dict[str, Any], GameState]] = []
+        self._next_db_game_id: Optional[int] = None
 
-    def run(self) -> Dict[str, Any]:
+    def run(self) -> SimulationOutputPayload:
         """
         Execute all replications and return aggregated results.
 
@@ -118,10 +148,16 @@ class SimulationRunner:
         )
         start_time = time.time()
 
-        # Persist dimension data once (teams, rosters, playbooks)
-        if self.db_manager:
-            self._persist_dimension_data()
-            self._persist_experiment_metadata()
+        # Ensure output configuration is valid based on the OutputMode
+        validate_output_config(
+            output_mode=self.output_mode,
+            has_db_manager=self.db_manager is not None,
+            json_output_path=self.json_output_path,
+        )
+
+        # Initialize DB game-id sequence for this run if DB output is requested.
+        if wants_db_output(self.output_mode):
+            self._next_db_game_id = int(self._get_next_game_id())
 
         # Ensure log directory exists for per-rep logs
         self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -143,15 +179,20 @@ class SimulationRunner:
         # Compute aggregate statistics
         aggregate_stats = self._compute_aggregate_stats()
 
-        return {
-            "experiment_id": self.experiment_id,
-            "experiment_name": self.experiment_name,
-            "num_reps": self.num_reps,
-            "base_seed": self.base_seed,
-            "elapsed_time": elapsed_time,
-            "games": self.game_results,
-            "aggregate": aggregate_stats,
-        }
+        results = self._build_output_payload(
+            elapsed_time=elapsed_time,
+            aggregate_stats=aggregate_stats,
+        )
+
+        if wants_json_output(self.output_mode):
+            json_path = self.json_writer.write_results(results)
+            logger.info(f"Results written to JSON: {json_path}")
+
+        if wants_db_output(self.output_mode):
+            self._persist_db_output(results)
+            logger.info("Results persisted to database.")
+
+        return results
 
     def _run_single_game(self, rep_number: int, seed: int) -> Dict[str, Any]:
         """
@@ -171,16 +212,24 @@ class SimulationRunner:
         rep_handler.setFormatter(
             logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         )
+        # Attach to root logger to capture logs from all modules during this rep
         root_logger = logging.getLogger()
         previous_level = root_logger.level
         root_logger.addHandler(rep_handler)
         root_logger.setLevel(min(previous_level, self.log_level))
 
+        # Initialize RNG for this game
         rng = RNG(seed)
         game_start = time.time()
 
-        # Determine the next game ID
-        game_id = self._get_next_game_id() if self.db_manager else str(rep_number)
+        # Determine the game ID. For DB output we reserve sequential IDs in-memory
+        # and persist after the full canonical payload has been built.
+        if wants_db_output(self.output_mode):
+            assert self._next_db_game_id is not None
+            game_id = str(self._next_db_game_id)
+            self._next_db_game_id += 1
+        else:
+            game_id = str(rep_number)
 
         # Create and run game engine
         engine = GameEngine(
@@ -196,41 +245,48 @@ class SimulationRunner:
 
         game_duration = time.time() - game_start
 
-        # Extract results from game state
-        game_state = engine.game_state
-        home_score = game_state.scoreboard.current_score(self.home_team)
-        away_score = game_state.scoreboard.current_score(self.away_team)
-        winner_id = None
-        if home_score > away_score:
+        # Extract winner from the end game state
+        end_game_state = engine.game_state
+        end_home_score = end_game_state.scoreboard.current_score(self.home_team)
+        end_away_score = end_game_state.scoreboard.current_score(self.away_team)
+        winner_id: Optional[str] = None
+        if end_home_score > end_away_score:
             winner_id = self.home_team.uid
-        elif away_score > home_score:
+        elif end_away_score > end_home_score:
             winner_id = self.away_team.uid
 
         # Determine game status
         status = "failed" if engine.max_drives_reached else "completed"
 
+        # Build game result metadata for this replication
         game_result: Dict[str, Any] = {
             "rep_number": rep_number,
             "seed": seed,
-            "home_score": home_score,
-            "away_score": away_score,
+            "home_score": end_home_score,
+            "away_score": end_away_score,
             "winner_id": winner_id,
-            "final_quarter": game_state.clock.current_quarter,
+            "final_quarter": end_game_state.clock.current_quarter,
             "duration_seconds": game_duration,
             "status": status,
-            "total_plays": game_state.total_plays(),
-            "total_drives": game_state.total_drives(),
+            "total_plays": end_game_state.total_plays(),
+            "total_drives": end_game_state.total_drives(),
         }
 
-        # Persist game result to database
-        if self.db_manager:
-            game_id = game_state.game_data.game_id
-            self._persist_game_result(game_result, game_id)
-            self._persist_game_facts(game_id, game_state)
+        # Queue DB persistence and write after canonical payload is built.
+        if wants_db_output(self.output_mode):
+            self._pending_db_games.append((game_id, game_result, end_game_state))
+
+        self.game_details.append(
+            serialize_game_state(
+                game_state=end_game_state,
+                rep_number=rep_number,
+                seed=seed,
+            )
+        )
 
         logger.info(
-            f"Rep {rep_number} complete [{status}]: {home_score}-{away_score} "
-            f"(Q{game_state.clock.current_quarter}, {game_duration:.2f}s)"
+            f"Rep {rep_number} complete [{status}]: {end_home_score}-{end_away_score} "
+            f"(Q{end_game_state.clock.current_quarter}, {game_duration:.2f}s)"
         )
 
         # Detach per-rep handler
@@ -240,65 +296,6 @@ class SimulationRunner:
 
         return game_result
 
-    def _persist_dimension_data(self) -> None:
-        """Persist teams, rosters, and playbooks to database."""
-        logger.info("Persisting dimension data (teams, rosters, playbooks)...")
-        assert self.db_manager is not None
-        dim_repo = DimensionRepository(self.db_manager)
-        dim_repo.persist_game_dimensions(self.home_team, self.away_team)
-
-    def _persist_experiment_metadata(self) -> None:
-        """Persist experiment metadata to database."""
-        logger.info("Persisting experiment metadata...")
-        assert self.db_manager is not None
-        exp_repo = ExperimentRepository(self.db_manager)
-        exp_repo.create(
-            name=self.experiment_name,
-            num_reps=self.num_reps,
-            base_seed=self.base_seed,
-            description=self.experiment_description,
-            experiment_id=self.experiment_id,
-        )
-
-    def _persist_game_result(self, game_result: Dict[str, Any], game_id: str) -> None:
-        """
-        Persist individual game result to database.
-
-        Args:
-            game_result: Game result metadata.
-            game_id: The game ID to use (already determined).
-        """
-        assert self.db_manager is not None
-        game_repo = GameRepository(self.db_manager)
-        game_repo.create(
-            seed=game_result["seed"],
-            home_team_id=self.home_team.uid,
-            away_team_id=self.away_team.uid,
-            home_score=game_result["home_score"],
-            away_score=game_result["away_score"],
-            winner_id=game_result["winner_id"],
-            total_plays=game_result["total_plays"],
-            total_drives=game_result["total_drives"],
-            final_quarter=game_result["final_quarter"],
-            experiment_id=self.experiment_id,
-            rep_number=game_result["rep_number"],
-            duration_seconds=game_result["duration_seconds"],
-            status=game_result["status"],
-            game_id=game_id,
-        )
-
-    def _persist_game_facts(self, game_id: str, game_state: GameState) -> None:
-        """
-        Persist all game facts (drives, plays, personnel assignments, participants).
-
-        Args:
-            game_id: The game fact ID to associate with all fact data.
-            game_state: The GameState object containing all play/drive execution data.
-        """
-        assert self.db_manager is not None
-        fact_repo = FactRepository(self.db_manager)
-        fact_repo.persist_game_facts(game_id, game_state)
-
     def _get_next_game_id(self) -> str:
         """
         Get the next sequential game ID by querying the database.
@@ -306,19 +303,8 @@ class SimulationRunner:
         Returns:
             Sequential game ID as a string (e.g., "1", "2", "3"...)
         """
-        assert self.db_manager is not None
-        from .db.schema import Game as OrmGame
-
-        session = self.db_manager.get_session()
-        try:
-            games = session.query(OrmGame.id).all()
-            if not games:
-                return "1"
-            # Convert IDs to integers and find max
-            max_id = max(int(game.id) for game in games)
-            return str(max_id + 1)
-        finally:
-            session.close()
+        assert self.db_writer is not None
+        return self.db_writer.get_next_game_id()
 
     def _compute_aggregate_stats(self) -> Dict[str, Any]:
         """Compute aggregate statistics across all replications."""
@@ -360,3 +346,52 @@ class SimulationRunner:
             "avg_duration_seconds": avg_duration,
             "failed_reps": failed_reps,
         }
+
+    def _build_experiment_payload(self, elapsed_time: float) -> ExperimentOutputPayload:
+        """Build canonical experiment metadata payload."""
+        return {
+            "id": self.experiment_id,
+            "name": self.experiment_name,
+            "num_reps": self.num_reps,
+            "base_seed": self.base_seed,
+            "elapsed_time": elapsed_time,
+            "description": self.experiment_description,
+        }
+
+    def _build_teams_payload(self) -> Dict[str, TeamOutputPayload]:
+        """Build canonical team payload for consistent JSON/DB projections."""
+        return {
+            "home": serialize_team(self.home_team),
+            "away": serialize_team(self.away_team),
+        }
+
+    def _build_output_payload(
+        self, elapsed_time: float, aggregate_stats: Dict[str, Any]
+    ) -> SimulationOutputPayload:
+        """Build canonical output payload shared across JSON and DB paths."""
+        experiment = self._build_experiment_payload(elapsed_time=elapsed_time)
+        teams = self._build_teams_payload()
+        results: SimulationResultsPayload = {
+            "games": self.game_results,
+            "aggregate": aggregate_stats,
+            "game_details": self.game_details,
+        }
+
+        return {
+            "schema_version": OUTPUT_SCHEMA_VERSION,
+            "experiment": experiment,
+            "teams": teams,
+            "results": results,
+        }
+
+    def _persist_db_output(self, output_payload: SimulationOutputPayload) -> None:
+        """Persist DB output after simulations complete and payload is assembled."""
+        assert self.db_writer is not None
+
+        logger.info("Persisting DB output from canonical payload...")
+        self.db_writer.write_results(
+            output_payload=output_payload,
+            pending_games=self._pending_db_games,
+        )
+
+        self._pending_db_games.clear()

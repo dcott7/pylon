@@ -1,7 +1,8 @@
 """Integration tests for full game simulation workflow."""
 
+import json
 import pytest
-from typing import Any, Dict, Generator
+from typing import Generator
 from pathlib import Path
 from pylon.domain.athlete import Athlete, AthletePositionEnum
 from pylon.domain.team import Team
@@ -16,6 +17,7 @@ from pylon.domain.rules.nfl import NFLRules
 from pylon.simulation_runner import SimulationRunner
 from pylon.db.database import DatabaseManager
 from pylon.db.schema import Game as OrmGame, Drive as OrmDrive, Play as OrmPlay
+from pylon.output import OutputMode, SimulationOutputPayload
 
 
 def create_test_team(uid: str, name: str) -> Team:
@@ -196,10 +198,11 @@ def test_db(tmp_path: Path) -> Generator[DatabaseManager]:
 class TestSimulationRunner:
     """Tests for SimulationRunner."""
 
-    def test_run_single_game_no_db(self):
+    def test_run_single_game_no_db(self, tmp_path: Path) -> None:
         """Test running a single game without database."""
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
+        output_path = tmp_path / "single_game_results.json"
 
         runner = SimulationRunner(
             home_team=home,
@@ -209,19 +212,30 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=3,  # Short game for testing
             db_manager=None,
+            output_mode=OutputMode.JSON,
+            json_output_path=output_path,
         )
 
         results = runner.run()
 
         assert results["num_reps"] == 1
-        assert len(results["games"]) == 1
-        assert results["games"][0]["home_score"] >= 0
-        assert results["games"][0]["away_score"] >= 0
+        assert len(results["results"]["games"]) == 1
+        assert results["results"]["games"][0]["home_score"] >= 0
+        assert results["results"]["games"][0]["away_score"] >= 0
+        assert "experiment" in results
+        assert "teams" in results
+        assert "results" in results
+        assert len(results["teams"]["home"]["athletes"]) > 0
+        assert "offense" in results["teams"]["home"]["playbooks"]
+        assert "defense" in results["teams"]["home"]["playbooks"]
+        assert len(results["results"]["game_details"]) == 1
+        assert output_path.exists()
 
-    def test_run_multiple_games_no_db(self):
+    def test_run_multiple_games_no_db(self, tmp_path: Path) -> None:
         """Test running multiple games without database."""
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
+        output_path = tmp_path / "multi_game_results.json"
 
         runner = SimulationRunner(
             home_team=home,
@@ -231,15 +245,18 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=2,
             db_manager=None,
+            output_mode=OutputMode.JSON,
+            json_output_path=output_path,
         )
 
         results = runner.run()
 
         assert results["num_reps"] == 3
-        assert len(results["games"]) == 3
+        assert len(results["results"]["games"]) == 3
         # Each game should have different seed
-        seeds = [game["seed"] for game in results["games"]]
+        seeds = [game["seed"] for game in results["results"]["games"]]
         assert len(set(seeds)) == 3  # All unique
+        assert output_path.exists()
 
     def test_run_game_with_database(self, test_db: DatabaseManager) -> None:
         """Test running a game with database persistence."""
@@ -254,10 +271,11 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=3,
             db_manager=test_db,
+            output_mode=OutputMode.DB,
             experiment_name="Test Experiment",
         )
 
-        results: Dict[str, Any] = runner.run()
+        results: SimulationOutputPayload = runner.run()
         assert isinstance(results, dict)
 
         # Verify game was persisted
@@ -282,9 +300,10 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=2,
             db_manager=test_db,
+            output_mode=OutputMode.DB,
         )
 
-        results: Dict[str, Any] = runner.run()
+        results: SimulationOutputPayload = runner.run()
         assert isinstance(results, dict)
 
         # Verify sequential game IDs
@@ -310,9 +329,10 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=3,
             db_manager=test_db,
+            output_mode=OutputMode.DB,
         )
 
-        results: Dict[str, Any] = runner.run()
+        results: SimulationOutputPayload = runner.run()
         assert isinstance(results, dict)
 
         # Verify drives were persisted
@@ -334,7 +354,7 @@ class TestSimulationRunner:
         for play in plays:
             assert play.drive_id is not None
 
-    def test_aggregate_stats_calculation(self):
+    def test_aggregate_stats_calculation(self, tmp_path: Path) -> None:
         """Test that aggregate statistics are calculated correctly."""
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
@@ -347,11 +367,13 @@ class TestSimulationRunner:
             rules=NFLRules(),
             max_drives=None,
             db_manager=None,
+            output_mode=OutputMode.JSON,
+            json_output_path=tmp_path / "aggregate_results.json",
         )
 
         results = runner.run()
 
-        aggregate = results["aggregate"]
+        aggregate = results["results"]["aggregate"]
         assert "home_wins" in aggregate
         assert "away_wins" in aggregate
         assert "ties" in aggregate
@@ -363,6 +385,59 @@ class TestSimulationRunner:
             aggregate["home_wins"] + aggregate["away_wins"] + aggregate["ties"]
         )
         assert total_results == 5
+
+    def test_db_mode_requires_db_manager(self) -> None:
+        """Test db mode rejects missing database manager."""
+        home = create_test_team("home", "Home Team")
+        away = create_test_team("away", "Away Team")
+
+        runner = SimulationRunner(
+            home_team=home,
+            away_team=away,
+            num_reps=1,
+            base_seed=42,
+            rules=NFLRules(),
+            db_manager=None,
+            output_mode=OutputMode.DB,
+        )
+
+        with pytest.raises(ValueError, match="db_manager is required"):
+            runner.run()
+
+    def test_both_mode_writes_json_and_database(
+        self, test_db: DatabaseManager, tmp_path: Path
+    ) -> None:
+        """Test both mode writes JSON and database outputs."""
+        home = create_test_team("home", "Home Team")
+        away = create_test_team("away", "Away Team")
+        output_path = tmp_path / "both_mode_results.json"
+
+        runner = SimulationRunner(
+            home_team=home,
+            away_team=away,
+            num_reps=1,
+            base_seed=42,
+            rules=NFLRules(),
+            db_manager=test_db,
+            output_mode=OutputMode.BOTH,
+            json_output_path=output_path,
+        )
+
+        results = runner.run()
+        assert results["num_reps"] == 1
+        assert output_path.exists()
+
+        with output_path.open("r", encoding="utf-8") as file_handle:
+            saved = json.load(file_handle)
+        assert saved["num_reps"] == 1
+        assert "experiment" in saved
+        assert "teams" in saved
+        assert "results" in saved
+
+        session = test_db.get_session()
+        games = session.query(OrmGame).all()
+        session.close()
+        assert len(games) == 1
 
 
 class TestEndToEndWorkflow:
@@ -383,6 +458,8 @@ class TestEndToEndWorkflow:
             rules=NFLRules(),
             max_drives=3,
             db_manager=test_db,
+            output_mode=OutputMode.BOTH,
+            json_output_path=tmp_path / "full_workflow_results.json",
             experiment_name="Chiefs vs 49ers Test",
             experiment_description="Integration test of full workflow",
             log_dir=tmp_path / "logs",
@@ -395,7 +472,8 @@ class TestEndToEndWorkflow:
         assert "experiment_name" in results
         assert results["experiment_name"] == "Chiefs vs 49ers Test"
         assert results["num_reps"] == 2
-        assert len(results["games"]) == 2
+        assert len(results["results"]["games"]) == 2
+        assert len(results["results"]["game_details"]) == 2
 
         # Verify database state
         session = test_db.get_session()
@@ -413,8 +491,9 @@ class TestEndToEndWorkflow:
         assert log_dir.exists()
         log_files = list(log_dir.glob("pylon.*.log"))
         assert len(log_files) == 2  # One per rep
+        assert (tmp_path / "full_workflow_results.json").exists()
 
-    def test_deterministic_replay(self) -> None:
+    def test_deterministic_replay(self, tmp_path: Path) -> None:
         """Test that same seed produces same results."""
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
@@ -428,6 +507,8 @@ class TestEndToEndWorkflow:
             rules=NFLRules(),
             max_drives=3,
             db_manager=None,
+            output_mode=OutputMode.JSON,
+            json_output_path=tmp_path / "deterministic_1.json",
         )
         results1 = runner1.run()
 
@@ -443,12 +524,14 @@ class TestEndToEndWorkflow:
             rules=NFLRules(),
             max_drives=3,
             db_manager=None,
+            output_mode=OutputMode.JSON,
+            json_output_path=tmp_path / "deterministic_2.json",
         )
         results2 = runner2.run()
 
         # Results should be identical
-        game1 = results1["games"][0]
-        game2 = results2["games"][0]
+        game1 = results1["results"]["games"][0]
+        game2 = results2["results"]["games"][0]
 
         assert game1["seed"] == game2["seed"]
         assert game1["home_score"] == game2["home_score"]

@@ -1,13 +1,13 @@
 import logging
 import sqlite3
-import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict
 
 from pylon.domain.team import Team
 from pylon.domain.rules.nfl import NFLRules
 from pylon.engine import SimulationRunner
 from pylon.db import DatabaseManager
+from pylon.output import OutputMode
 
 from .utils.teams import load_team
 
@@ -15,13 +15,15 @@ from .utils.teams import load_team
 TEAM_NAMES = ["Bears", "49ers"]
 
 # setup paths
-NUM_REPS = 50
+NUM_REPS = 2
 LOG_LEVEL = logging.DEBUG
 EXAMPLE_DIR = Path(__file__).parent
 ROOT_DIR = EXAMPLE_DIR.parent.parent
 DATA_DIR = ROOT_DIR / "data"
 INPUT_DB_PATH = DATA_DIR / "football.db"
 PYLON_DB_PATH = EXAMPLE_DIR / "pylon_sim.db"
+RESULTS_JSON_PATH = EXAMPLE_DIR / "simulation_results.json"
+OUTPUT_MODE = OutputMode.JSON
 
 
 def load_teams(conn: sqlite3.Connection) -> Dict[str, Team]:
@@ -79,6 +81,8 @@ def main() -> None:
         base_seed=42,
         rules=NFLRules(),
         db_manager=db_manager,
+        output_mode=OUTPUT_MODE,
+        json_output_path=RESULTS_JSON_PATH,
         experiment_name=f"{away.name} at {home.name} - {NUM_REPS} Rep Test",
         experiment_description="Test run of multi-rep simulation with database persistence",
         log_dir=EXAMPLE_DIR / "log",
@@ -91,11 +95,11 @@ def main() -> None:
     logger.info("\n" + "=" * 80)
     logger.info("Simulation Results")
     logger.info("=" * 80)
-    logger.info(f"Experiment ID: {results['experiment_id']}")
-    logger.info(f"Total Reps: {results['num_reps']}")
-    logger.info(f"Total Time: {results['elapsed_time']:.2f}s")
+    logger.info(f"Experiment ID: {results['experiment']['id']}")
+    logger.info(f"Total Reps: {results['experiment']['num_reps']}")
+    logger.info(f"Total Time: {results['experiment']['elapsed_time']:.2f}s")
 
-    agg = results["aggregate"]
+    agg = results["results"]["aggregate"]
     if "failed_reps" in agg and agg["failed_reps"] > 0:
         logger.warning(f"Failed Reps: {agg['failed_reps']}")
 
@@ -108,41 +112,7 @@ def main() -> None:
         logger.info(f"{away.name} Avg Score: {agg['avg_away_score']:.1f}")
         logger.info(f"Avg Game Duration: {agg['avg_duration_seconds']:.2f}s")
 
-    # Save results to JSON
-    results_file = EXAMPLE_DIR / "simulation_results.json"
-    with open(results_file, "w") as f:
-        # Include aggregate and per-rep details for easier analysis.
-        rep_results: List[Dict[str, Any]] = [
-            {
-                "rep_number": game["rep_number"],
-                "seed": game["seed"],
-                "status": game["status"],
-                "score": {
-                    home.name: game["home_score"],
-                    away.name: game["away_score"],
-                },
-                "winner_id": game["winner_id"],
-                "final_quarter": game["final_quarter"],
-                "duration_seconds": game["duration_seconds"],
-                "total_plays": game["total_plays"],
-                "total_drives": game["total_drives"],
-            }
-            for game in results["games"]
-        ]
-
-        output: Dict[str, Any] = {
-            "experiment": {
-                "id": results["experiment_id"],
-                "name": results["experiment_name"],
-                "num_reps": results["num_reps"],
-                "base_seed": results["base_seed"],
-                "elapsed_time": results["elapsed_time"],
-            },
-            "aggregate": results["aggregate"],
-            "reps": rep_results,
-        }
-        json.dump(output, f, indent=2)
-    logger.info(f"\nResults saved to: {results_file}")
+    logger.info(f"\nResults saved to: {RESULTS_JSON_PATH}")
 
     logger.info(f"Database persisted to: {PYLON_DB_PATH}")
     logger.info("=" * 80)
