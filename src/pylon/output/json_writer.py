@@ -2,7 +2,9 @@
 
 import json
 from pathlib import Path
-from typing import Any, Mapping, Union
+from typing import Union
+
+from .types import SimulationOutputPayload
 
 
 class JsonOutputWriter:
@@ -12,7 +14,7 @@ class JsonOutputWriter:
         self.output_path = Path(output_path)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def write_results(self, results: Mapping[str, Any]) -> Path:
+    def write_results(self, results: SimulationOutputPayload) -> Path:
         """Write simulation results to JSON and return the resolved output path."""
         with open(self.output_path, "w", encoding="utf-8") as file_handle:
             json.dump(results, file_handle, indent=2)
