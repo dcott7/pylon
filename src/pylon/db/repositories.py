@@ -6,17 +6,11 @@ and ORM objects (from schema), and provide persistence operations.
 """
 
 import logging
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 import uuid
-
-from sqlalchemy import insert
 
 from ..domain.athlete import Athlete as DomainAthlete
 from ..domain.athlete import AthletePositionEnum
-from ..domain.team import Team as DomainTeam
-from ..domain.playbook import Formation as DomainFormation
-from ..domain.playbook import PersonnelPackage as DomainPersonnel
-from ..domain.playbook import PlayCall as DomainPlayCall
 from ..state.drive_record import DriveRecord
 from ..state.game_state import GameState
 from ..state.play_record import PlayRecord, PlayParticipantType
@@ -33,6 +27,15 @@ from .schema import Play as OrmPlay
 from .schema import PlayPersonnelAssignment as OrmPlayPersonnelAssignment
 from .schema import PlayParticipant as OrmPlayParticipant
 from .schema import team_roster
+
+if TYPE_CHECKING:
+    from ..output.types import (
+        AthleteOutputPayload,
+        FormationOutputPayload,
+        PersonnelOutputPayload,
+        PlayCallOutputPayload,
+        TeamOutputPayload,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -53,49 +56,49 @@ class TeamRepository:
         """
         self.db = db_manager
 
-    def to_orm(self, domain_team: DomainTeam) -> OrmTeam:
+    def to_orm(self, team_output: "TeamOutputPayload") -> OrmTeam:
         """
         Convert a domain Team to an ORM Team.
 
         Args:
-            domain_team: Domain Team object.
+            team_output: Team output payload.
 
         Returns:
             ORM Team object (not yet persisted).
         """
         orm_team = OrmTeam(
-            id=domain_team.uid,
-            name=domain_team.name,
+            id=team_output["uid"],
+            name=team_output["name"],
             abbreviation=None,  # Domain team doesn't have abbreviation yet
         )
         return orm_team
 
-    def save(self, domain_team: DomainTeam) -> OrmTeam:
+    def save(self, team_output: "TeamOutputPayload") -> OrmTeam:
         """
-        Convert and persist a domain Team.
+        Convert and persist a team output payload.
 
         Args:
-            domain_team: Domain Team object.
+            team_output: Team output payload.
 
         Returns:
             Persisted ORM Team object.
         """
-        orm_team = self.to_orm(domain_team)
+        orm_team = self.to_orm(team_output)
         self.db.insert_dimension_data(orm_team)
         logger.info(f"Persisted team: {orm_team.name} (id={orm_team.id})")
         return orm_team
 
-    def save_batch(self, domain_teams: List[DomainTeam]) -> List[OrmTeam]:
+    def save_batch(self, team_outputs: List["TeamOutputPayload"]) -> List[OrmTeam]:
         """
-        Convert and persist multiple domain Teams.
+        Convert and persist multiple team output payloads.
 
         Args:
-            domain_teams: List of domain Team objects.
+            team_outputs: List of team output payloads.
 
         Returns:
             List of persisted ORM Team objects.
         """
-        orm_teams = [self.to_orm(team) for team in domain_teams]
+        orm_teams = [self.to_orm(team) for team in team_outputs]
         self.db.insert_dimension_data(*orm_teams)
         logger.info(f"Persisted {len(orm_teams)} team(s).")
         return orm_teams
@@ -117,55 +120,83 @@ class AthleteRepository:
         """
         self.db = db_manager
 
-    def to_orm(self, domain_athlete: DomainAthlete) -> OrmAthlete:
+    def to_orm(self, athlete_output: "AthleteOutputPayload") -> OrmAthlete:
         """
         Convert a domain Athlete to an ORM Athlete.
 
         Args:
-            domain_athlete: Domain Athlete object.
+            athlete_output: Athlete output payload.
 
         Returns:
             ORM Athlete object (not yet persisted).
         """
         orm_athlete = OrmAthlete(
-            id=domain_athlete.uid,
-            first_name=domain_athlete.first_name,
-            last_name=domain_athlete.last_name,
-            position=domain_athlete.position,
+            id=athlete_output["uid"],
+            first_name=athlete_output["first_name"],
+            last_name=athlete_output["last_name"],
+            position=athlete_output["position"],
         )
         return orm_athlete
 
-    def save(self, domain_athlete: DomainAthlete) -> OrmAthlete:
+    def save(self, athlete_output: "AthleteOutputPayload") -> OrmAthlete:
         """
-        Convert and persist a domain Athlete.
+        Convert and persist an athlete output payload.
 
         Args:
-            domain_athlete: Domain Athlete object.
+            athlete_output: Athlete output payload.
 
         Returns:
             Persisted ORM Athlete object.
         """
-        orm_athlete = self.to_orm(domain_athlete)
+        orm_athlete = self.to_orm(athlete_output)
         self.db.insert_dimension_data(orm_athlete)
         logger.info(
             f"Persisted athlete: {orm_athlete.first_name} {orm_athlete.last_name} (id={orm_athlete.id})"
         )
         return orm_athlete
 
-    def save_batch(self, domain_athletes: List[DomainAthlete]) -> List[OrmAthlete]:
+    def save_batch(
+        self, athlete_outputs: List["AthleteOutputPayload"]
+    ) -> List[OrmAthlete]:
         """
-        Convert and persist multiple domain Athletes.
+        Convert and persist multiple athlete output payloads.
 
         Args:
-            domain_athletes: List of domain Athlete objects.
+            athlete_outputs: List of athlete output payloads.
 
         Returns:
             List of persisted ORM Athlete objects.
         """
-        orm_athletes = [self.to_orm(athlete) for athlete in domain_athletes]
+        orm_athletes = [self.to_orm(athlete) for athlete in athlete_outputs]
         self.db.insert_dimension_data(*orm_athletes)
         logger.info(f"Persisted {len(orm_athletes)} athlete(s).")
         return orm_athletes
+
+
+class TeamRosterRepository:
+    """Repository for team-athlete association table persistence."""
+
+    def __init__(self, db_manager: DatabaseManager) -> None:
+        self.db = db_manager
+
+    def save_batch(self, team_outputs: List["TeamOutputPayload"]) -> None:
+        """Persist team-to-athlete mappings in the team_roster association table."""
+        team_roster_rows: List[Dict[str, str]] = []
+
+        for team in team_outputs:
+            for athlete in team["athletes"]:
+                team_roster_rows.append(
+                    {"team_id": team["uid"], "athlete_id": athlete["uid"]}
+                )
+
+        if not team_roster_rows:
+            return
+
+        self.db.insert_rows(
+            table=team_roster,
+            rows=team_roster_rows,
+            label="team_roster association",
+        )
 
 
 class FormationRepository:
@@ -185,39 +216,43 @@ class FormationRepository:
         self.db = db_manager
 
     def to_orm(
-        self, domain_formation: DomainFormation, parent_id: Optional[str] = None
+        self,
+        formation_output: "FormationOutputPayload",
+        parent_id: Optional[str] = None,
     ) -> OrmFormation:
         """
-        Convert a domain Formation to an ORM Formation.
+        Convert a Formation payload to an ORM Formation.
 
         Args:
-            domain_formation: Domain Formation object.
+            formation_output: Formation output payload.
             parent_id: Optional parent formation ID for sub-formations.
 
         Returns:
             ORM Formation object (not yet persisted).
         """
         orm_formation = OrmFormation(
-            id=domain_formation.uid,
-            name=domain_formation.name,
+            id=formation_output["uid"],
+            name=formation_output["name"],
             parent_formation_id=parent_id,
         )
         return orm_formation
 
     def save(
-        self, domain_formation: DomainFormation, parent_id: Optional[str] = None
+        self,
+        formation_output: "FormationOutputPayload",
+        parent_id: Optional[str] = None,
     ) -> OrmFormation:
         """
-        Convert and persist a domain Formation.
+        Convert and persist a Formation payload.
 
         Args:
-            domain_formation: Domain Formation object.
+            formation_output: Formation object.
             parent_id: Optional parent formation ID.
 
         Returns:
             Persisted ORM Formation object.
         """
-        orm_formation = self.to_orm(domain_formation, parent_id)
+        orm_formation = self.to_orm(formation_output, parent_id)
         self.db.insert_dimension_data(orm_formation)
         logger.info(
             f"Persisted formation: {orm_formation.name} (id={orm_formation.id})"
@@ -225,20 +260,20 @@ class FormationRepository:
         return orm_formation
 
     def save_batch(
-        self, domain_formations: List[DomainFormation]
+        self, formation_outputs: List["FormationOutputPayload"]
     ) -> List[OrmFormation]:
         """
-        Convert and persist multiple domain Formations.
+        Convert and persist multiple Formation payloads.
 
         Duplicates (by ID or name) are silently ignored.
 
         Args:
-            domain_formations: List of domain Formation objects.
+            formation_outputs: List of FormationOutputPayload objects.
 
         Returns:
             List of persisted ORM Formation objects.
         """
-        orm_formations = [self.to_orm(formation) for formation in domain_formations]
+        orm_formations = [self.to_orm(formation) for formation in formation_outputs]
         self.db.insert_dimension_data_or_ignore(*orm_formations)
         logger.info(
             f"Persisted {len(orm_formations)} formation(s) (duplicates ignored)."
@@ -262,32 +297,32 @@ class PersonnelRepository:
         """
         self.db = db_manager
 
-    def to_orm(self, domain_personnel: DomainPersonnel) -> OrmPersonnel:
+    def to_orm(self, personnel_output: "PersonnelOutputPayload") -> OrmPersonnel:
         """
         Convert a domain Personnel to an ORM Personnel.
 
         Args:
-            domain_personnel: Domain Personnel object.
+            personnel_output: Personnel output payload.
 
         Returns:
             ORM Personnel object (not yet persisted).
         """
         orm_personnel = OrmPersonnel(
-            id=domain_personnel.uid, name=domain_personnel.name
+            id=personnel_output["uid"], name=personnel_output["name"]
         )
         return orm_personnel
 
-    def save(self, domain_personnel: DomainPersonnel) -> OrmPersonnel:
+    def save(self, personnel_output: "PersonnelOutputPayload") -> OrmPersonnel:
         """
         Convert and persist a domain Personnel.
 
         Args:
-            domain_personnel: Domain Personnel object.
+            personnel_output: Personnel output payload.
 
         Returns:
             Persisted ORM Personnel object.
         """
-        orm_personnel = self.to_orm(domain_personnel)
+        orm_personnel = self.to_orm(personnel_output)
         self.db.insert_dimension_data(orm_personnel)
         logger.info(
             f"Persisted personnel: {orm_personnel.name} (id={orm_personnel.id})"
@@ -295,7 +330,7 @@ class PersonnelRepository:
         return orm_personnel
 
     def save_batch(
-        self, domain_personnels: List[DomainPersonnel]
+        self, personnel_output: List["PersonnelOutputPayload"]
     ) -> List[OrmPersonnel]:
         """
         Convert and persist multiple domain Personnel.
@@ -303,12 +338,12 @@ class PersonnelRepository:
         Duplicates (by ID) are silently ignored.
 
         Args:
-            domain_personnels: List of domain Personnel objects.
+            personnel_output: List of PersonnelOutputPayload objects.
 
         Returns:
             List of persisted ORM Personnel objects.
         """
-        orm_personnels = [self.to_orm(personnel) for personnel in domain_personnels]
+        orm_personnels = [self.to_orm(personnel) for personnel in personnel_output]
         self.db.insert_dimension_data_or_ignore(*orm_personnels)
         logger.info(
             f"Persisted {len(orm_personnels)} personnel(s) (duplicates ignored)."
@@ -335,7 +370,7 @@ class PlayCallRepository:
 
     def to_orm(
         self,
-        domain_play: DomainPlayCall,
+        play_output: "PlayCallOutputPayload",
         team_id: str,
         formation_id: Optional[str] = None,
         personnel_id: Optional[str] = None,
@@ -344,7 +379,7 @@ class PlayCallRepository:
         Convert a domain PlayCall to an ORM PlayCall.
 
         Args:
-            domain_play: Domain PlayCall object.
+            play_output: PlayCallOutputPayload object.
             team_id: Team UID that owns this play.
             formation_id: Optional Formation ID reference.
             personnel_id: Optional Personnel ID reference.
@@ -353,29 +388,29 @@ class PlayCallRepository:
             ORM PlayCall object (not yet persisted).
         """
         orm_play_call = OrmPlayCall(
-            id=domain_play.uid,
-            name=domain_play.name,
-            play_type=domain_play.play_type,
-            side=domain_play.side,
+            id=play_output["uid"],
+            name=play_output["name"],
+            play_type=play_output["play_type"],
+            side=play_output["side"],
             team_id=team_id,
             formation_id=formation_id,
             personnel_id=personnel_id,
-            description=domain_play.description,
+            description=play_output["description"],
         )
         return orm_play_call
 
     def save(
         self,
-        domain_play: DomainPlayCall,
+        play_output: "PlayCallOutputPayload",
         team_id: str,
         formation_id: Optional[str] = None,
         personnel_id: Optional[str] = None,
     ) -> OrmPlayCall:
         """
-        Convert and persist a domain PlayCall.
+        Convert and persist a PlayCall payload.
 
         Args:
-            domain_play: Domain PlayCall object.
+            play_output: PlayCallOutputPayload object.
             team_id: Team UID that owns this play.
             formation_id: Optional Formation ID reference.
             personnel_id: Optional Personnel ID reference.
@@ -383,7 +418,7 @@ class PlayCallRepository:
         Returns:
             Persisted ORM PlayCall object.
         """
-        orm_play_call = self.to_orm(domain_play, team_id, formation_id, personnel_id)
+        orm_play_call = self.to_orm(play_output, team_id, formation_id, personnel_id)
         self.db.insert_dimension_data(orm_play_call)
         logger.info(
             f"Persisted play call: {orm_play_call.name} (id={orm_play_call.id})"
@@ -392,7 +427,7 @@ class PlayCallRepository:
 
     def save_batch(
         self,
-        domain_plays: List[DomainPlayCall],
+        play_output: List["PlayCallOutputPayload"],
         team_id: str,
         formation_ids: Optional[Dict[str, str]] = None,
         personnel_ids: Optional[Dict[str, str]] = None,
@@ -403,7 +438,7 @@ class PlayCallRepository:
         Duplicates (by ID) are silently ignored.
 
         Args:
-            domain_plays: List of domain PlayCall objects.
+            play_output: List of PlayCallOutputPayload objects.
             team_id: Team UID that owns these plays.
             formation_ids: Optional mapping of play UID -> formation ID.
             personnel_ids: Optional mapping of play UID -> personnel ID.
@@ -418,10 +453,10 @@ class PlayCallRepository:
             self.to_orm(
                 play,
                 team_id,
-                formation_ids.get(play.uid),
-                personnel_ids.get(play.uid),
+                formation_ids.get(play["uid"]),
+                personnel_ids.get(play["uid"]),
             )
-            for play in domain_plays
+            for play in play_output
         ]
         self.db.insert_dimension_data_or_ignore(*orm_plays)
         logger.info(f"Persisted {len(orm_plays)} play(s) (duplicates ignored).")
@@ -585,14 +620,15 @@ class DimensionRepository:
         self.db = db_manager
         self.teams = TeamRepository(db_manager)
         self.athletes = AthleteRepository(db_manager)
+        self.team_roster = TeamRosterRepository(db_manager)
         self.formations = FormationRepository(db_manager)
         self.personnel = PersonnelRepository(db_manager)
         self.play_calls = PlayCallRepository(db_manager)
 
     def persist_game_dimensions(
         self,
-        home_team: DomainTeam,
-        away_team: DomainTeam,
+        home_team: "TeamOutputPayload",
+        away_team: "TeamOutputPayload",
     ) -> None:
         """
         Persist all dimension data for a game.
@@ -605,81 +641,54 @@ class DimensionRepository:
         - Plays (all play templates from both teams' playbooks)
 
         Args:
-            home_team: Home team domain object.
-            away_team: Away team domain object.
+            home_team: Home team canonical output payload.
+            away_team: Away team canonical output payload.
         """
         logger.info("Persisting game dimension data...")
 
         # Persist teams
-        orm_teams = self.teams.save_batch([home_team, away_team])
+        self.teams.save_batch([home_team, away_team])
 
         # Persist all athletes from both rosters and associate with their teams
-        all_athletes = home_team.roster + away_team.roster
+        all_athletes = home_team["athletes"] + away_team["athletes"]
         if all_athletes:
             self.athletes.save_batch(all_athletes)
+            self.team_roster.save_batch([home_team, away_team])
 
-            # Build athlete-to-team mapping and populate team_roster association
-            team_roster_rows: List[Dict[str, str]] = []
-            for team in [home_team, away_team]:
-                orm_team = next(t for t in orm_teams if t.id == team.uid)
-                for athlete in team.roster:
-                    team_roster_rows.append(
-                        {"team_id": orm_team.id, "athlete_id": athlete.uid}
-                    )
+        # Collect all formations/personnel globally and plays per team.
+        # We dedupe formations/personnel by UID before delegating to repositories.
+        all_formations: Dict[str, "FormationOutputPayload"] = {}
+        all_personnels: Dict[str, "PersonnelOutputPayload"] = {}
+        team_plays: Dict[str, List["PlayCallOutputPayload"]] = {}
 
-            # Insert team_roster associations
-            if team_roster_rows:
-                session = self.db.get_session()
-                try:
-                    session.execute(insert(team_roster).values(team_roster_rows))
-                    session.commit()
-                    logger.info(
-                        f"Persisted {len(team_roster_rows)} team-athlete associations."
-                    )
-                finally:
-                    session.close()
-
-        # Collect all formations and personnel from both teams' playbooks
-        # (deduped globally by UID since both teams share standard NFL formations/personnel)
-        all_formations: Dict[str, DomainFormation] = {}  # uid -> formation
-        all_personnels: Dict[str, DomainPersonnel] = {}  # uid -> personnel
-        team_play_maps: Dict[
-            str, Dict[str, str]
-        ] = {}  # team_uid -> {play_uid -> formation_uid}
-        team_personnel_maps: Dict[
-            str, Dict[str, str]
-        ] = {}  # team_uid -> {play_uid -> personnel_uid}
-
+        # Process both teams to extract plays, formations, and personnel
         for team in [home_team, away_team]:
             # Collect plays from both offensive and defensive playbooks
-            off_plays = team.off_playbook.plays if team.off_playbook else []
-            def_plays = team.def_playbook.plays if team.def_playbook else []
+            playbooks = team["playbooks"]
+            off_plays: List["PlayCallOutputPayload"] = playbooks["offense"]["plays"]
+            def_plays: List["PlayCallOutputPayload"] = playbooks["defense"]["plays"]
             all_plays = off_plays + def_plays
 
             if not all_plays:
+                team_plays[team["uid"]] = []
                 continue
 
-            formation_map: Dict[str, str] = {}  # play_uid -> formation_uid
-            personnel_map: Dict[str, str] = {}  # play_uid -> personnel_uid
+            team_play_payloads: List["PlayCallOutputPayload"] = []
 
             # Extract formations and personnel from plays
             for play in all_plays:
-                if hasattr(play, "formation") and play.formation:
-                    # Deduplicate by UID (both teams use same NFL formations with same IDs)
-                    if play.formation.uid not in all_formations:
-                        all_formations[play.formation.uid] = play.formation
-                    formation_map[play.uid] = play.formation.uid
+                formation = play["formation"]
+                personnel = play["personnel_package"]
 
-                if hasattr(play, "personnel") and play.personnel_package:
-                    # Deduplicate by uid
-                    if play.personnel_package.uid not in all_personnels:
-                        all_personnels[play.personnel_package.uid] = (
-                            play.personnel_package
-                        )
-                    personnel_map[play.uid] = play.personnel_package.uid
+                # Deduplicate by UID (both teams often share standard formations/personnel).
+                if formation["uid"] not in all_formations:
+                    all_formations[formation["uid"]] = formation
+                if personnel["uid"] not in all_personnels:
+                    all_personnels[personnel["uid"]] = personnel
 
-            team_play_maps[team.uid] = formation_map
-            team_personnel_maps[team.uid] = personnel_map
+                team_play_payloads.append(play)
+
+            team_plays[team["uid"]] = team_play_payloads
 
         # Persist deduplicated formations and personnel
         if all_formations:
@@ -689,15 +698,19 @@ class DimensionRepository:
 
         # Persist plays for both teams
         for team in [home_team, away_team]:
-            off_plays = team.off_playbook.plays if team.off_playbook else []
-            def_plays = team.def_playbook.plays if team.def_playbook else []
-            all_plays = off_plays + def_plays
-
-            if all_plays:
-                formation_map = team_play_maps.get(team.uid, {})
-                personnel_map = team_personnel_maps.get(team.uid, {})
+            plays = team_plays.get(team["uid"], [])
+            if plays:
+                formation_ids = {
+                    play["uid"]: play["formation"]["uid"] for play in plays
+                }
+                personnel_ids = {
+                    play["uid"]: play["personnel_package"]["uid"] for play in plays
+                }
                 self.play_calls.save_batch(
-                    all_plays, team.uid, formation_map, personnel_map
+                    plays,
+                    team["uid"],
+                    formation_ids=formation_ids,
+                    personnel_ids=personnel_ids,
                 )
 
         logger.info("Game dimension data persisted successfully.")

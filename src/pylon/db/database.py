@@ -8,7 +8,7 @@ Supports SQLite (development) and PostgreSQL (production).
 import logging
 from typing import Any, Optional
 
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, insert
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -168,6 +168,30 @@ class DatabaseManager:
             Exception: If insertion fails.
         """
         self.insert_objects(*invocations, label="model invocation")
+
+    def insert_rows(self, table: Any, rows: list[dict[str, Any]], label: str) -> None:
+        """Insert raw row dictionaries into an association/bridge table.
+
+        Args:
+            table: SQLAlchemy table object to insert into.
+            rows: Row dictionaries to insert.
+            label: Description for logging.
+        """
+        if not rows:
+            logger.debug(f"No {label} rows to insert.")
+            return
+
+        session = self.get_session()
+        try:
+            session.execute(insert(table).values(rows))
+            session.commit()
+            logger.info(f"Inserted {len(rows)} {label} row(s).")
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to insert {label} rows: {e}")
+            raise
+        finally:
+            session.close()
 
     def insert_dimension_data_or_ignore(
         self,
