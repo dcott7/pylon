@@ -11,9 +11,9 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
-from sim.base import Simulation as Simulation
-from sim.runner import SimulationRunner as SimulationRunner
-from sim.runner import SimulationRunnerConfig as SimulationRunnerConfig
+from sim.base import Simulation
+from sim.runner import SimulationRunner
+from sim.runner import SimulationRunnerConfig
 from sim.rng import RNG
 from .domain.team import Team
 from .domain.rules.base import LeagueRules
