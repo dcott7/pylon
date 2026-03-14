@@ -71,7 +71,7 @@ class PassPlayEngine:
         self.assign_personnel()
 
         passer = self.get_passer()
-        self.play_data.add_participant(passer.uid, PlayParticipantType.PASSER)
+        self.play_data.add_participant(passer, PlayParticipantType.PASSER)
 
         # Check for sack before attempting the pass
         is_sack = self.is_sack()
@@ -80,7 +80,7 @@ class PassPlayEngine:
         if is_sack:
             # Sack: negative yardage, no completion/interception
             sacker = self.get_sacker()
-            self.play_data.add_participant(sacker.uid, PlayParticipantType.TACKLER)
+            self.play_data.add_participant(sacker, PlayParticipantType.TACKLER)
 
             sack_yards = self.get_sack_yards()
             self.play_data.set_yards_gained(-sack_yards)
@@ -104,7 +104,7 @@ class PassPlayEngine:
 
         # No sack: proceed with pass attempt
         targetted = self.get_targetted_receiver()
-        self.play_data.add_participant(targetted.uid, PlayParticipantType.RECEIVER)
+        self.play_data.add_participant(targetted, PlayParticipantType.RECEIVER)
 
         air_yards = self.get_airyards()
         self.play_data.set_air_yards(air_yards)
@@ -138,7 +138,7 @@ class PassPlayEngine:
 
                 interceptor = self.get_interceptor()
                 self.play_data.add_participant(
-                    interceptor.uid, PlayParticipantType.INTERCEPTOR
+                    interceptor, PlayParticipantType.INTERCEPTOR
                 )
                 return_yards = self.get_interception_return_yards(interceptor)
                 yards_gained = -return_yards

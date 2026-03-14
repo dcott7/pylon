@@ -63,7 +63,7 @@ class RunPlayEngine:
 
         logger.debug(f"Run Play Yards Gained: {yards_gained}")
 
-        self.play_data.add_participant(rusher.uid, PlayParticipantType.RUSHER)
+        self.play_data.add_participant(rusher, PlayParticipantType.RUSHER)
 
     def assign_personnel(self) -> None:
         """Assign offensive and defensive personnel for the run play."""

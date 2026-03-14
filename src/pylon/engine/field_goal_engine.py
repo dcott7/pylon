@@ -55,7 +55,7 @@ class FieldGoalPlayEngine:
 
         self.play_data.set_yards_gained(yards_gained)
         logger.debug(f"Field Goal Play Yards Gained: {yards_gained}")
-        self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
+        self.play_data.add_participant(kicker, PlayParticipantType.KICKER)
 
     def assign_personnel(self) -> None:
         """Assign offensive (FG unit) and defensive (FG block) personnel."""

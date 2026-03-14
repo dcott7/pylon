@@ -53,8 +53,8 @@ class PuntPlayEngine:
         return_distance = self.get_return_distance(returner)
         # TODO: Add logic for touchback, fair catch, etc.
 
-        self.play_data.add_participant(punter.uid, PlayParticipantType.PUNTER)
-        self.play_data.add_participant(returner.uid, PlayParticipantType.RETURNER)
+        self.play_data.add_participant(punter, PlayParticipantType.PUNTER)
+        self.play_data.add_participant(returner, PlayParticipantType.RETURNER)
         self.play_data.set_yards_gained(punt_distance - return_distance)
         self.play_data.set_is_possession_change(True)
 

@@ -197,10 +197,12 @@ class PlayExecutionData:
         logger.debug(f"Set def_personnel_assignments to {def_personnel_assignments}")
 
     def add_participant(
-        self, player_id: str, participant_type: PlayParticipantType
+        self, player: Athlete, participant_type: PlayParticipantType
     ) -> None:
-        self._participants[player_id] = participant_type
-        logger.debug(f"Added participant {player_id} as {participant_type}")
+        self._participants[player.uid] = participant_type
+        logger.debug(
+            f"Added participant {player.first_name[0]}. {player.last_name} ({player.uid}) as {participant_type}"
+        )
 
     def set_air_yards(self, air_yards: int) -> None:
         self._air_yards = air_yards

@@ -78,7 +78,7 @@ class KickoffPlayEngine:
                 # After field flip, receiving team will be at touchback_spot
                 net_yards = distance_to_goal - touchback_spot
 
-                self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
+                self.play_data.add_participant(kicker, PlayParticipantType.KICKER)
                 self.play_data.set_yards_gained(net_yards)
                 self.play_data.set_is_possession_change(True)
                 self.play_data.set_is_turnover(False)
@@ -112,8 +112,8 @@ class KickoffPlayEngine:
         final_spot_from_kicking_goal = 100 - final_spot_from_receiving_goal
         net_yards = final_spot_from_kicking_goal - kickoff_spot
 
-        self.play_data.add_participant(kicker.uid, PlayParticipantType.KICKER)
-        self.play_data.add_participant(returner.uid, PlayParticipantType.RETURNER)
+        self.play_data.add_participant(kicker, PlayParticipantType.KICKER)
+        self.play_data.add_participant(returner, PlayParticipantType.RETURNER)
         self.play_data.set_yards_gained(net_yards)
         self.play_data.set_is_possession_change(True)
         self.play_data.set_is_turnover(False)
