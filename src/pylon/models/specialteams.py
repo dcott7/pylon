@@ -5,7 +5,7 @@ from typing import Dict, List
 from .model import TypedModel, ModelContext
 from ..state.game_state import GameState
 from ..domain.athlete import Athlete, AthletePositionEnum
-from ..engine.rng import RNG
+from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

@@ -4,7 +4,7 @@ from typing import Generic, TypeVar, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..state.game_state import GameState
-    from ..engine.rng import RNG
+    from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

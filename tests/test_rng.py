@@ -1,6 +1,6 @@
 """Unit tests for deterministic RNG behavior."""
 
-from pylon.engine.rng import RNG
+from sim.rng import RNG
 
 
 class TestRNG:

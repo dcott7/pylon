@@ -7,7 +7,7 @@ from ..state.game_state import GameState, GameStateUpdater
 from ..state.drive_record import DriveRecord
 from ..domain.rules.base import LeagueRules
 from ..models.registry import ModelRegistry
-from .rng import RNG
+from ...sim.rng import RNG
 from .play_engine import PlayEngine
 
 

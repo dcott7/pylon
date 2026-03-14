@@ -7,7 +7,7 @@ from ..models.registry import ModelRegistry
 from ..state.play_record import PlayParticipantType, PlayExecutionData
 from ..domain.athlete import Athlete
 from ..domain.rules.base import LeagueRules
-from .rng import RNG
+from ...sim.rng import RNG
 from ..models.personnel import (
     PlaceKickerSelectionModel,
     PlaceKickerSelectionContext,

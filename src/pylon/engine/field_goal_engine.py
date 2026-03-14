@@ -7,7 +7,7 @@ from ..models.registry import ModelRegistry
 from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.playbook import PlayTypeEnum
-from .rng import RNG
+from ...sim.rng import RNG
 from ..models.personnel import (
     KickerSelectionContext,
     KickerSelectionModel,

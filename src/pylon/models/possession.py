@@ -8,7 +8,7 @@ from .model import TypedModel, ModelContext
 from ..state.game_state import GameState
 from ..domain.athlete import Athlete, AthletePositionEnum
 from ..domain.team import Team
-from ..engine.rng import RNG
+from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

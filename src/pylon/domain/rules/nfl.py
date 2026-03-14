@@ -17,7 +17,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from ...models.registry import ModelRegistry
-from ...engine.rng import RNG
+from ....sim.rng import RNG
 from ...models.misc import (
     CoinTossWinnerModel,
     CoinTossContext,

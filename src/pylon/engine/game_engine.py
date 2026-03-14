@@ -4,7 +4,7 @@ from typing import Any, List
 from .drive_engine import DriveEngine
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry, TypedModel
-from .rng import RNG
+from ...sim.rng import RNG
 from ..domain.rules.base import LeagueRules
 from ..domain.rules.nfl import NFLRules
 from ..domain.team import Team

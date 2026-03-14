@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from ..domain.team import Team
 from ..domain.rules.base import LeagueRules
-from .rng import RNG
+from ...sim.rng import RNG
 from .run_engine import RunPlayEngine
 from .pass_engine import PassPlayEngine
 from .punt_engine import PuntPlayEngine

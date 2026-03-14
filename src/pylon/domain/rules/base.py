@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING, Dict
 
 from ...domain.team import Team
 from ...models.registry import ModelRegistry
-from ...engine.rng import RNG
+from ....sim.rng import RNG
 
 if TYPE_CHECKING:
     from ...state.game_state import GameState

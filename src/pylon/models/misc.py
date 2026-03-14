@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from .model import TypedModel, ModelContext
 from ..domain.team import Team
-from ..engine.rng import RNG
+from ...sim.rng import RNG
 
 if TYPE_CHECKING:
     from ..state.game_state import GameState

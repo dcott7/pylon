@@ -6,7 +6,7 @@ from .model import TypedModel, ModelContext, ModelExecutionError
 from ..state.game_state import GameState
 from ..domain.playbook import PlayCall, PlayTypeEnum
 from ..domain.athlete import Athlete, AthletePositionEnum
-from ..engine.rng import RNG
+from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

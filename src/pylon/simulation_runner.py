@@ -17,7 +17,7 @@ from .domain.team import Team
 from .domain.rules.base import LeagueRules
 from .domain.rules.nfl import NFLRules
 from .models.registry import TypedModel
-from .engine.rng import RNG
+from ..sim.rng import RNG
 from .db.database import DatabaseManager
 from .state.game_state import GameState
 from .output import (

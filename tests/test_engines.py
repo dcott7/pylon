@@ -24,7 +24,7 @@ from pylon.models.offense import (
 )
 from pylon.models.defense import DefensivePlayCallModel, DefPlayCallContext
 from pylon.domain.rules.nfl import NFLRules
-from pylon.engine.rng import RNG
+from sim.rng import RNG
 from pylon.state.play_record import PlayExecutionData
 
 

@@ -8,7 +8,7 @@ from ..state.play_record import PlayExecutionData, PlayParticipantType
 from ..domain.athlete import Athlete
 from ..domain.team import Team
 from ..domain.playbook import PlayTypeEnum
-from .rng import RNG
+from ...sim.rng import RNG
 from ..models.personnel import (
     PasserSelectionContext,
     TargettedSelectionContext,
