@@ -11,12 +11,12 @@ import logging
 import time
 from typing import Callable, Generic, List, Sequence, TypeVar
 
-from .base import Simulation
 from .exceptions import (
     OutputSinkError,
     SimulationConfigurationError,
     SimulationExecutionError,
 )
+from .factory import SimulationFactory
 from .observer import SimulationObserver
 from .output import OutputSink, SimulationOutput
 from .rng import RNG
@@ -44,7 +44,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
     def __init__(
         self,
         config: SimulationRunnerConfig,
-        simulation_factory: Callable[[int, RNG], Simulation[TResult]],
+        simulation_factory: SimulationFactory[TResult],
         aggregate_fn: Callable[[List[TResult]], TAggregate],
         sinks: Sequence[OutputSink[SimulationOutput[TResult, TAggregate]]]
         | None = None,

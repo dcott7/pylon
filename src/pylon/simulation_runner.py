@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from sim.base import Simulation
+from sim.factory import SimulationFactory
 from sim.observer import SimulationObserver
 from sim.runner import SimulationRunner
 from sim.runner import SimulationRunnerConfig
@@ -228,6 +229,9 @@ class PylonSimulationRunner:
             log_dir=self.log_dir,
             log_level=self.log_level,
         )
+        simulation_factory: SimulationFactory[PylonSimulationResult] = (
+            self._simulation_factory
+        )
 
         # Use the generic SimulationRunner to execute all replications with the
         # provided simulation factory and aggregate function.
@@ -237,7 +241,7 @@ class PylonSimulationRunner:
                 base_seed=self.base_seed,
                 schema_version=OUTPUT_SCHEMA_VERSION,
             ),
-            simulation_factory=self._simulation_factory,
+            simulation_factory=simulation_factory,
             aggregate_fn=self._aggregate_from_simulation_runs,
             observers=[rep_logger_observer],
         )
