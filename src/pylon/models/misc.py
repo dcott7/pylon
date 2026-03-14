@@ -4,9 +4,9 @@ from enum import Enum
 import logging
 from typing import TYPE_CHECKING
 
+from sim.rng import RNG
 from .model import TypedModel, ModelContext
 from ..domain.team import Team
-from ...sim.rng import RNG
 
 if TYPE_CHECKING:
     from ..state.game_state import GameState

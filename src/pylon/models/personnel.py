@@ -2,12 +2,12 @@ from abc import abstractmethod
 from typing import Dict, List
 import logging
 
+from sim.rng import RNG
 from .model import TypedModel, ModelExecutionError, ModelContext
 from ..state.game_state import GameState
 from ..domain.playbook import PlayCall, PlayTypeEnum
 from ..domain.athlete import Athlete, AthletePositionEnum, POSITION_TREE
 from ..domain.team import Team
-from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

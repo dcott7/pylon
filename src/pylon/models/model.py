@@ -3,8 +3,8 @@ import logging
 from typing import Generic, TypeVar, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from sim.rng import RNG
     from ..state.game_state import GameState
-    from ...sim.rng import RNG
 
 
 logger = logging.getLogger(__name__)

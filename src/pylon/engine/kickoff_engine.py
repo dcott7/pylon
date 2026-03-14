@@ -2,12 +2,12 @@
 
 import logging
 
+from sim.rng import RNG
 from ..state.game_state import GameState
 from ..models.registry import ModelRegistry
 from ..state.play_record import PlayParticipantType, PlayExecutionData
 from ..domain.athlete import Athlete
 from ..domain.rules.base import LeagueRules
-from ...sim.rng import RNG
 from ..models.personnel import (
     PlaceKickerSelectionModel,
     PlaceKickerSelectionContext,

@@ -24,9 +24,9 @@ from abc import ABC, abstractmethod
 import logging
 from typing import TYPE_CHECKING, Dict
 
+from sim.rng import RNG
 from ...domain.team import Team
 from ...models.registry import ModelRegistry
-from ....sim.rng import RNG
 
 if TYPE_CHECKING:
     from ...state.game_state import GameState

@@ -3,9 +3,9 @@
 import logging
 from typing import Dict, List
 
+from sim.rng import RNG
 from ..domain.team import Team
 from ..domain.rules.base import LeagueRules
-from ...sim.rng import RNG
 from .run_engine import RunPlayEngine
 from .pass_engine import PassPlayEngine
 from .punt_engine import PuntPlayEngine

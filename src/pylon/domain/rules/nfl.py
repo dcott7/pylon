@@ -16,8 +16,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from sim.rng import RNG
 from ...models.registry import ModelRegistry
-from ....sim.rng import RNG
 from ...models.misc import (
     CoinTossWinnerModel,
     CoinTossContext,
