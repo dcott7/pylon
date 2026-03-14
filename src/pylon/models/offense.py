@@ -77,7 +77,7 @@ class RushYardsGainedContext(ModelContext):
         self,
         game_state: GameState,
         rng: RNG,
-        play_call: PlayCall,
+        play_call: PlayCall | None,
         rusher: Athlete,
     ) -> None:
         super().__init__(game_state, rng)
