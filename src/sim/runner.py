@@ -43,7 +43,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
     def __init__(
         self,
         config: SimulationRunnerConfig,
-        simulation_factory: Callable[[RNG], Simulation[TResult]],
+        simulation_factory: Callable[[int, RNG], Simulation[TResult]],
         aggregate_fn: Callable[[List[TResult]], TAggregate],
         sinks: Sequence[OutputSink[SimulationOutput[TResult, TAggregate]]]
         | None = None,
@@ -108,7 +108,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
 
         try:
             rng = RNG(seed)
-            simulation = self.simulation_factory(rng)
+            simulation = self.simulation_factory(rep_number, rng)
             result = simulation.run()
         except Exception as exc:
             logger.exception("Replication %s failed with seed=%s", rep_number, seed)

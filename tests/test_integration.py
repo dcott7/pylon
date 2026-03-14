@@ -14,7 +14,7 @@ from pylon.domain.playbook import (
     PersonnelPackage,
 )
 from pylon.domain.rules.nfl import NFLRules
-from pylon.simulation_runner import SimulationRunner
+from pylon.simulation_runner import PylonSimulationRunner
 from pylon.db.database import DatabaseManager
 from pylon.db.schema import Game as OrmGame, Drive as OrmDrive, Play as OrmPlay
 from pylon.output import OutputMode, SimulationOutputPayload
@@ -195,8 +195,8 @@ def test_db(tmp_path: Path) -> Generator[DatabaseManager]:
     db.close()
 
 
-class TestSimulationRunner:
-    """Tests for SimulationRunner."""
+class TestPylonSimulationRunner:
+    """Tests for PylonSimulationRunner."""
 
     def test_run_single_game_no_db(self, tmp_path: Path) -> None:
         """Test running a single game without database."""
@@ -204,7 +204,7 @@ class TestSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "single_game_results.json"
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -218,7 +218,7 @@ class TestSimulationRunner:
 
         results = runner.run()
 
-        assert results["num_reps"] == 1
+        assert results["experiment"]["num_reps"] == 1
         assert len(results["results"]["games"]) == 1
         assert results["results"]["games"][0]["home_score"] >= 0
         assert results["results"]["games"][0]["away_score"] >= 0
@@ -237,7 +237,7 @@ class TestSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "multi_game_results.json"
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=3,
@@ -251,7 +251,7 @@ class TestSimulationRunner:
 
         results = runner.run()
 
-        assert results["num_reps"] == 3
+        assert results["experiment"]["num_reps"] == 3
         assert len(results["results"]["games"]) == 3
         # Each game should have different seed
         seeds = [game["seed"] for game in results["results"]["games"]]
@@ -263,7 +263,7 @@ class TestSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -292,7 +292,7 @@ class TestSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=3,
@@ -321,7 +321,7 @@ class TestSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -359,7 +359,7 @@ class TestSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=5,
@@ -391,7 +391,7 @@ class TestSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -412,7 +412,7 @@ class TestSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "both_mode_results.json"
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -424,12 +424,12 @@ class TestSimulationRunner:
         )
 
         results = runner.run()
-        assert results["num_reps"] == 1
+        assert results["experiment"]["num_reps"] == 1
         assert output_path.exists()
 
         with output_path.open("r", encoding="utf-8") as file_handle:
             saved = json.load(file_handle)
-        assert saved["num_reps"] == 1
+        assert saved["experiment"]["num_reps"] == 1
         assert "experiment" in saved
         assert "teams" in saved
         assert "results" in saved
@@ -450,7 +450,7 @@ class TestEndToEndWorkflow:
         home = create_test_team("chiefs", "Kansas City Chiefs")
         away = create_test_team("49ers", "San Francisco 49ers")
 
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=2,
@@ -468,10 +468,9 @@ class TestEndToEndWorkflow:
         results = runner.run()
 
         # Verify results structure
-        assert "experiment_id" in results
-        assert "experiment_name" in results
-        assert results["experiment_name"] == "Chiefs vs 49ers Test"
-        assert results["num_reps"] == 2
+        assert "experiment" in results
+        assert results["experiment"]["name"] == "Chiefs vs 49ers Test"
+        assert results["experiment"]["num_reps"] == 2
         assert len(results["results"]["games"]) == 2
         assert len(results["results"]["game_details"]) == 2
 
@@ -499,7 +498,7 @@ class TestEndToEndWorkflow:
         away = create_test_team("away", "Away Team")
 
         # Run first simulation
-        runner1 = SimulationRunner(
+        runner1 = PylonSimulationRunner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -516,7 +515,7 @@ class TestEndToEndWorkflow:
         home2 = create_test_team("home", "Home Team")
         away2 = create_test_team("away", "Away Team")
 
-        runner2 = SimulationRunner(
+        runner2 = PylonSimulationRunner(
             home_team=home2,
             away_team=away2,
             num_reps=1,

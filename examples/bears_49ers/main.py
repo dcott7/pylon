@@ -5,7 +5,7 @@ from typing import Dict
 
 from pylon.domain.team import Team
 from pylon.domain.rules.nfl import NFLRules
-from pylon.engine import SimulationRunner
+from pylon.engine import PylonSimulationRunner
 from pylon.db import DatabaseManager
 from pylon.output import OutputMode
 
@@ -74,7 +74,7 @@ def main() -> None:
 
     # Run multi-rep simulation with per-rep logs under ./log
     logger.info(f"\n--- Running multi-rep simulation ({NUM_REPS} reps) ---")
-    runner = SimulationRunner(
+    runner = PylonSimulationRunner(
         home_team=home,
         away_team=away,
         num_reps=NUM_REPS,

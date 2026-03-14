@@ -7,19 +7,21 @@ and model comparison experiments.
 """
 
 import logging
-import time
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List
 
+from sim.base import Simulation as Simulation
+from sim.runner import SimulationRunner as SimulationRunner
+from sim.runner import SimulationRunnerConfig as SimulationRunnerConfig
 from sim.rng import RNG
-from .engine.game_engine import GameEngine
 from .domain.team import Team
 from .domain.rules.base import LeagueRules
 from .domain.rules.nfl import NFLRules
 from .models.registry import TypedModel
 from .db.database import DatabaseManager
 from .state.game_state import GameState
+from .simulation import PylonSimulation, PylonSimulationResult
 from .output import (
     DBOutputWriter,
     ExperimentOutputPayload,
@@ -36,10 +38,48 @@ from .output import (
 from .output.serializers import serialize_game_state
 from .output.types import GameStateOutputPayload, SimulationResultsPayload
 
+
 logger = logging.getLogger(__name__)
 
 
-class SimulationRunner:
+class _ReplicationLoggedSimulation(Simulation[PylonSimulationResult]):
+    """Wrap a one-game simulation with per-rep file logging."""
+
+    def __init__(
+        self,
+        simulation: PylonSimulation,
+        rep_number: int,
+        log_dir: Path,
+        log_level: int,
+    ) -> None:
+        self._simulation = simulation
+        self._rep_number = rep_number
+        self._log_dir = log_dir
+        self._log_level = log_level
+        self.rng = simulation.rng
+
+    def run(self) -> PylonSimulationResult:
+        rep_log_path = self._log_dir / f"pylon.{self._rep_number}.log"
+        rep_handler = logging.FileHandler(rep_log_path, mode="w")
+        rep_handler.setLevel(self._log_level)
+        rep_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
+
+        root_logger = logging.getLogger()
+        previous_level = root_logger.level
+        root_logger.addHandler(rep_handler)
+        root_logger.setLevel(min(previous_level, self._log_level))
+
+        try:
+            return self._simulation.run()
+        finally:
+            root_logger.removeHandler(rep_handler)
+            rep_handler.close()
+            root_logger.setLevel(previous_level)
+
+
+class PylonSimulationRunner:
     """
     Orchestrates multiple game simulation replications for statistical analysis.
 
@@ -50,7 +90,7 @@ class SimulationRunner:
     - Collecting aggregate statistics across reps
 
     Usage:
-        runner = SimulationRunner(
+        runner = PylonSimulationRunner(
             home_team=bears,
             away_team=niners,
             num_reps=100,
@@ -146,7 +186,6 @@ class SimulationRunner:
         logger.info(
             f"Starting experiment: {self.experiment_name} ({self.num_reps} reps, base_seed={self.base_seed})"
         )
-        start_time = time.time()
 
         # Ensure output configuration is valid based on the OutputMode
         validate_output_config(
@@ -162,22 +201,31 @@ class SimulationRunner:
         # Ensure log directory exists for per-rep logs
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
-        # Run all replications
-        for rep_number in range(1, self.num_reps + 1):
-            seed = self.base_seed + rep_number
-            logger.info(f"Running rep {rep_number}/{self.num_reps} (seed={seed})...")
+        # Reset per-run mutable state in case the runner instance is reused.
+        self.game_results = []
+        self.game_details = []
+        self._pending_db_games = []
 
-            game_result = self._run_single_game(rep_number, seed)
-            self.game_results.append(game_result)
+        # Use the generic SimulationRunner to execute all replications with the
+        # provided simulation factory and aggregate function.
+        base_runner = SimulationRunner[PylonSimulationResult, Dict[str, Any]](
+            config=SimulationRunnerConfig(
+                num_reps=self.num_reps,
+                base_seed=self.base_seed,
+                schema_version=OUTPUT_SCHEMA_VERSION,
+            ),
+            simulation_factory=self._simulation_factory,
+            aggregate_fn=self._aggregate_from_simulation_runs,
+        )
+        base_output = base_runner.run()
 
-        elapsed_time = time.time() - start_time
+        elapsed_time = base_output.elapsed_time
         logger.info(
             f"Experiment complete: {self.num_reps} reps in {elapsed_time:.2f}s "
             f"({elapsed_time / self.num_reps:.2f}s per game)"
         )
 
-        # Compute aggregate statistics
-        aggregate_stats = self._compute_aggregate_stats()
+        aggregate_stats = base_output.aggregate
 
         results = self._build_output_payload(
             elapsed_time=elapsed_time,
@@ -194,36 +242,12 @@ class SimulationRunner:
 
         return results
 
-    def _run_single_game(self, rep_number: int, seed: int) -> Dict[str, Any]:
-        """
-        Execute a single game replication.
-
-        Args:
-            rep_number: Replication number (1-based).
-            seed: Random seed for this rep.
-
-        Returns:
-            Dictionary with game result metadata.
-        """
-        # Attach per-rep log file to capture all module logs for this game
-        rep_log_path = self.log_dir / f"pylon.{rep_number}.log"
-        rep_handler = logging.FileHandler(rep_log_path, mode="w")
-        rep_handler.setLevel(self.log_level)
-        rep_handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        )
-        # Attach to root logger to capture logs from all modules during this rep
-        root_logger = logging.getLogger()
-        previous_level = root_logger.level
-        root_logger.addHandler(rep_handler)
-        root_logger.setLevel(min(previous_level, self.log_level))
-
-        # Initialize RNG for this game
-        rng = RNG(seed)
-        game_start = time.time()
-
-        # Determine the game ID. For DB output we reserve sequential IDs in-memory
-        # and persist after the full canonical payload has been built.
+    def _simulation_factory(
+        self,
+        rep_number: int,
+        rng: RNG,
+    ) -> Simulation[PylonSimulationResult]:
+        """Create one per-rep pylon simulation for the generic sim runner."""
         if wants_db_output(self.output_mode):
             assert self._next_db_game_id is not None
             game_id = str(self._next_db_game_id)
@@ -231,70 +255,66 @@ class SimulationRunner:
         else:
             game_id = str(rep_number)
 
-        # Create and run game engine
-        engine = GameEngine(
+        logger.info(f"Running rep {rep_number}/{self.num_reps} (seed={rng.seed})...")
+        simulation = PylonSimulation(
             home_team=self.home_team,
             away_team=self.away_team,
             game_id=game_id,
-            user_models=self.user_models,
             rng=rng,
+            user_models=self.user_models,
             rules=self.rules,
             max_drives=self.max_drives,
         )
-        engine.run()
+        return _ReplicationLoggedSimulation(
+            simulation=simulation,
+            rep_number=rep_number,
+            log_dir=self.log_dir,
+            log_level=self.log_level,
+        )
 
-        game_duration = time.time() - game_start
+    def _aggregate_from_simulation_runs(
+        self,
+        run_results: List[PylonSimulationResult],
+    ) -> Dict[str, Any]:
+        """Build pylon-specific game outputs and aggregate stats from sim runs."""
+        self.game_results = []
+        self.game_details = []
+        self._pending_db_games = []
 
-        # Extract winner from the end game state
-        end_game_state = engine.game_state
-        end_home_score = end_game_state.scoreboard.current_score(self.home_team)
-        end_away_score = end_game_state.scoreboard.current_score(self.away_team)
-        winner_id: str | None = None
-        if end_home_score > end_away_score:
-            winner_id = self.home_team.uid
-        elif end_away_score > end_home_score:
-            winner_id = self.away_team.uid
-
-        # Determine game status
-        status = "failed" if engine.max_drives_reached else "completed"
-
-        # Build game result metadata for this replication
-        game_result: Dict[str, Any] = {
-            "rep_number": rep_number,
-            "seed": seed,
-            "home_score": end_home_score,
-            "away_score": end_away_score,
-            "winner_id": winner_id,
-            "final_quarter": end_game_state.clock.current_quarter,
-            "duration_seconds": game_duration,
-            "status": status,
-            "total_plays": end_game_state.total_plays(),
-            "total_drives": end_game_state.total_drives(),
-        }
-
-        # Queue DB persistence and write after canonical payload is built.
-        if wants_db_output(self.output_mode):
-            self._pending_db_games.append((game_id, game_result, end_game_state))
-
-        self.game_details.append(
-            serialize_game_state(
-                game_state=end_game_state,
-                rep_number=rep_number,
-                seed=seed,
+        for rep_number, run_result in enumerate(run_results, start=1):
+            game_result: Dict[str, Any] = {
+                "rep_number": rep_number,
+                "seed": run_result.seed,
+                "home_score": run_result.home_score,
+                "away_score": run_result.away_score,
+                "winner_id": run_result.winner_id,
+                "final_quarter": run_result.final_quarter,
+                "duration_seconds": run_result.duration_seconds,
+                "status": run_result.status,
+                "total_plays": run_result.total_plays,
+                "total_drives": run_result.total_drives,
+            }
+            self.game_results.append(game_result)
+            self.game_details.append(
+                serialize_game_state(
+                    game_state=run_result.game_state,
+                    rep_number=rep_number,
+                    seed=run_result.seed,
+                )
             )
-        )
 
-        logger.info(
-            f"Rep {rep_number} complete [{status}]: {end_home_score}-{end_away_score} "
-            f"(Q{end_game_state.clock.current_quarter}, {game_duration:.2f}s)"
-        )
+            if wants_db_output(self.output_mode):
+                self._pending_db_games.append(
+                    (run_result.game_id, game_result, run_result.game_state)
+                )
 
-        # Detach per-rep handler
-        root_logger.removeHandler(rep_handler)
-        rep_handler.close()
-        root_logger.setLevel(previous_level)
+            logger.info(
+                f"Rep {rep_number} complete [{run_result.status}]: "
+                f"{run_result.home_score}-{run_result.away_score} "
+                f"(Q{run_result.final_quarter}, {run_result.duration_seconds:.2f}s)"
+            )
 
-        return game_result
+        return self._compute_aggregate_stats()
 
     def _get_next_game_id(self) -> str:
         """
