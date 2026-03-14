@@ -26,7 +26,7 @@ Design notes:
 
 import logging
 import uuid
-from typing import List, Optional
+from typing import List
 
 from .athlete import Athlete, AthletePositionEnum
 from .playbook import (
@@ -51,10 +51,10 @@ class Team:
     def __init__(
         self,
         name: str,
-        off_playbook: Optional[Playbook] = None,
-        def_playbook: Optional[Playbook] = None,
-        roster: Optional[List[Athlete]] = None,
-        uid: Optional[str] = None,
+        off_playbook: Playbook | None = None,
+        def_playbook: Playbook | None = None,
+        roster: List[Athlete] | None = None,
+        uid: str | None = None,
     ) -> None:
         # Keep uid stable across reloads (use provided UID when available)
         self._uid = uid or str(uuid.uuid4())
@@ -95,11 +95,11 @@ class Team:
         return self._roster
 
     @property
-    def off_playbook(self) -> Optional[Playbook]:
+    def off_playbook(self) -> Playbook | None:
         return self._off_playbook
 
     @property
-    def def_playbook(self) -> Optional[Playbook]:
+    def def_playbook(self) -> Playbook | None:
         return self._def_playbook
 
     @property
@@ -112,7 +112,7 @@ class Team:
     def has_defensive_playbook(self) -> bool:
         return self._def_playbook is not None
 
-    def get_athlete_by_uid(self, athlete_uid: str) -> Optional[Athlete]:
+    def get_athlete_by_uid(self, athlete_uid: str) -> Athlete | None:
         for athlete in self._roster:
             if athlete.uid == athlete_uid:
                 return athlete
@@ -128,4 +128,3 @@ class Team:
                 f"No athletes found at position {position} in team {self.name}"
             )
         return athletes_at_position
-

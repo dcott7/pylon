@@ -1,7 +1,6 @@
 """Drive-level simulation loop: executes plays until drive ends per league rules."""
 
 import logging
-from typing import Optional
 
 from ..state.play_record import PlayRecord
 from ..state.game_state import GameState, GameStateUpdater
@@ -39,7 +38,7 @@ class DriveEngine:
         self.play_engine = PlayEngine(game_state, models, rng, self.rules)
 
     def run(self) -> DriveRecord:
-        last_play: Optional[PlayRecord] = None
+        last_play: PlayRecord | None = None
         play_count = 0
         max_plays = 50  # Safety limit to prevent infinite loops during testing
 

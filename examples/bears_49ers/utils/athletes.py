@@ -1,6 +1,6 @@
 import sqlite3
 import logging
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 
 from pylon.domain.athlete import Athlete, AthletePositionEnum
 
@@ -8,7 +8,9 @@ from pylon.domain.athlete import Athlete, AthletePositionEnum
 logger = logging.getLogger(__name__)
 
 
-def get_roster_athlete_ids(conn: sqlite3.Connection, team_id: int, season: int):
+def get_roster_athlete_ids(
+    conn: sqlite3.Connection, team_id: int, season: int
+) -> List[int]:
     cur = conn.cursor()
     cur.execute(
         """
@@ -32,7 +34,7 @@ def get_athletes(conn: sqlite3.Connection, athlete_ids: list[int]):
     return cur.fetchall()
 
 
-def cast_pos(pos_abbv: str) -> Optional[AthletePositionEnum]:
+def cast_pos(pos_abbv: str) -> AthletePositionEnum | None:
     mapping = {
         "QB": AthletePositionEnum.QB,
         "RB": AthletePositionEnum.RB,
@@ -91,8 +93,8 @@ def load_team_athletes(
 
 
 def get_madden_rating(
-    conn: sqlite3.Connection, espn_id: int, iteration_id: Optional[str] = None
-) -> Optional[Dict[str, Any]]:
+    conn: sqlite3.Connection, espn_id: int, iteration_id: str | None = None
+) -> Dict[str, Any] | None:
     """
     Fetch Madden rating for an athlete by ESPN ID.
 
@@ -142,7 +144,7 @@ def get_madden_rating(
 
 
 def get_team_madden_ratings(
-    conn: sqlite3.Connection, team_id: int, iteration_id: Optional[str] = None
+    conn: sqlite3.Connection, team_id: int, iteration_id: str | None = None
 ) -> Dict[int, Dict[str, Any]]:
     """
     Fetch Madden ratings for all athletes on a team.
@@ -206,7 +208,7 @@ def load_team_athletes_with_madden(
     conn: sqlite3.Connection,
     team_id: int,
     season: int = 2025,
-    iteration_id: Optional[str] = None,
+    iteration_id: str | None = None,
 ) -> List[Athlete]:
     """
     Load team athletes and enrich with Madden ratings.

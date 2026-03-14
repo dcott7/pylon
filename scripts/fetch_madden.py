@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import requests
 import sqlite3
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 import logging
 import os
 
@@ -176,7 +176,7 @@ def ea_to_espn_corrections(
     return corrections.get((norm_first, norm_last, dob), (norm_first, norm_last, dob))
 
 
-def normalize_madden_birthdate(raw: Optional[str]) -> Optional[str]:
+def normalize_madden_birthdate(raw: str | None) -> str | None:
     """
     Converts Madden birthdate like '8/29/02' to '2002-08-29'
     """

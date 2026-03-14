@@ -1,4 +1,4 @@
-from typing import Counter, Dict, List, Optional, Tuple
+from typing import Counter, Dict, List, Tuple
 import logging
 import sqlite3
 
@@ -15,7 +15,7 @@ from pylon.domain.athlete import AthletePositionEnum, PositionTree, POSITION_TRE
 logger = logging.getLogger(__name__)
 
 
-def expand_group(tree: PositionTree, count: Optional[int]) -> List[AthletePositionEnum]:
+def expand_group(tree: PositionTree, count: int | None) -> List[AthletePositionEnum]:
     leaves = tree.all_positions()
     result: List[AthletePositionEnum] = []
 

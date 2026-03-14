@@ -10,7 +10,7 @@ import logging
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from .engine.game_engine import GameEngine
 from .domain.team import Team
@@ -67,15 +67,15 @@ class SimulationRunner:
         away_team: Team,
         num_reps: int,
         base_seed: int = 42,
-        user_models: Optional[List[TypedModel[Any, Any]]] = None,
+        user_models: List[TypedModel[Any, Any]] | None = None,
         rules: LeagueRules = NFLRules(),  # type: ignore
-        max_drives: Optional[int] = None,
-        db_manager: Optional[DatabaseManager] = None,
+        max_drives: int | None = None,
+        db_manager: DatabaseManager | None = None,
         output_mode: OutputMode = OutputMode.JSON,
-        json_output_path: Optional[Path | str] = None,
-        experiment_name: Optional[str] = None,
-        experiment_description: Optional[str] = None,
-        log_dir: Optional[Path | str] = None,
+        json_output_path: Path | str | None = None,
+        experiment_name: str | None = None,
+        experiment_description: str | None = None,
+        log_dir: Path | str | None = None,
         log_level: int = logging.INFO,
     ) -> None:
         """
@@ -130,7 +130,7 @@ class SimulationRunner:
         self.game_results: List[Dict[str, Any]] = []
         self.game_details: List[GameStateOutputPayload] = []
         self._pending_db_games: List[tuple[str, Dict[str, Any], GameState]] = []
-        self._next_db_game_id: Optional[int] = None
+        self._next_db_game_id: int | None = None
 
     def run(self) -> SimulationOutputPayload:
         """
@@ -249,7 +249,7 @@ class SimulationRunner:
         end_game_state = engine.game_state
         end_home_score = end_game_state.scoreboard.current_score(self.home_team)
         end_away_score = end_game_state.scoreboard.current_score(self.away_team)
-        winner_id: Optional[str] = None
+        winner_id: str | None = None
         if end_home_score > end_away_score:
             winner_id = self.home_team.uid
         elif end_away_score > end_home_score:

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from .model import TypedModel, ModelContext, ModelExecutionError
 from ..state.game_state import GameState
@@ -22,7 +22,7 @@ class DefPlayCallContext(ModelContext):
         self,
         game_state: GameState,
         rng: RNG,
-        offensive_play_type: Optional[PlayTypeEnum] = None,
+        offensive_play_type: PlayTypeEnum | None = None,
     ) -> None:
         super().__init__(game_state, rng)
         self.offensive_play_type = offensive_play_type

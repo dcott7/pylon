@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from .model import TypedModel, ModelContext, ModelExecutionError
 from ..state.game_state import GameState
@@ -77,7 +77,7 @@ class RushYardsGainedContext(ModelContext):
         self,
         game_state: GameState,
         rng: RNG,
-        play_call: Optional[PlayCall],
+        play_call: PlayCall,
         rusher: Athlete,
     ) -> None:
         super().__init__(game_state, rng)

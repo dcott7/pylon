@@ -28,7 +28,7 @@ Key design:
 from __future__ import annotations
 from enum import Enum
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 import uuid
 
 
@@ -103,9 +103,9 @@ class PositionTree:
 
     def __init__(
         self,
-        position: Optional[AthletePositionEnum],
-        children: Optional[Dict[AthletePositionEnum, "PositionTree"]] = None,
-        parent: Optional["PositionTree"] = None,
+        position: AthletePositionEnum | None,
+        children: Dict[AthletePositionEnum, "PositionTree"] | None = None,
+        parent: PositionTree | None = None,
     ):
         self.position = position
         self.children = children or {}
@@ -121,7 +121,7 @@ class PositionTree:
         """Check if the current node is a leaf node (has no children)."""
         return len(self.children) == 0
 
-    def find_node(self, pos: AthletePositionEnum) -> Optional["PositionTree"]:
+    def find_node(self, pos: AthletePositionEnum) -> PositionTree | None:
         """Find and return the node corresponding to the given position."""
         if self.position == pos:
             return self
@@ -171,7 +171,7 @@ class Athlete:
         first_name: str,
         last_name: str,
         position: AthletePositionEnum,
-        uid: Optional[str] = None,
+        uid: str | None = None,
     ) -> None:
         self._uid = uid or str(uuid.uuid4())
         self._first_name = first_name

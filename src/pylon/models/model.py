@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Generic, TypeVar, Optional, Type, TYPE_CHECKING
+from typing import Generic, TypeVar, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..state.game_state import GameState
@@ -44,8 +44,8 @@ class TypedModel(ABC, Generic[C, R]):
 
     def __init__(
         self,
-        name: Optional[str] = None,
-        return_type: Optional[Type[R]] = None,
+        name: str | None = None,
+        return_type: Type[R] | None = None,
     ) -> None:
         self.name = name or self.__class__.__name__
         self._return_type = return_type

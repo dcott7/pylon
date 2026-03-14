@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, TypeVar
+from typing import Sequence, TypeVar
 import random
 import logging
 import time
@@ -16,7 +16,7 @@ class RNG:
     to generate random numbers with an optional seed for reproducibility.
     """
 
-    def __init__(self, seed: Optional[int] = None) -> None:
+    def __init__(self, seed: int | None = None) -> None:
         if seed is None:
             seed = int(time.time_ns() & 0xFFFFFFFF)
             logger.debug(f"RNG initialized with generated seed={seed}")
@@ -40,7 +40,7 @@ class RNG:
     def randint(self, a: int, b: int) -> int:
         return self._rng.randint(a, b)
 
-    def choice(self, seq: Sequence[T], weights: Optional[Sequence[float]] = None) -> T:
+    def choice(self, seq: Sequence[T], weights: Sequence[float] | None = None) -> T:
         if weights is not None:
             return self._rng.choices(seq, weights=weights, k=1)[0]
         return self._rng.choice(seq)

@@ -5,7 +5,6 @@ so engines can advance the ball and change possession as plays execute.
 """
 
 import logging
-from typing import Optional
 
 from ..domain.team import Team
 
@@ -37,8 +36,8 @@ class PossessionState:
         self,
         pos_team: Team,
         ball_position: int,
-        down: Optional[int],  # None if not applicable
-        distance: Optional[int],  # None if not applicable
+        down: int | None,  # None if not applicable
+        distance: int | None,  # None if not applicable
     ) -> None:
         self._pos_team = pos_team
         self._ball_position = ball_position
@@ -79,11 +78,11 @@ class PossessionState:
         return self._ball_position
 
     @property
-    def down(self) -> Optional[int]:
+    def down(self) -> int | None:
         return self._down
 
     @property
-    def distance(self) -> Optional[int]:
+    def distance(self) -> int | None:
         return self._distance
 
     # ===============================

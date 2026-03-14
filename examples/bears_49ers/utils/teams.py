@@ -1,4 +1,3 @@
-from typing import Optional
 import logging
 import sqlite3
 
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def load_team(
     conn: sqlite3.Connection, team_name: str, include_plays: bool = True
-) -> Optional[Team]:
+) -> Team | None:
     """
     Load a full Team domain object from the database, including:
     - roster (Athlete objects)

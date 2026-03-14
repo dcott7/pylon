@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import Union
 
 from .types import SimulationOutputPayload
 
@@ -10,7 +9,7 @@ from .types import SimulationOutputPayload
 class JsonOutputWriter:
     """Writes simulation results to JSON file output."""
 
-    def __init__(self, output_path: Union[Path, str]) -> None:
+    def __init__(self, output_path: Path | str) -> None:
         self.output_path = Path(output_path)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 

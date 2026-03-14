@@ -6,7 +6,7 @@ and ORM objects (from schema), and provide persistence operations.
 """
 
 import logging
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List
 import uuid
 
 from ..domain.athlete import Athlete as DomainAthlete
@@ -218,7 +218,7 @@ class FormationRepository:
     def to_orm(
         self,
         formation_output: "FormationOutputPayload",
-        parent_id: Optional[str] = None,
+        parent_id: str | None = None,
     ) -> OrmFormation:
         """
         Convert a Formation payload to an ORM Formation.
@@ -240,7 +240,7 @@ class FormationRepository:
     def save(
         self,
         formation_output: "FormationOutputPayload",
-        parent_id: Optional[str] = None,
+        parent_id: str | None = None,
     ) -> OrmFormation:
         """
         Convert and persist a Formation payload.
@@ -372,8 +372,8 @@ class PlayCallRepository:
         self,
         play_output: "PlayCallOutputPayload",
         team_id: str,
-        formation_id: Optional[str] = None,
-        personnel_id: Optional[str] = None,
+        formation_id: str | None = None,
+        personnel_id: str | None = None,
     ) -> OrmPlayCall:
         """
         Convert a domain PlayCall to an ORM PlayCall.
@@ -403,8 +403,8 @@ class PlayCallRepository:
         self,
         play_output: "PlayCallOutputPayload",
         team_id: str,
-        formation_id: Optional[str] = None,
-        personnel_id: Optional[str] = None,
+        formation_id: str | None = None,
+        personnel_id: str | None = None,
     ) -> OrmPlayCall:
         """
         Convert and persist a PlayCall payload.
@@ -429,8 +429,8 @@ class PlayCallRepository:
         self,
         play_output: List["PlayCallOutputPayload"],
         team_id: str,
-        formation_ids: Optional[Dict[str, str]] = None,
-        personnel_ids: Optional[Dict[str, str]] = None,
+        formation_ids: Dict[str, str] | None = None,
+        personnel_ids: Dict[str, str] | None = None,
     ) -> List[OrmPlayCall]:
         """
         Convert and persist multiple domain PlayCalls.
@@ -485,8 +485,8 @@ class ExperimentRepository:
         name: str,
         num_reps: int,
         base_seed: int,
-        description: Optional[str] = None,
-        experiment_id: Optional[str] = None,
+        description: str | None = None,
+        experiment_id: str | None = None,
     ) -> OrmExperiment:
         """
         Create and persist a new experiment.
@@ -538,14 +538,14 @@ class GameRepository:
         away_team_id: str,
         home_score: int,
         away_score: int,
-        winner_id: Optional[str],
+        winner_id: str | None,
         total_plays: int,
         total_drives: int,
         final_quarter: int,
-        experiment_id: Optional[str] = None,
-        rep_number: Optional[int] = None,
-        duration_seconds: Optional[float] = None,
-        game_id: Optional[str] = None,
+        experiment_id: str | None = None,
+        rep_number: int | None = None,
+        duration_seconds: float | None = None,
+        game_id: str | None = None,
         status: str = "completed",
     ) -> OrmGame:
         """

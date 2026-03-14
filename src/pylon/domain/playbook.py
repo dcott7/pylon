@@ -34,9 +34,10 @@ Key design:
 - PlayCall is a play with execution-specific context (down, distance, etc.)
 """
 
+from __future__ import annotations
 from enum import Enum
 import logging
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Set
 import uuid
 
 from .athlete import AthletePositionEnum, POSITION_TREE
@@ -142,10 +143,10 @@ class Formation:
         position_counts: Dict[
             AthletePositionEnum, int
         ],  # e.g. {AthletePositionEnum.QB: 1, AthletePositionEnum.WR: 3}
-        tags: Optional[List[str]] = None,
-        parent: Optional["Formation"] = None,
-        subformations: Optional[Set["Formation"]] = None,
-        uid: Optional[str] = None,
+        tags: List[str] | None = None,
+        parent: Formation | None = None,
+        subformations: Set[Formation] | None = None,
+        uid: str | None = None,
     ) -> None:
         self._uid = uid if uid else str(uuid.uuid4())
         self.name = name
@@ -250,7 +251,7 @@ class PersonnelPackage:
         self,
         name: str,
         counts: Dict[AthletePositionEnum, int],
-        uid: Optional[str] = None,
+        uid: str | None = None,
     ) -> None:
         self._uid = uid if uid else str(uuid.uuid4())
         self.name = name
@@ -285,9 +286,9 @@ class PlayCall:
         formation: Formation,
         personnel_package: PersonnelPackage,
         side: PlaySideEnum,
-        description: Optional[str] = None,
-        tags: Optional[List[str]] = None,
-        uid: Optional[str] = None,
+        description: str | None = None,
+        tags: List[str] | None = None,
+        uid: str | None = None,
     ) -> None:
         self._uid = uid if uid else str(uuid.uuid4())
         self.name = name
@@ -372,8 +373,8 @@ class Playbook:
 
     def __init__(
         self,
-        plays: Optional[List[PlayCall]] = None,
-        uid: Optional[str] = None,
+        plays: List[PlayCall] | None = None,
+        uid: str | None = None,
     ) -> None:
         self._uid = uid if uid else str(uuid.uuid4())
         self._plays = plays or []
@@ -398,7 +399,7 @@ class Playbook:
     def get_by_name(self, name: str) -> List[PlayCall]:
         return [play for play in self._plays if play.name == name]
 
-    def get_by_uid(self, uid: str) -> Optional[PlayCall]:
+    def get_by_uid(self, uid: str) -> PlayCall | None:
         for play in self._plays:
             if play.uid == uid:
                 return play

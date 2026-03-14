@@ -8,7 +8,7 @@ pending kickoffs/extra points, and drive/play records.
 from __future__ import annotations
 from enum import auto, Enum
 import logging
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List
 import uuid
 
 from .game_clock import GameClock
@@ -46,8 +46,8 @@ class GameStatus(Enum):
 
 class PlayOutcome:
     def __init__(self) -> None:
-        self.scoring_type: Optional[ScoringTypeEnum] = None
-        self.scoring_team: Optional[Team] = None
+        self.scoring_type: ScoringTypeEnum | None = None
+        self.scoring_team: Team | None = None
         self.possession_change: bool = False
         self.is_turnover: bool = False
         self.is_terminal: bool = False
@@ -64,9 +64,9 @@ class PlayOutcome:
 
 
 class GameSnapshot:
-    def __init__(self, game_state: Optional["GameState"] = None) -> None:
-        self.pos_team: Optional[Team] = game_state.pos_team if game_state else None
-        self.def_team: Optional[Team] = game_state.def_team if game_state else None
+    def __init__(self, game_state: GameState | None = None) -> None:
+        self.pos_team: Team | None = game_state.pos_team if game_state else None
+        self.def_team: Team | None = game_state.def_team if game_state else None
         self.clock_snapshot: ClockSnapshot = (
             ClockSnapshot(game_state.clock) if game_state else ClockSnapshot(None)
         )
@@ -102,8 +102,8 @@ class GameExecutionData:
     def __init__(self, game_id: str) -> None:
         self.game_id: str = game_id
         self._status: GameStatus = GameStatus.NOT_STARTED
-        self._coin_toss_winner: Optional[Team] = None
-        self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
+        self._coin_toss_winner: Team | None = None
+        self._coin_toss_winner_choice: CoinTossChoice | None = None
         self.drives: List["DriveRecord"] = []
 
     # ==============================
@@ -156,15 +156,15 @@ class GameExecutionData:
         return self._status
 
     @property
-    def coin_toss_winner(self) -> Optional[Team]:
+    def coin_toss_winner(self) -> Team | None:
         return self._coin_toss_winner
 
     @property
-    def coin_toss_winner_choice(self) -> Optional[CoinTossChoice]:
+    def coin_toss_winner_choice(self) -> CoinTossChoice | None:
         return self._coin_toss_winner_choice
 
     @property
-    def last_drive(self) -> Optional["DriveRecord"]:
+    def last_drive(self) -> DriveRecord | None:
         if not self.drives:
             logger.warning("No drives found in game state.")
             return None
@@ -285,11 +285,11 @@ class GameState:
             distance=None,
         )
         # Pending special plays (kickoffs, extra points)
-        self._pending_kickoff: Optional[KickoffSetup] = None
-        self._pending_extra_point: Optional[ExtraPointSetup] = None
+        self._pending_kickoff: KickoffSetup | None = None
+        self._pending_extra_point: ExtraPointSetup | None = None
         # Coin toss info
-        self._coin_toss_winner: Optional[Team] = None
-        self._coin_toss_winner_choice: Optional[CoinTossChoice] = None
+        self._coin_toss_winner: Team | None = None
+        self._coin_toss_winner_choice: CoinTossChoice | None = None
         # Execution data (set by GameEngine)
         self._game_data: GameExecutionData = GameExecutionData(game_id)
 
@@ -333,19 +333,19 @@ class GameState:
         return self.opponent(self.possession.pos_team)
 
     @property
-    def pending_kickoff(self) -> Optional[KickoffSetup]:
+    def pending_kickoff(self) -> KickoffSetup | None:
         return self._pending_kickoff
 
     @property
-    def pending_extra_point(self) -> Optional[ExtraPointSetup]:
+    def pending_extra_point(self) -> ExtraPointSetup | None:
         return self._pending_extra_point
 
     @property
-    def coin_toss_winner(self) -> Optional[Team]:
+    def coin_toss_winner(self) -> Team | None:
         return self._coin_toss_winner
 
     @property
-    def coin_toss_winner_choice(self) -> Optional[CoinTossChoice]:
+    def coin_toss_winner_choice(self) -> CoinTossChoice | None:
         return self._coin_toss_winner_choice
 
     @property

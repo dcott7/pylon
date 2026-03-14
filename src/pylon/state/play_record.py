@@ -7,7 +7,7 @@ game state before/after a play for downstream analysis and consistency checks.
 from __future__ import annotations
 from enum import Enum
 import logging
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List
 
 from ..domain.team import Team
 from ..domain.athlete import Athlete, AthletePositionEnum
@@ -59,9 +59,9 @@ class PlaySnapshot:
     all attributes to None.
     """
 
-    def __init__(self, game_state: Optional[GameState] = None) -> None:
-        self.pos_team: Optional[Team] = game_state.pos_team if game_state else None
-        self.def_team: Optional[Team] = game_state.def_team if game_state else None
+    def __init__(self, game_state: GameState | None = None) -> None:
+        self.pos_team: Team | None = game_state.pos_team if game_state else None
+        self.def_team: Team | None = game_state.def_team if game_state else None
         self.clock_snapshot: ClockSnapshot = (
             ClockSnapshot(game_state.clock) if game_state else ClockSnapshot(None)
         )
@@ -104,38 +104,38 @@ class PlayExecutionData:
     """
 
     def __init__(self) -> None:
-        self._play_type: Optional[PlayTypeEnum] = None
-        self._off_play_call: Optional[PlayCall] = None
-        self._def_play_call: Optional[PlayCall] = None
-        self._time_elapsed: Optional[int] = None
-        self._preplay_clock_runoff: Optional[int] = None
-        self._is_clock_running: Optional[bool] = None
-        self._yards_gained: Optional[int] = None
-        self._is_fg_attempt: Optional[bool] = None
-        self._fg_good: Optional[bool] = None
-        self._is_possession_change: Optional[bool] = None
-        self._is_turnover: Optional[bool] = None
+        self._play_type: PlayTypeEnum | None = None
+        self._off_play_call: PlayCall | None = None
+        self._def_play_call: PlayCall | None = None
+        self._time_elapsed: int | None = None
+        self._preplay_clock_runoff: int | None = None
+        self._is_clock_running: bool | None = None
+        self._yards_gained: int | None = None
+        self._is_fg_attempt: bool | None = None
+        self._fg_good: bool | None = None
+        self._is_possession_change: bool | None = None
+        self._is_turnover: bool | None = None
         self._off_personnel_assignments: Dict[AthletePositionEnum, List[Athlete]] = {}
         self._def_personnel_assignments: Dict[AthletePositionEnum, List[Athlete]] = {}
         self._participants: Dict[str, PlayParticipantType] = {}
 
         # Pass-specific metrics
-        self._air_yards: Optional[int] = None
-        self._yards_after_catch: Optional[int] = None
-        self._is_complete: Optional[bool] = None
-        self._is_interception: Optional[bool] = None
-        self._is_sack: Optional[bool] = None
+        self._air_yards: int | None = None
+        self._yards_after_catch: int | None = None
+        self._is_complete: bool | None = None
+        self._is_interception: bool | None = None
+        self._is_sack: bool | None = None
 
         # Run-specific metrics
-        self._run_gap: Optional[str] = None  # "A", "B", "C", etc.
-        self._is_fumble: Optional[bool] = None
-        self._fumble_recovered_by_team: Optional[Team] = None
+        self._run_gap: str | None = None  # "A", "B", "C", etc.
+        self._is_fumble: bool | None = None
+        self._fumble_recovered_by_team: Team | None = None
 
         # Penalty information
-        self._penalty_occurred: Optional[bool] = None
-        self._penalty_yards: Optional[int] = None
-        self._penalty_team: Optional[Team] = None
-        self._penalty_type: Optional[str] = None
+        self._penalty_occurred: bool | None = None
+        self._penalty_yards: int | None = None
+        self._penalty_team: Team | None = None
+        self._penalty_type: str | None = None
 
     # ==============================
     # Setters
@@ -144,11 +144,11 @@ class PlayExecutionData:
         self._play_type = play_type
         logger.debug(f"Set play_type to {play_type}")
 
-    def set_off_play_call(self, play_call: Optional[PlayCall]) -> None:
+    def set_off_play_call(self, play_call: PlayCall | None) -> None:
         self._off_play_call = play_call
         logger.debug(f"Set off_play_call to {play_call}")
 
-    def set_def_play_call(self, play_call: Optional[PlayCall]) -> None:
+    def set_def_play_call(self, play_call: PlayCall | None) -> None:
         self._def_play_call = play_call
         logger.debug(f"Set def_play_call to {play_call}")
 
@@ -254,47 +254,47 @@ class PlayExecutionData:
     # Getters
     # ==============================
     @property
-    def play_type(self) -> Optional[PlayTypeEnum]:
+    def play_type(self) -> PlayTypeEnum | None:
         return self._play_type
 
     @property
-    def off_play_call(self) -> Optional[PlayCall]:
+    def off_play_call(self) -> PlayCall | None:
         return self._off_play_call
 
     @property
-    def def_play_call(self) -> Optional[PlayCall]:
+    def def_play_call(self) -> PlayCall | None:
         return self._def_play_call
 
     @property
-    def time_elapsed(self) -> Optional[int]:
+    def time_elapsed(self) -> int | None:
         return self._time_elapsed
 
     @property
-    def preplay_clock_runoff(self) -> Optional[int]:
+    def preplay_clock_runoff(self) -> int | None:
         return self._preplay_clock_runoff
 
     @property
-    def yards_gained(self) -> Optional[int]:
+    def yards_gained(self) -> int | None:
         return self._yards_gained
 
     @property
-    def is_fg_attempt(self) -> Optional[bool]:
+    def is_fg_attempt(self) -> bool | None:
         return self._is_fg_attempt
 
     @property
-    def fg_good(self) -> Optional[bool]:
+    def fg_good(self) -> bool | None:
         return self._fg_good
 
     @property
-    def is_clock_running(self) -> Optional[bool]:
+    def is_clock_running(self) -> bool | None:
         return self._is_clock_running
 
     @property
-    def is_possession_change(self) -> Optional[bool]:
+    def is_possession_change(self) -> bool | None:
         return self._is_possession_change
 
     @property
-    def is_turnover(self) -> Optional[bool]:
+    def is_turnover(self) -> bool | None:
         return self._is_turnover
 
     @property
@@ -310,51 +310,51 @@ class PlayExecutionData:
         return self._participants
 
     @property
-    def air_yards(self) -> Optional[int]:
+    def air_yards(self) -> int | None:
         return self._air_yards
 
     @property
-    def yards_after_catch(self) -> Optional[int]:
+    def yards_after_catch(self) -> int | None:
         return self._yards_after_catch
 
     @property
-    def is_complete(self) -> Optional[bool]:
+    def is_complete(self) -> bool | None:
         return self._is_complete
 
     @property
-    def is_interception(self) -> Optional[bool]:
+    def is_interception(self) -> bool | None:
         return self._is_interception
 
     @property
-    def is_sack(self) -> Optional[bool]:
+    def is_sack(self) -> bool | None:
         return self._is_sack
 
     @property
-    def run_gap(self) -> Optional[str]:
+    def run_gap(self) -> str | None:
         return self._run_gap
 
     @property
-    def is_fumble(self) -> Optional[bool]:
+    def is_fumble(self) -> bool | None:
         return self._is_fumble
 
     @property
-    def fumble_recovered_by_team(self) -> Optional[Team]:
+    def fumble_recovered_by_team(self) -> Team | None:
         return self._fumble_recovered_by_team
 
     @property
-    def penalty_occurred(self) -> Optional[bool]:
+    def penalty_occurred(self) -> bool | None:
         return self._penalty_occurred
 
     @property
-    def penalty_yards(self) -> Optional[int]:
+    def penalty_yards(self) -> int | None:
         return self._penalty_yards
 
     @property
-    def penalty_team(self) -> Optional[Team]:
+    def penalty_team(self) -> Team | None:
         return self._penalty_team
 
     @property
-    def penalty_type(self) -> Optional[str]:
+    def penalty_type(self) -> str | None:
         return self._penalty_type
 
     # ==============================
@@ -513,43 +513,43 @@ class PlayRecord:
         return self._execution_data
 
     @property
-    def off_play_call(self) -> Optional[PlayCall]:
+    def off_play_call(self) -> PlayCall | None:
         return self._execution_data.off_play_call
 
     @property
-    def def_play_call(self) -> Optional[PlayCall]:
+    def def_play_call(self) -> PlayCall | None:
         return self._execution_data.def_play_call
 
     @property
-    def yards_gained(self) -> Optional[int]:
+    def yards_gained(self) -> int | None:
         return self._execution_data.yards_gained
 
     @property
-    def time_elapsed(self) -> Optional[int]:
+    def time_elapsed(self) -> int | None:
         return self._execution_data.time_elapsed
 
     @property
-    def preplay_clock_runoff(self) -> Optional[int]:
+    def preplay_clock_runoff(self) -> int | None:
         return self._execution_data.preplay_clock_runoff
 
     @property
-    def is_fg_attempt(self) -> Optional[bool]:
+    def is_fg_attempt(self) -> bool | None:
         return self._execution_data.is_fg_attempt
 
     @property
-    def fg_good(self) -> Optional[bool]:
+    def fg_good(self) -> bool | None:
         return self._execution_data.fg_good
 
     @property
-    def is_clock_running(self) -> Optional[bool]:
+    def is_clock_running(self) -> bool | None:
         return self._execution_data.is_clock_running
 
     @property
-    def is_possession_change(self) -> Optional[bool]:
+    def is_possession_change(self) -> bool | None:
         return self._execution_data.is_possession_change
 
     @property
-    def is_turnover(self) -> Optional[bool]:
+    def is_turnover(self) -> bool | None:
         return self._execution_data.is_turnover
 
     @property
@@ -566,51 +566,51 @@ class PlayRecord:
         return self._execution_data.participants
 
     @property
-    def air_yards(self) -> Optional[int]:
+    def air_yards(self) -> int | None:
         return self._execution_data.air_yards
 
     @property
-    def yards_after_catch(self) -> Optional[int]:
+    def yards_after_catch(self) -> int | None:
         return self._execution_data.yards_after_catch
 
     @property
-    def is_complete(self) -> Optional[bool]:
+    def is_complete(self) -> bool | None:
         return self._execution_data.is_complete
 
     @property
-    def is_interception(self) -> Optional[bool]:
+    def is_interception(self) -> bool | None:
         return self._execution_data.is_interception
 
     @property
-    def is_sack(self) -> Optional[bool]:
+    def is_sack(self) -> bool | None:
         return self._execution_data.is_sack
 
     @property
-    def run_gap(self) -> Optional[str]:
+    def run_gap(self) -> str | None:
         return self._execution_data.run_gap
 
     @property
-    def is_fumble(self) -> Optional[bool]:
+    def is_fumble(self) -> bool | None:
         return self._execution_data.is_fumble
 
     @property
-    def fumble_recovered_by_team(self) -> Optional[Team]:
+    def fumble_recovered_by_team(self) -> Team | None:
         return self._execution_data.fumble_recovered_by_team
 
     @property
-    def penalty_occurred(self) -> Optional[bool]:
+    def penalty_occurred(self) -> bool | None:
         return self._execution_data.penalty_occurred
 
     @property
-    def penalty_yards(self) -> Optional[int]:
+    def penalty_yards(self) -> int | None:
         return self._execution_data.penalty_yards
 
     @property
-    def penalty_team(self) -> Optional[Team]:
+    def penalty_team(self) -> Team | None:
         return self._execution_data.penalty_team
 
     @property
-    def penalty_type(self) -> Optional[str]:
+    def penalty_type(self) -> str | None:
         return self._execution_data.penalty_type
 
     # ==============================

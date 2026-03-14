@@ -2,7 +2,7 @@
 
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, Optional
+from typing import Any, Dict, List, TypedDict
 
 
 OUTPUT_SCHEMA_VERSION = "1.0"
@@ -37,7 +37,7 @@ class FormationOutputPayload(TypedDict):
 
     uid: str
     name: str
-    parent_uid: Optional[str]
+    parent_uid: str | None
     position_counts: Dict[str, int]
     tags: List[str]
 
@@ -59,14 +59,14 @@ class PlayCallOutputPayload(TypedDict):
     formation: FormationOutputPayload
     personnel_package: PersonnelOutputPayload
     side: str
-    description: Optional[str]
+    description: str | None
     tags: List[str]
 
 
 class PlaybookOutputPayload(TypedDict):
     """Canonical serialized playbook payload."""
 
-    uid: Optional[str]
+    uid: str | None
     plays: List[PlayCallOutputPayload]
 
 
@@ -87,37 +87,37 @@ class ExperimentOutputPayload(TypedDict):
     num_reps: int
     base_seed: int
     elapsed_time: float
-    description: Optional[str]
+    description: str | None
 
 
 class ClockSnapshotOutputPayload(TypedDict):
     """Serialized clock snapshot payload."""
 
-    quarter: Optional[int]
-    time_remaining: Optional[int]
-    clock_is_running: Optional[bool]
+    quarter: int | None
+    time_remaining: int | None
+    clock_is_running: bool | None
 
 
 class PossessionSnapshotOutputPayload(TypedDict):
     """Serialized possession snapshot payload."""
 
-    down: Optional[int]
-    distance: Optional[int]
-    yardline: Optional[int]
+    down: int | None
+    distance: int | None
+    yardline: int | None
 
 
 class ScoreSnapshotOutputPayload(TypedDict):
     """Serialized score snapshot payload."""
 
-    pos_team: Optional[int]
-    def_team: Optional[int]
+    pos_team: int | None
+    def_team: int | None
 
 
 class SnapshotOutputPayload(TypedDict):
     """Serialized combined snapshot payload used by plays and drives."""
 
-    pos_team_uid: Optional[str]
-    def_team_uid: Optional[str]
+    pos_team_uid: str | None
+    def_team_uid: str | None
     clock: ClockSnapshotOutputPayload
     possession: PossessionSnapshotOutputPayload
     score: ScoreSnapshotOutputPayload
@@ -126,7 +126,7 @@ class SnapshotOutputPayload(TypedDict):
 class AthleteRefOutputPayload(TypedDict):
     uid: str
     display_name: str
-    position: Optional[str]
+    position: str | None
 
 
 class PersonnelAssignmentsOutputPayload(TypedDict):
@@ -140,36 +140,36 @@ class ParticipantOutputPayload(TypedDict):
     """Serialized play participant entry inspired by ESPN style payloads."""
 
     athlete: AthleteRefOutputPayload
-    position: Optional[str]
+    position: str | None
     type: str
 
 
 class PlayExecutionOutputPayload(TypedDict):
     """Serialized play execution payload."""
 
-    play_type: Optional[str]
-    off_play_call_uid: Optional[str]
-    def_play_call_uid: Optional[str]
-    time_elapsed: Optional[int]
-    preplay_clock_runoff: Optional[int]
-    yards_gained: Optional[int]
-    is_possession_change: Optional[bool]
-    is_turnover: Optional[bool]
-    is_fg_attempt: Optional[bool]
-    fg_good: Optional[bool]
-    is_clock_running: Optional[bool]
-    air_yards: Optional[int]
-    yards_after_catch: Optional[int]
-    is_complete: Optional[bool]
-    is_interception: Optional[bool]
-    is_sack: Optional[bool]
-    run_gap: Optional[str]
-    is_fumble: Optional[bool]
-    fumble_recovered_by_team_uid: Optional[str]
-    penalty_occurred: Optional[bool]
-    penalty_yards: Optional[int]
-    penalty_type: Optional[str]
-    penalty_team_uid: Optional[str]
+    play_type: str | None
+    off_play_call_uid: str | None
+    def_play_call_uid: str | None
+    time_elapsed: int | None
+    preplay_clock_runoff: int | None
+    yards_gained: int | None
+    is_possession_change: bool | None
+    is_turnover: bool | None
+    is_fg_attempt: bool | None
+    fg_good: bool | None
+    is_clock_running: bool | None
+    air_yards: int | None
+    yards_after_catch: int | None
+    is_complete: bool | None
+    is_interception: bool | None
+    is_sack: bool | None
+    run_gap: str | None
+    is_fumble: bool | None
+    fumble_recovered_by_team_uid: str | None
+    penalty_occurred: bool | None
+    penalty_yards: int | None
+    penalty_type: str | None
+    penalty_team_uid: str | None
     participants: List[ParticipantOutputPayload]
     personnel_assignments: PersonnelAssignmentsOutputPayload
 
@@ -191,8 +191,8 @@ class DriveExecutionOutputPayload(TypedDict):
     yards_gained: int
     is_scoring_drive: bool
     scoring_type: str
-    scoring_team_uid: Optional[str]
-    result: Optional[str]
+    scoring_team_uid: str | None
+    result: str | None
 
 
 class DriveRecordOutputPayload(TypedDict):
@@ -208,8 +208,8 @@ class DriveRecordOutputPayload(TypedDict):
 class CoinTossOutputPayload(TypedDict):
     """Serialized coin toss payload."""
 
-    winner_uid: Optional[str]
-    winner_choice: Optional[str]
+    winner_uid: str | None
+    winner_choice: str | None
 
 
 class GameStateOutputPayload(TypedDict):
@@ -253,7 +253,7 @@ def wants_db_output(output_mode: OutputMode) -> bool:
 def validate_output_config(
     output_mode: OutputMode,
     has_db_manager: bool,
-    json_output_path: Optional[Path],
+    json_output_path: Path | None,
 ) -> None:
     """Validate required dependencies for the selected output mode."""
     if wants_db_output(output_mode) and not has_db_manager:

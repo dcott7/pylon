@@ -6,7 +6,7 @@ provides snapshots of clock, possession, and scoreboard at drive boundaries.
 
 from __future__ import annotations
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 import logging
 
 from ..domain.team import Team
@@ -39,9 +39,9 @@ class DriveStatus(Enum):
 
 
 class DriveSnapshot:
-    def __init__(self, game_state: Optional[GameState] = None) -> None:
-        self.pos_team: Optional[Team] = game_state.pos_team if game_state else None
-        self.def_team: Optional[Team] = game_state.def_team if game_state else None
+    def __init__(self, game_state: GameState | None = None) -> None:
+        self.pos_team: Team | None = game_state.pos_team if game_state else None
+        self.def_team: Team | None = game_state.def_team if game_state else None
         self.clock_snapshot: ClockSnapshot = (
             ClockSnapshot(game_state.clock) if game_state else ClockSnapshot(None)
         )
@@ -80,8 +80,8 @@ class DriveExecutionData:
         self._yards_gained: int = 0
         self._is_scoring_drive: bool = False
         self._scoring_type: ScoringTypeEnum = ScoringTypeEnum.NONE
-        self._scoring_team: Optional[Team] = None
-        self._result: Optional[DriveEndResult] = None
+        self._scoring_team: Team | None = None
+        self._result: DriveEndResult | None = None
         # TODO: We need to update this because PlayRecord does not
         # contain all of the information like personnel used, offensive
         # and defensive formations, etc. This data is contained in the
@@ -156,11 +156,11 @@ class DriveExecutionData:
         return self._scoring_type
 
     @property
-    def scoring_team(self) -> Optional[Team]:
+    def scoring_team(self) -> Team | None:
         return self._scoring_team
 
     @property
-    def result(self) -> Optional[DriveEndResult]:
+    def result(self) -> DriveEndResult | None:
         return self._result
 
     @property
@@ -168,7 +168,7 @@ class DriveExecutionData:
         return self._plays
 
     @property
-    def last_play(self) -> Optional[PlayRecord]:
+    def last_play(self) -> PlayRecord | None:
         if len(self._plays) == 0:
             logger.warning("No plays in DriveRecord; last_play is None.")
             return None
@@ -222,7 +222,7 @@ class DriveRecord:
         return self._execution_data.plays
 
     @property
-    def last_play(self) -> Optional[PlayRecord]:
+    def last_play(self) -> PlayRecord | None:
         """Access last play through execution data."""
         return self._execution_data.last_play
 

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Dict, List, Optional
+from typing import Dict, List
 import logging
 
 from .model import TypedModel, ModelExecutionError, ModelContext
@@ -88,8 +88,8 @@ class PlayerAssignmentContext(ModelContext):
         self,
         game_state: GameState,
         rng: RNG,
-        play_call: Optional[PlayCall],
-        play_type: Optional[PlayTypeEnum] = None,
+        play_call: PlayCall | None,
+        play_type: PlayTypeEnum | None = None,
     ) -> None:
         super().__init__(game_state, rng)
         self.play_call = play_call
@@ -264,7 +264,7 @@ class DefaultOffensivePlayerAssignmentModel(OffensivePlayerAssignmentModel):
         return assignments
 
     def _fallback_assignments(
-        self, team: Team, play_type: Optional[PlayTypeEnum]
+        self, team: Team, play_type: PlayTypeEnum | None
     ) -> Dict[AthletePositionEnum, List[Athlete]]:
         if play_type is None:
             raise ModelExecutionError(

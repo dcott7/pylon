@@ -6,7 +6,7 @@ Supports SQLite (development) and PostgreSQL (production).
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any, Dict, List
 
 from sqlalchemy import create_engine, Engine, insert
 from sqlalchemy.orm import Session, sessionmaker
@@ -28,7 +28,7 @@ class DatabaseManager:
 
     def __init__(
         self,
-        connection_string: Optional[str] = None,
+        connection_string: str | None = None,
         echo: bool = False,
     ) -> None:
         """
@@ -169,7 +169,7 @@ class DatabaseManager:
         """
         self.insert_objects(*invocations, label="model invocation")
 
-    def insert_rows(self, table: Any, rows: list[dict[str, Any]], label: str) -> None:
+    def insert_rows(self, table: Any, rows: List[Dict[str, Any]], label: str) -> None:
         """Insert raw row dictionaries into an association/bridge table.
 
         Args:

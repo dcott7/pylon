@@ -15,8 +15,9 @@ Fact tables:
 - Game: Individual game results (one per simulation rep)
 """
 
+from __future__ import annotations
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Dict, List
 
 from sqlalchemy import (
     Column,
@@ -61,7 +62,7 @@ class Team(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Team UID
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    abbreviation: Mapped[Optional[str]] = mapped_column(String(3), nullable=True)
+    abbreviation: Mapped[str | None] = mapped_column(String(3), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
@@ -123,7 +124,7 @@ class Position(Base):
     position_enum: Mapped[AthletePositionEnum] = mapped_column(
         SQLEnum(AthletePositionEnum), nullable=False, unique=True
     )
-    parent_position_id: Mapped[Optional[str]] = mapped_column(
+    parent_position_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("position.id"), nullable=True
     )
     is_leaf: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
@@ -152,7 +153,7 @@ class Formation(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Formation UID
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    parent_formation_id: Mapped[Optional[str]] = mapped_column(
+    parent_formation_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("formation.id"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
@@ -214,14 +215,14 @@ class PlayCall(Base):
     team_id: Mapped[str] = mapped_column(String, ForeignKey("team.id"), nullable=False)
 
     # Formation and Personnel references
-    formation_id: Mapped[Optional[str]] = mapped_column(
+    formation_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("formation.id"), nullable=True
     )
-    personnel_id: Mapped[Optional[str]] = mapped_column(
+    personnel_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("personnel.id"), nullable=True
     )
 
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
@@ -230,8 +231,8 @@ class PlayCall(Base):
         foreign_keys=[team_id],
         back_populates="plays",
     )
-    formation: Mapped[Optional["Formation"]] = relationship("Formation")
-    personnel: Mapped[Optional["Personnel"]] = relationship(
+    formation: Mapped[Formation | None] = relationship("Formation")
+    personnel: Mapped[Personnel | None] = relationship(
         "Personnel", back_populates="plays"
     )
 
@@ -283,15 +284,15 @@ class ModelInvocation(Base):
     model_type: Mapped[str] = mapped_column(
         String, nullable=False
     )  # e.g., "offensive_play_call", "passer_selection"
-    model_version: Mapped[Optional[str]] = mapped_column(
+    model_version: Mapped[str | None] = mapped_column(
         String, nullable=True
     )  # Optional version tag
 
     # Game context references (foreign keys optional for flexibility)
-    game_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    drive_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    play_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    engine_phase: Mapped[Optional[str]] = mapped_column(
+    game_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    drive_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    play_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    engine_phase: Mapped[str | None] = mapped_column(
         String, nullable=True
     )  # e.g., "play_call", "personnel_selection"
 
@@ -305,11 +306,11 @@ class ModelInvocation(Base):
     )  # Discriminator: "PlayCall", "Athlete", "float", etc.
 
     # RNG state for replayability (optional)
-    rng_seed: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    rng_seed: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Performance metrics
-    duration_ms: Mapped[Optional[float]] = mapped_column(nullable=True)
-    error: Mapped[Optional[str]] = mapped_column(
+    duration_ms: Mapped[float | None] = mapped_column(nullable=True)
+    error: Mapped[str | None] = mapped_column(
         Text, nullable=True
     )  # If execution failed
 
@@ -338,7 +339,7 @@ class Experiment(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Experiment UID
     name: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     num_reps: Mapped[int] = mapped_column(Integer, nullable=False)
     base_seed: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
@@ -382,10 +383,10 @@ class Game(Base):
     __tablename__ = "game"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)  # Game UID
-    experiment_id: Mapped[Optional[str]] = mapped_column(
+    experiment_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("experiment.id"), nullable=True
     )
-    rep_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    rep_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     seed: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Team references
@@ -399,21 +400,21 @@ class Game(Base):
     # Final results
     home_score: Mapped[int] = mapped_column(Integer, nullable=False)
     away_score: Mapped[int] = mapped_column(Integer, nullable=False)
-    winner_id: Mapped[Optional[str]] = mapped_column(
+    winner_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("team.id"), nullable=True
     )
 
     # Game statistics
     total_plays: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     total_drives: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    duration_seconds: Mapped[Optional[float]] = mapped_column(nullable=True)
+    duration_seconds: Mapped[float | None] = mapped_column(nullable=True)
     final_quarter: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="completed")
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
-    experiment: Mapped[Optional["Experiment"]] = relationship(
+    experiment: Mapped[Experiment | None] = relationship(
         "Experiment",
         back_populates="games",
     )
@@ -425,7 +426,7 @@ class Game(Base):
         "Team",
         foreign_keys=[away_team_id],
     )
-    winner: Mapped[Optional["Team"]] = relationship(
+    winner: Mapped[Team | None] = relationship(
         "Team",
         foreign_keys=[winner_id],
     )
@@ -463,15 +464,15 @@ class Drive(Base):
     # Start snapshot
     start_quarter: Mapped[int] = mapped_column(Integer, nullable=False)
     start_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False)
-    start_down: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    start_distance: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    start_down: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    start_distance: Mapped[int | None] = mapped_column(Integer, nullable=True)
     start_yardline: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # End snapshot
     end_quarter: Mapped[int] = mapped_column(Integer, nullable=False)
     end_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False)
-    end_down: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    end_distance: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    end_down: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    end_distance: Mapped[int | None] = mapped_column(Integer, nullable=True)
     end_yardline: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Aggregates
@@ -483,10 +484,10 @@ class Drive(Base):
     result: Mapped[str] = mapped_column(
         String, nullable=False
     )  # e.g., score, turnover, punt, end_of_half
-    scoring_type: Mapped[Optional[str]] = mapped_column(
+    scoring_type: Mapped[str | None] = mapped_column(
         String, nullable=True
     )  # touchdown/fg/safety/none
-    scoring_team_id: Mapped[Optional[str]] = mapped_column(
+    scoring_team_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("team.id"), nullable=True
     )
 
@@ -513,19 +514,19 @@ class Play(Base):
     )  # 1-based within drive
 
     # Call metadata
-    play_call_id: Mapped[Optional[str]] = mapped_column(
+    play_call_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("play_call.id"), nullable=True
     )
-    play_type: Mapped[Optional[PlayTypeEnum]] = mapped_column(
+    play_type: Mapped[PlayTypeEnum | None] = mapped_column(
         SQLEnum(PlayTypeEnum), nullable=True
     )
-    side: Mapped[Optional[PlaySideEnum]] = mapped_column(
+    side: Mapped[PlaySideEnum | None] = mapped_column(
         SQLEnum(PlaySideEnum), nullable=True
     )
-    formation_id: Mapped[Optional[str]] = mapped_column(
+    formation_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("formation.id"), nullable=True
     )
-    personnel_id: Mapped[Optional[str]] = mapped_column(
+    personnel_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("personnel.id"), nullable=True
     )
 
@@ -540,8 +541,8 @@ class Play(Base):
     # Start snapshot
     quarter: Mapped[int] = mapped_column(Integer, nullable=False)
     time_remaining: Mapped[int] = mapped_column(Integer, nullable=False)
-    down: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    distance: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    down: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    distance: Mapped[int | None] = mapped_column(Integer, nullable=True)
     yardline_start: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Outcomes
@@ -549,13 +550,13 @@ class Play(Base):
     yards_gained: Mapped[int] = mapped_column(Integer, nullable=False)
     possession_changed: Mapped[bool] = mapped_column(Integer, nullable=False, default=0)
     turnover: Mapped[bool] = mapped_column(Integer, nullable=False, default=0)
-    scoring_type: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    scoring_team_id: Mapped[Optional[str]] = mapped_column(
+    scoring_type: Mapped[str | None] = mapped_column(String, nullable=True)
+    scoring_team_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("team.id"), nullable=True
     )
 
     # Optional serialized snapshot for replay/debug (core fields are already columns)
-    snapshot_json: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    snapshot_json: Mapped[Dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
@@ -612,10 +613,10 @@ class PlayParticipant(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
     play_id: Mapped[int] = mapped_column(Integer, ForeignKey("play.id"), nullable=False)
-    athlete_id: Mapped[Optional[str]] = mapped_column(
+    athlete_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("athlete.id"), nullable=True
     )
-    team_id: Mapped[Optional[str]] = mapped_column(
+    team_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("team.id"), nullable=True
     )
     participant_type: Mapped[PlayParticipantType] = mapped_column(
@@ -624,9 +625,9 @@ class PlayParticipant(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
-    play: Mapped["Play"] = relationship("Play", back_populates="participants_rel")
-    athlete: Mapped[Optional["Athlete"]] = relationship("Athlete")
-    team: Mapped[Optional["Team"]] = relationship("Team")
+    play: Mapped[Play] = relationship("Play", back_populates="participants_rel")
+    athlete: Mapped[Athlete | None] = relationship("Athlete")
+    team: Mapped[Team | None] = relationship("Team")
 
     def __repr__(self) -> str:
         return (

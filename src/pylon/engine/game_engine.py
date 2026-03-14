@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Optional
+from typing import Any, List
 
 from .drive_engine import DriveEngine
 from ..state.game_state import GameState
@@ -73,13 +73,13 @@ class GameEngine:
         home_team: Team,
         away_team: Team,
         game_id: str,
-        user_models: Optional[List[TypedModel[Any, Any]]] = None,
+        user_models: List[TypedModel[Any, Any]] | None = None,
         rng: RNG = RNG(),
         rules: LeagueRules = NFLRules(),  # type: ignore
         # the maximum number of drives before forcing game end. It should
         # normally be None, but can be set for testing purposes If getting
         # an infinite loop.
-        max_drives: Optional[int] = None,
+        max_drives: int | None = None,
     ) -> None:
         self.models = ModelRegistry()
         self.rng = rng

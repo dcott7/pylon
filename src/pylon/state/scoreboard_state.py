@@ -1,7 +1,7 @@
 """Scoreboard state container for tracking points by team during a game."""
 
 import logging
-from typing import Dict, Optional
+from typing import Dict
 
 from ..domain.team import Team
 
@@ -55,7 +55,7 @@ class Scoreboard:
         scores = list(self._scores.values())
         return scores[0] == scores[1]
 
-    def leader(self) -> Optional[Team]:
+    def leader(self) -> Team | None:
         """Return the leading team, or None if tied."""
         home_score, away_score = list(self._scores.values())
         if home_score == away_score:
