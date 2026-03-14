@@ -6,6 +6,7 @@ from typing import Dict
 from pylon.domain.team import Team
 from pylon.domain.rules.nfl import NFLRules
 from pylon.engine import PylonSimulationRunner
+from pylon.simulation_runner import PylonSimulationRunnerConfig
 from pylon.db import DatabaseManager
 from pylon.output import OutputMode
 
@@ -75,19 +76,21 @@ def main() -> None:
     # Run multi-rep simulation with per-rep logs under ./log
     logger.info(f"\n--- Running multi-rep simulation ({NUM_REPS} reps) ---")
     runner = PylonSimulationRunner(
-        home_team=home,
-        away_team=away,
-        num_reps=NUM_REPS,
-        base_seed=42,
-        rules=NFLRules(),
-        db_manager=db_manager,
-        output_mode=OUTPUT_MODE,
-        json_output_path=RESULTS_JSON_PATH,
-        experiment_name=f"{away.name} at {home.name} - {NUM_REPS} Rep Test",
-        experiment_description="Test run of multi-rep simulation with database persistence",
-        log_dir=EXAMPLE_DIR / "log",
-        log_level=LOG_LEVEL,
-        # max_drives=100,  # Uncomment to limit drives per game for debugging infinate loops
+        config=PylonSimulationRunnerConfig(
+            home_team=home,
+            away_team=away,
+            num_reps=NUM_REPS,
+            base_seed=42,
+            rules=NFLRules(),
+            db_manager=db_manager,
+            output_mode=OUTPUT_MODE,
+            json_output_path=RESULTS_JSON_PATH,
+            experiment_name=f"{away.name} at {home.name} - {NUM_REPS} Rep Test",
+            experiment_description="Test run of multi-rep simulation with database persistence",
+            log_dir=EXAMPLE_DIR / "log",
+            log_level=LOG_LEVEL,
+            # max_drives=100,  # Uncomment to limit drives per game for debugging infinate loops
+        ),
     )
     results = runner.run()
 

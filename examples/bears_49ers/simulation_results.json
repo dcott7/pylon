@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "experiment": {
-    "id": "47b46efc-062b-437a-a494-0ebe93fd27d4",
+    "id": "eb407ed7-7b73-4928-81c0-aa0a6c028c65",
     "name": "49ers at Bears - 2 Rep Test",
     "num_reps": 2,
     "base_seed": 42,
-    "elapsed_time": 2.9501209259033203,
+    "elapsed_time": 2.7902610301971436,
     "description": "Test run of multi-rep simulation with database persistence"
   },
   "teams": {
@@ -484,7 +484,7 @@
       ],
       "playbooks": {
         "offense": {
-          "uid": "4c273274-a1ae-48af-a10a-252d5286ba37",
+          "uid": "0969a540-d244-4f78-8129-b7d9de2bb227",
           "plays": [
             {
               "uid": "418",
@@ -14251,7 +14251,7 @@
           ]
         },
         "defense": {
-          "uid": "19bb31e5-6c08-42f2-a2c6-1515ca5ea288",
+          "uid": "d7fa6fb7-1984-4343-8398-015f4d286cbe",
           "plays": [
             {
               "uid": "208",
@@ -23308,7 +23308,7 @@
       ],
       "playbooks": {
         "offense": {
-          "uid": "5470f04d-ed98-4495-93dd-05b76cf5ea95",
+          "uid": "77bf36a2-47a2-4eb4-9b45-552477625777",
           "plays": [
             {
               "uid": "1",
@@ -36977,7 +36977,7 @@
           ]
         },
         "defense": {
-          "uid": "64e3c1e1-0f83-4123-ad71-34fef358d2a1",
+          "uid": "fefa43fe-74b3-4448-b6ab-b5c6193798e5",
           "plays": [
             {
               "uid": "1",
@@ -45144,7 +45144,7 @@
         "away_score": 12,
         "winner_id": null,
         "final_quarter": 5,
-        "duration_seconds": 1.3766248226165771,
+        "duration_seconds": 1.1969609260559082,
         "status": "completed",
         "total_plays": 117,
         "total_drives": 19
@@ -45156,7 +45156,7 @@
         "away_score": 30,
         "winner_id": "25",
         "final_quarter": 5,
-        "duration_seconds": 1.566532850265503,
+        "duration_seconds": 1.5867691040039062,
         "status": "completed",
         "total_plays": 121,
         "total_drives": 20
@@ -45170,7 +45170,7 @@
       "away_win_pct": 0.5,
       "avg_home_score": 18.0,
       "avg_away_score": 21.0,
-      "avg_duration_seconds": 1.47157883644104,
+      "avg_duration_seconds": 1.3918650150299072,
       "failed_reps": 0
     },
     "game_details": [

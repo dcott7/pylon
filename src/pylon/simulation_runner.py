@@ -8,6 +8,7 @@ and model comparison experiments.
 
 import logging
 import uuid
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -28,7 +29,6 @@ from .output import (
     DBOutputWriter,
     ExperimentOutputPayload,
     JsonOutputWriter,
-    OUTPUT_SCHEMA_VERSION,
     OutputMode,
     SimulationOutputPayload,
     TeamOutputPayload,
@@ -42,6 +42,24 @@ from .output.types import GameStateOutputPayload, SimulationResultsPayload
 
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True, kw_only=True)
+class PylonSimulationRunnerConfig(SimulationRunnerConfig):
+    """Pylon-specific runner configuration built on generic simulation config."""
+
+    home_team: Team
+    away_team: Team
+    user_models: List[TypedModel[Any, Any]] | None = None
+    rules: LeagueRules = field(default_factory=NFLRules)
+    max_drives: int | None = None
+    db_manager: DatabaseManager | None = None
+    output_mode: OutputMode = OutputMode.JSON
+    json_output_path: Path | str | None = None
+    experiment_name: str | None = None
+    experiment_description: str | None = None
+    log_dir: Path | str | None = None
+    log_level: int = logging.INFO
 
 
 class _PerReplicationLogObserver(
@@ -113,74 +131,53 @@ class PylonSimulationRunner:
 
     Usage:
         runner = PylonSimulationRunner(
+            config=PylonSimulationRunnerConfig(
             home_team=bears,
             away_team=niners,
             num_reps=100,
             base_seed=42,
             db_manager=db,
             output_mode=OutputMode.BOTH,
+            ),
         )
         results = runner.run()
     """
 
-    def __init__(
-        self,
-        home_team: Team,
-        away_team: Team,
-        num_reps: int,
-        base_seed: int = 42,
-        user_models: List[TypedModel[Any, Any]] | None = None,
-        rules: LeagueRules = NFLRules(),  # type: ignore
-        max_drives: int | None = None,
-        db_manager: DatabaseManager | None = None,
-        output_mode: OutputMode = OutputMode.JSON,
-        json_output_path: Path | str | None = None,
-        experiment_name: str | None = None,
-        experiment_description: str | None = None,
-        log_dir: Path | str | None = None,
-        log_level: int = logging.INFO,
-    ) -> None:
+    def __init__(self, config: PylonSimulationRunnerConfig) -> None:
         """
         Initialize the SimulationRunner.
 
         Args:
-            home_team: Home team for all replications.
-            away_team: Away team for all replications.
-            num_reps: Number of replications to run.
-            base_seed: Base seed for deterministic rep generation (rep N uses base_seed + N).
-            user_models: Optional custom models to override defaults.
-            rules: League rules (defaults to NFLRules).
-            max_drives: Optional drive limit per game.
-            db_manager: Optional database manager for persistence.
-            output_mode: Output destination: "json", "db", or "both".
-            json_output_path: Optional output path for JSON results.
-            experiment_name: Optional human-readable experiment name.
-            experiment_description: Optional detailed description.
+            config: Pylon-specific runner configuration.
         """
-        self.home_team = home_team
-        self.away_team = away_team
-        self.num_reps = num_reps
-        self.base_seed = base_seed
-        self.user_models = user_models
-        self.rules = rules
-        self.max_drives = max_drives
-        self.db_manager = db_manager
-        self.output_mode = output_mode
-        self.log_dir = Path(log_dir) if log_dir is not None else Path("./log")
+        self.home_team = config.home_team
+        self.away_team = config.away_team
+        self.num_reps = config.num_reps
+        self.base_seed = config.base_seed
+        self.schema_version = config.schema_version
+        self.user_models = config.user_models
+        self.rules = config.rules
+        self.max_drives = config.max_drives
+        self.db_manager = config.db_manager
+        self.output_mode = config.output_mode
+        self.log_dir = (
+            Path(config.log_dir) if config.log_dir is not None else Path("./log")
+        )
         self.json_output_path = (
-            Path(json_output_path)
-            if json_output_path is not None
+            Path(config.json_output_path)
+            if config.json_output_path is not None
             else self.log_dir / "simulation_results.json"
         )
         self.json_writer = JsonOutputWriter(self.json_output_path)
-        self.log_level = log_level
+        self.log_level = config.log_level
 
         # Experiment metadata
         self.experiment_id = str(uuid.uuid4())
         self.experiment_name = (
-            experiment_name or f"{home_team.name} vs {away_team.name} - {num_reps} reps"
+            config.experiment_name
+            or f"{self.home_team.name} vs {self.away_team.name} - {self.num_reps} reps"
         )
-        self.experiment_description = experiment_description
+        self.experiment_description = config.experiment_description
 
         self.db_writer = (
             DBOutputWriter(db_manager=self.db_manager)
@@ -239,7 +236,7 @@ class PylonSimulationRunner:
             config=SimulationRunnerConfig(
                 num_reps=self.num_reps,
                 base_seed=self.base_seed,
-                schema_version=OUTPUT_SCHEMA_VERSION,
+                schema_version=self.schema_version,
             ),
             simulation_factory=simulation_factory,
             aggregate_fn=self._aggregate_from_simulation_runs,
@@ -421,7 +418,7 @@ class PylonSimulationRunner:
         }
 
         return {
-            "schema_version": OUTPUT_SCHEMA_VERSION,
+            "schema_version": self.schema_version,
             "experiment": experiment,
             "teams": teams,
             "results": results,

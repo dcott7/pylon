@@ -2,7 +2,7 @@
 
 import json
 import pytest
-from typing import Generator
+from typing import Any, Generator
 from pathlib import Path
 from pylon.domain.athlete import Athlete, AthletePositionEnum
 from pylon.domain.team import Team
@@ -14,10 +14,15 @@ from pylon.domain.playbook import (
     PersonnelPackage,
 )
 from pylon.domain.rules.nfl import NFLRules
-from pylon.simulation_runner import PylonSimulationRunner
+from pylon.simulation_runner import PylonSimulationRunner, PylonSimulationRunnerConfig
 from pylon.db.database import DatabaseManager
 from pylon.db.schema import Game as OrmGame, Drive as OrmDrive, Play as OrmPlay
 from pylon.output import OutputMode, SimulationOutputPayload
+
+
+def _make_runner(**kwargs: Any) -> PylonSimulationRunner:
+    """Construct runner via explicit config object for tests."""
+    return PylonSimulationRunner(config=PylonSimulationRunnerConfig(**kwargs))
 
 
 def create_test_team(uid: str, name: str) -> Team:
@@ -204,7 +209,7 @@ class TestPylonSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "single_game_results.json"
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -237,7 +242,7 @@ class TestPylonSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "multi_game_results.json"
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=3,
@@ -263,7 +268,7 @@ class TestPylonSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -292,7 +297,7 @@ class TestPylonSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=3,
@@ -321,7 +326,7 @@ class TestPylonSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -359,7 +364,7 @@ class TestPylonSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=5,
@@ -391,7 +396,7 @@ class TestPylonSimulationRunner:
         home = create_test_team("home", "Home Team")
         away = create_test_team("away", "Away Team")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -412,7 +417,7 @@ class TestPylonSimulationRunner:
         away = create_test_team("away", "Away Team")
         output_path = tmp_path / "both_mode_results.json"
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -450,7 +455,7 @@ class TestEndToEndWorkflow:
         home = create_test_team("chiefs", "Kansas City Chiefs")
         away = create_test_team("49ers", "San Francisco 49ers")
 
-        runner = PylonSimulationRunner(
+        runner = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=2,
@@ -498,7 +503,7 @@ class TestEndToEndWorkflow:
         away = create_test_team("away", "Away Team")
 
         # Run first simulation
-        runner1 = PylonSimulationRunner(
+        runner1 = _make_runner(
             home_team=home,
             away_team=away,
             num_reps=1,
@@ -515,7 +520,7 @@ class TestEndToEndWorkflow:
         home2 = create_test_team("home", "Home Team")
         away2 = create_test_team("away", "Away Team")
 
-        runner2 = PylonSimulationRunner(
+        runner2 = _make_runner(
             home_team=home2,
             away_team=away2,
             num_reps=1,
