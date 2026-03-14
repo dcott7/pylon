@@ -7,6 +7,7 @@ from .exceptions import (
     SimulationError,
     SimulationExecutionError,
 )
+from .observer import SimulationObserver
 from .output import OutputSink, SimulationOutput
 from .rng import RNG
 from .runner import SimulationRunner, SimulationRunnerConfig
@@ -14,6 +15,7 @@ from .runner import SimulationRunner, SimulationRunnerConfig
 __all__ = [
     "Simulation",
     "SimulationOutput",
+    "SimulationObserver",
     "OutputSink",
     "RNG",
     "SimulationError",

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from sim.base import Simulation
+from sim.observer import SimulationObserver
 from sim.runner import SimulationRunner
 from sim.runner import SimulationRunnerConfig
 from sim.rng import RNG
@@ -42,24 +43,21 @@ from .output.types import GameStateOutputPayload, SimulationResultsPayload
 logger = logging.getLogger(__name__)
 
 
-class _ReplicationLoggedSimulation(Simulation[PylonSimulationResult]):
-    """Wrap a one-game simulation with per-rep file logging."""
+class _PerReplicationLogObserver(
+    SimulationObserver[PylonSimulationResult, Dict[str, Any]]
+):
+    """Observer that writes one log file per replication."""
 
-    def __init__(
-        self,
-        simulation: PylonSimulation,
-        rep_number: int,
-        log_dir: Path,
-        log_level: int,
-    ) -> None:
-        self._simulation = simulation
-        self._rep_number = rep_number
+    def __init__(self, log_dir: Path, log_level: int) -> None:
         self._log_dir = log_dir
         self._log_level = log_level
-        self.rng = simulation.rng
+        self._active_handlers: Dict[int, tuple[logging.FileHandler, int]] = {}
 
-    def run(self) -> PylonSimulationResult:
-        rep_log_path = self._log_dir / f"pylon.{self._rep_number}.log"
+    def on_run_start(self, config: SimulationRunnerConfig) -> None:
+        self._log_dir.mkdir(parents=True, exist_ok=True)
+
+    def on_replication_start(self, rep_number: int, seed: int) -> None:
+        rep_log_path = self._log_dir / f"pylon.{rep_number}.log"
         rep_handler = logging.FileHandler(rep_log_path, mode="w")
         rep_handler.setLevel(self._log_level)
         rep_handler.setFormatter(
@@ -70,13 +68,36 @@ class _ReplicationLoggedSimulation(Simulation[PylonSimulationResult]):
         previous_level = root_logger.level
         root_logger.addHandler(rep_handler)
         root_logger.setLevel(min(previous_level, self._log_level))
+        self._active_handlers[rep_number] = (rep_handler, previous_level)
 
-        try:
-            return self._simulation.run()
-        finally:
-            root_logger.removeHandler(rep_handler)
-            rep_handler.close()
-            root_logger.setLevel(previous_level)
+    def on_replication_success(
+        self,
+        rep_number: int,
+        seed: int,
+        duration_seconds: float,
+        result: PylonSimulationResult,
+    ) -> None:
+        self._teardown_replication_logger(rep_number)
+
+    def on_replication_failure(
+        self, rep_number: int, seed: int, error: Exception
+    ) -> None:
+        self._teardown_replication_logger(rep_number)
+
+    def on_run_complete(self, output: object) -> None:
+        for rep_number in list(self._active_handlers.keys()):
+            self._teardown_replication_logger(rep_number)
+
+    def _teardown_replication_logger(self, rep_number: int) -> None:
+        logger_state = self._active_handlers.pop(rep_number, None)
+        if logger_state is None:
+            return
+
+        rep_handler, previous_level = logger_state
+        root_logger = logging.getLogger()
+        root_logger.removeHandler(rep_handler)
+        rep_handler.close()
+        root_logger.setLevel(previous_level)
 
 
 class PylonSimulationRunner:
@@ -198,13 +219,15 @@ class PylonSimulationRunner:
         if wants_db_output(self.output_mode):
             self._next_db_game_id = int(self._get_next_game_id())
 
-        # Ensure log directory exists for per-rep logs
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-
         # Reset per-run mutable state in case the runner instance is reused.
         self.game_results = []
         self.game_details = []
         self._pending_db_games = []
+
+        rep_logger_observer = _PerReplicationLogObserver(
+            log_dir=self.log_dir,
+            log_level=self.log_level,
+        )
 
         # Use the generic SimulationRunner to execute all replications with the
         # provided simulation factory and aggregate function.
@@ -216,6 +239,7 @@ class PylonSimulationRunner:
             ),
             simulation_factory=self._simulation_factory,
             aggregate_fn=self._aggregate_from_simulation_runs,
+            observers=[rep_logger_observer],
         )
         base_output = base_runner.run()
 
@@ -265,12 +289,7 @@ class PylonSimulationRunner:
             rules=self.rules,
             max_drives=self.max_drives,
         )
-        return _ReplicationLoggedSimulation(
-            simulation=simulation,
-            rep_number=rep_number,
-            log_dir=self.log_dir,
-            log_level=self.log_level,
-        )
+        return simulation
 
     def _aggregate_from_simulation_runs(
         self,

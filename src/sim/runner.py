@@ -17,6 +17,7 @@ from .exceptions import (
     SimulationConfigurationError,
     SimulationExecutionError,
 )
+from .observer import SimulationObserver
 from .output import OutputSink, SimulationOutput
 from .rng import RNG
 
@@ -47,6 +48,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
         aggregate_fn: Callable[[List[TResult]], TAggregate],
         sinks: Sequence[OutputSink[SimulationOutput[TResult, TAggregate]]]
         | None = None,
+        observers: Sequence[SimulationObserver[TResult, TAggregate]] | None = None,
     ) -> None:
         if config.num_reps < 1:
             raise SimulationConfigurationError("num_reps must be greater than 0")
@@ -55,6 +57,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
         self.simulation_factory = simulation_factory
         self.aggregate_fn = aggregate_fn
         self.sinks = list(sinks) if sinks is not None else []
+        self.observers = list(observers) if observers is not None else []
 
     def run(self) -> SimulationOutput[TResult, TAggregate]:
         """Run all configured replications and return canonical output."""
@@ -64,6 +67,7 @@ class SimulationRunner(Generic[TResult, TAggregate]):
             self.config.base_seed,
             len(self.sinks),
         )
+        self._notify_observers("on_run_start", self.config)
         started_at = time.time()
         run_results: List[TResult] = []
 
@@ -98,12 +102,14 @@ class SimulationRunner(Generic[TResult, TAggregate]):
 
         # Emit output to all configured sinks (DB, JSON, etc.)
         self._emit_to_sinks(output)
+        self._notify_observers("on_run_complete", output)
 
         return output
 
     def _run_single(self, rep_number: int, seed: int) -> TResult:
         """Run one replication with an explicit seed."""
         logger.debug("Running replication %s with seed=%s", rep_number, seed)
+        self._notify_observers("on_replication_start", rep_number, seed)
         rep_start = time.time()
 
         try:
@@ -112,12 +118,20 @@ class SimulationRunner(Generic[TResult, TAggregate]):
             result = simulation.run()
         except Exception as exc:
             logger.exception("Replication %s failed with seed=%s", rep_number, seed)
+            self._notify_observers("on_replication_failure", rep_number, seed, exc)
             raise SimulationExecutionError(
                 f"Replication {rep_number} failed for seed={seed}"
             ) from exc
 
         rep_elapsed = time.time() - rep_start
         logger.debug("Replication %s complete in %.3fs", rep_number, rep_elapsed)
+        self._notify_observers(
+            "on_replication_success",
+            rep_number,
+            seed,
+            rep_elapsed,
+            result,
+        )
         return result
 
     def _emit_to_sinks(self, output: SimulationOutput[TResult, TAggregate]) -> None:
@@ -141,3 +155,15 @@ class SimulationRunner(Generic[TResult, TAggregate]):
                 sink_name,
                 sink_elapsed,
             )
+
+    def _notify_observers(self, method_name: str, *args: object) -> None:
+        """Dispatch lifecycle notifications to registered observers."""
+        for observer in self.observers:
+            try:
+                getattr(observer, method_name)(*args)
+            except Exception:
+                logger.exception(
+                    "Simulation observer %s failed handling %s",
+                    observer.__class__.__name__,
+                    method_name,
+                )
