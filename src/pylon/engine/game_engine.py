@@ -40,6 +40,7 @@ from ..models.defense import (
 from ..models.specialteams import (
     DefaultPuntDistanceModel,
     DefaultPuntReturnDistanceModel,
+    DefaultFieldGoalModel,
     DefaultKickoffReturnDistanceModel,
     DefaultKickoffDistanceModel,
     DefaultKickoffTouchbackDecisionModel,
@@ -152,6 +153,7 @@ class GameEngine:
         self.models.register_model(DefaultPuntReturnerSelectionModel())
         self.models.register_model(DefaultPuntDistanceModel())
         self.models.register_model(DefaultPuntReturnDistanceModel())
+        self.models.register_model(DefaultFieldGoalModel())
         self.models.register_model(DefaultKickerSelectionModel())
         self.models.register_model(DefaultPlayTimeElapsedModel())
         self.models.register_model(DefaultPrePlayClockRunoffModel())

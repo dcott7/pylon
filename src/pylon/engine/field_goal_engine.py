@@ -36,22 +36,31 @@ class FieldGoalPlayEngine:
 
     def run(self) -> None:
         assert self.play_data.play_type == PlayTypeEnum.FIELD_GOAL
+        self.play_data.set_is_fg_attempt(True)
 
         # Assign personnel for this field goal play
         self.assign_personnel()
 
         kicker = self.get_kicker()
         is_fg_good = self.is_fg_good(kicker)
+        self.play_data.set_fg_good(is_fg_good)
 
         yards_gained: int = 0
         if is_fg_good:
             yards_gained = (
                 self.game_state.possession.ball_position
             )  # yards to goal line
+            self.play_data.set_is_possession_change(False)
+            self.play_data.set_is_turnover(False)
             logger.debug(
                 f"Field Goal is GOOD. Yards Gained: {yards_gained} "
                 "(field goal distance)"
             )
+        else:
+            # Missed field goal: defense takes over at the current spot.
+            self.play_data.set_is_possession_change(True)
+            self.play_data.set_is_turnover(True)
+            logger.debug("Field Goal is NO GOOD. Possession changes.")
 
         self.play_data.set_yards_gained(yards_gained)
         logger.debug(f"Field Goal Play Yards Gained: {yards_gained}")

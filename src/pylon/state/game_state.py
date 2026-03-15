@@ -477,6 +477,11 @@ class GameStateUpdater:
 
         if play_data.is_fg_attempt:
             GameStateUpdater._update_scoring(game_state, play_data, league_rules)
+            if play_data.fg_good:
+                return
+
+            # Missed field goals should still update possession.
+            GameStateUpdater._update_possession(game_state, play_data, league_rules)
             return
 
         # Skip scoring for kickoffs/punts - they don't result in scores by themselves
